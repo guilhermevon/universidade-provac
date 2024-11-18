@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Link, useLocation } from 'react-router-dom';
-import { FaUser } from 'react-icons/fa';
-import { HiOutlineVideoCamera, HiOutlineViewBoards, HiOutlineBookOpen, HiOutlineAcademicCap, HiDocumentDuplicate, HiChartBar, HiOutlineUserGroup } from 'react-icons/hi';
-import { FiLogIn } from 'react-icons/fi';
-import logoProvac from '../../assets/logo_provac.png';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Link, useLocation } from "react-router-dom";
+import { FaUser } from "react-icons/fa";
+import {
+  HiOutlineVideoCamera,
+  HiOutlineViewBoards,
+  HiOutlineBookOpen,
+  HiOutlineAcademicCap,
+  HiDocumentDuplicate,
+  HiChartBar,
+  HiOutlineUserGroup,
+} from "react-icons/hi";
+import { FiLogIn } from "react-icons/fi";
+import logoProvac from "../../assets/logo_provac.png";
 
 // Assuming the main colors from the image are dark blue, red, and white:
 const NavbarContainer = styled.nav`
@@ -48,7 +56,7 @@ const NavLinks = styled.ul`
   justify-content: center;
 
   @media (max-width: 768px) {
-    display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+    display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
     flex-direction: column;
     width: 100%;
     position: absolute;
@@ -73,7 +81,7 @@ const NavLink = styled.li`
     }
 
     &.active {
-      background-color: #0D47A1; /* Red background */
+      background-color: #0d47a1; /* Red background */
       color: #fff;
       font-weight: bold;
     }
@@ -172,11 +180,11 @@ const Sidebar = styled.div`
     padding: 10px;
 
     &:hover {
-      background-color: #0D47A1;
+      background-color: #0d47a1;
     }
 
     &.active {
-      background-color: #0D47A1; /* Red background for active items */
+      background-color: #0d47a1; /* Red background for active items */
       font-weight: bold;
       color: #fff;
     }
@@ -214,9 +222,9 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const role = sessionStorage.getItem('role');
-    const usuario = sessionStorage.getItem('usuario');
-    if (role === '1' && usuario === 'admin') {
+    const role = sessionStorage.getItem("role");
+    const usuario = sessionStorage.getItem("usuario");
+    if (role === "1" && usuario === "admin") {
       setIsAdmin(true);
     }
   }, []);
@@ -225,7 +233,16 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
-  const isGestorArea = ['/areagest', '/cursos', '/modulos', '/aulas', '/provas', '/documentacao', '/graficos', '/aprovacao'].includes(location.pathname);
+  const isGestorArea = [
+    "/areagest",
+    "/cursos",
+    "/modulos",
+    "/aulas",
+    "/provas",
+    "/documentacao",
+    "/graficos",
+    "/aprovacao",
+  ].includes(location.pathname);
 
   return (
     <>
@@ -235,12 +252,40 @@ const Navbar = () => {
           <LogoText>Provac University</LogoText>
         </LogoContainer>
         <NavLinks isOpen={isOpen}>
-          <NavLink><Link to="/home" className={location.pathname === '/home' ? 'active' : ''}>Home</Link></NavLink>
-          <NavLink><Link to="/courses" className={location.pathname === '/courses' ? 'active' : ''}>Cursos</Link></NavLink>
-          <NavLink><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>Sobre</Link></NavLink>
-          <NavLink><Link to="/cursos" className={location.pathname === '/cursos' ? 'active' : ''}>Área Gestor</Link></NavLink>
+          <NavLink>
+            <Link
+              to="/home"
+              className={location.pathname === "/home" ? "active" : ""}
+            >
+              Home
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link
+              to="/courses"
+              className={location.pathname === "/courses" ? "active" : ""}
+            >
+              Cursos
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link
+              to="/about"
+              className={location.pathname === "/about" ? "active" : ""}
+            >
+              Sobre
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link
+              to="/cursos"
+              className={location.pathname === "/cursos" ? "active" : ""}
+            >
+              Área Gestor
+            </Link>
+          </NavLink>
         </NavLinks>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <LoginLink>
             <FiLogIn />
             <Link to="/login">Login</Link>
@@ -259,44 +304,48 @@ const Navbar = () => {
       {isGestorArea && (
         <Sidebar>
           <ul>
-            <li className={location.pathname === '/cursos' ? 'active' : ''}>
+            <li className={location.pathname === "/cursos" ? "active" : ""}>
               <Link to="/cursos">
                 <HiOutlineVideoCamera />
                 Cursos
               </Link>
             </li>
-            <li className={location.pathname === '/modulos' ? 'active' : ''}>
+            <li className={location.pathname === "/modulos" ? "active" : ""}>
               <Link to="/modulos">
                 <HiOutlineViewBoards />
                 Módulos
               </Link>
             </li>
-            <li className={location.pathname === '/aulas' ? 'active' : ''}>
+            <li className={location.pathname === "/aulas" ? "active" : ""}>
               <Link to="/aulas">
                 <HiOutlineBookOpen />
                 Aulas
               </Link>
             </li>
-            <li className={location.pathname === '/provas' ? 'active' : ''}>
+            <li className={location.pathname === "/provas" ? "active" : ""}>
               <Link to="/provas">
                 <HiOutlineAcademicCap />
                 Provas
               </Link>
             </li>
-            <li className={location.pathname === '/documentacao' ? 'active' : ''}>
+            <li
+              className={location.pathname === "/documentacao" ? "active" : ""}
+            >
               <Link to="/documentacao">
                 <HiDocumentDuplicate />
                 Documentação
               </Link>
             </li>
-            <li className={location.pathname === '/graficos' ? 'active' : ''}>
+            <li className={location.pathname === "/graficos" ? "active" : ""}>
               <Link to="/graficos">
                 <HiChartBar />
                 Gráficos
               </Link>
             </li>
             {isAdmin && (
-              <li className={location.pathname === '/aprovacao' ? 'active' : ''}>
+              <li
+                className={location.pathname === "/aprovacao" ? "active" : ""}
+              >
                 <Link to="/aprovacao">
                   <HiOutlineAcademicCap />
                   Aprovação de Cursos

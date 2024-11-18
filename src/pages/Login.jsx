@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import styled, { createGlobalStyle } from "styled-components";
+import axios from "axios";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -150,25 +150,30 @@ const SecondaryButton = styled(Button)`
   }
 `;
 
+//Estrutura de Site------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [formType, setFormType] = useState('login');
+  const [formType, setFormType] = useState("login");
   const [departamentos, setDepartamentos] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
-  const [selectedDepartamento, setSelectedDepartamento] = useState('');
+  const [selectedDepartamento, setSelectedDepartamento] = useState("");
 
   useEffect(() => {
     const fetchDepartamentos = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.get('http://localhost:5000/api/departamentos', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:5000/api/departamentos",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setDepartamentos(response.data);
       } catch (error) {
-        console.error('Erro ao buscar departamentos:', error);
+        console.error("Erro ao buscar departamentos:", error);
       }
     };
 
@@ -178,16 +183,19 @@ const LoginPage = () => {
   useEffect(() => {
     if (selectedDepartamento) {
       const fetchFuncoes = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem("token");
         try {
-          const response = await axios.get(`http://localhost:5000/api/departamentos/${selectedDepartamento}/funcoes`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `http://localhost:5000/api/departamentos/${selectedDepartamento}/funcoes`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           setFuncoes(response.data);
         } catch (error) {
-          console.error('Erro ao buscar funções:', error);
+          console.error("Erro ao buscar funções:", error);
         }
       };
 
@@ -204,38 +212,46 @@ const LoginPage = () => {
 
     try {
       let response;
-      if (formType === 'login') {
-        response = await axios.post('http://localhost:5000/api/login', formData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true
-        });
+      if (formType === "login") {
+        response = await axios.post(
+          "http://localhost:5000/api/login",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
       } else {
-        response = await axios.post('http://localhost:5000/api/register', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          withCredentials: true
-        });
+        response = await axios.post(
+          "http://localhost:5000/api/register",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        );
         if (response.status === 201) {
-          setFormType('login');
+          setFormType("login");
           return;
         }
       }
 
       if (response.data.token) {
-        console.log('Login bem-sucedido:', response.data);
-        sessionStorage.setItem('token', response.data.token);
-        sessionStorage.setItem('userId', response.data.user.id);
-        sessionStorage.setItem('role', response.data.user.role);
-        sessionStorage.setItem('usuario', response.data.user.usuario);
-        navigate('/courses');
+        console.log("Login bem-sucedido:", response.data);
+        sessionStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("userId", response.data.user.id);
+        sessionStorage.setItem("role", response.data.user.role);
+        sessionStorage.setItem("usuario", response.data.user.usuario);
+        navigate("/courses");
       } else {
-        console.error('Erro de autenticação:', response.data);
+        console.error("Erro de autenticação:", response.data);
       }
     } catch (error) {
-      console.error('Erro:', error);
+      console.error("Erro:", error);
     }
   };
 
@@ -244,9 +260,9 @@ const LoginPage = () => {
       <GlobalStyle />
       <PageWrapper>
         <FormWrapper>
-          <FormTitle>{formType === 'login' ? 'Login' : 'Cadastrar'}</FormTitle>
+          <FormTitle>{formType === "login" ? "Login" : "Cadastrar"}</FormTitle>
           <form onSubmit={handleSubmit}>
-            {formType === 'register' && (
+            {formType === "register" && (
               <>
                 <FormField>
                   <Label htmlFor="usuario">Nome completo</Label>
@@ -262,6 +278,8 @@ const LoginPage = () => {
                     required
                   >
                     <option value="">Selecione um departamento</option>
+                    <option value="">RH</option>
+                    <option value="">PMO</option>
                     {departamentos.map((dp, index) => (
                       <option key={index} value={dp.dp}>
                         {dp.dp}
@@ -273,6 +291,8 @@ const LoginPage = () => {
                   <Label htmlFor="funcao">Função</Label>
                   <Select id="funcao" name="funcao" required>
                     <option value="">Selecione uma função</option>
+                    <option value="">Desenvolvedor jr</option>
+                    <option value="">Analista 1</option>
                     {funcoes.map((funcao) => (
                       <option key={funcao.id} value={funcao.funcao}>
                         {funcao.funcao}
@@ -286,7 +306,13 @@ const LoginPage = () => {
                 </FormField>
                 <FormField>
                   <Label htmlFor="foto">Foto</Label>
-                  <Input id="foto" name="foto" type="file" accept="image/*" required />
+                  <Input
+                    id="foto"
+                    name="foto"
+                    type="file"
+                    accept="image/*"
+                    required
+                  />
                 </FormField>
               </>
             )}
@@ -298,10 +324,16 @@ const LoginPage = () => {
               <Label htmlFor="password">Senha</Label>
               <Input id="password" name="password" type="password" required />
             </FormField>
-            <Button type="submit">{formType === 'login' ? 'Log In' : 'Cadastrar'}</Button>
+            <Button type="submit">
+              {formType === "login" ? "Log In" : "Cadastrar"}
+            </Button>
           </form>
-          <SecondaryButton onClick={() => setFormType(formType === 'login' ? 'register' : 'login')}>
-            {formType === 'login' ? 'Criar uma conta' : 'Já tenho uma conta'}
+          <SecondaryButton
+            onClick={() =>
+              setFormType(formType === "login" ? "register" : "login")
+            }
+          >
+            {formType === "login" ? "Criar uma conta" : "Já tenho uma conta"}
           </SecondaryButton>
         </FormWrapper>
       </PageWrapper>
