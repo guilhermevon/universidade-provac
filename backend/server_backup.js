@@ -41,7 +41,7 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || "fallback_secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // true em produção, false em desenvolvimento
