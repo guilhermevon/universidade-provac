@@ -325,7 +325,7 @@ const LoginPage = () => {
               <Input id="password" name="password" type="password" required />
             </FormField>
             <Button type="submit">
-              {formType === "login" ? "Log In" : "Cadastrar"}
+              {formType === "login" ? "Entrar" : "Cadastrar"}
             </Button>
           </form>
           <SecondaryButton

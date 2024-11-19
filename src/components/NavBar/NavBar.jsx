@@ -112,6 +112,8 @@ const ToggleButton = styled.div`
 
 const LoginLink = styled.div`
   display: flex;
+  position: relative;
+  z-index: 10;
   align-items: center;
   gap: 0.5rem;
 
@@ -249,7 +251,7 @@ const Navbar = () => {
       <NavbarContainer>
         <LogoContainer>
           <LogoImage src={logoProvac} alt="Provac Logo" />
-          <LogoText>Provac University</LogoText>
+          <LogoText>Universidade Provac</LogoText>
         </LogoContainer>
         <NavLinks isOpen={isOpen}>
           <NavLink>

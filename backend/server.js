@@ -103,7 +103,7 @@ app.post("/api/register", upload.single("foto"), async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.educ_users (usuario, email, senha, funcao, dp, matricula, role, foto) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+      "INSERT INTO educ_system.educ_users (usuario, email, senha, funcao, dp, matricula, role, foto) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [
         usuario,
         email,
@@ -151,7 +151,7 @@ app.post("/api/login", async (req, res) => {
   try {
     // Primeiro, consulta o banco de dados PostgreSQL para buscar o usuário pelo email
     const result = await pool.query(
-      "SELECT * FROM departamento_pessoal.educ_users WHERE email = $1",
+      "SELECT * FROM educ_system.educ_users WHERE email = $1",
       [email]
     );
 
@@ -228,7 +228,7 @@ app.get("/api/courses", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
-       FROM departamento_pessoal.courses
+       FROM educ_system.courses
        WHERE status = 'aprovado' 
        ORDER BY dp, title`
     );
@@ -261,7 +261,7 @@ app.post("/api/manage-courses", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.courses (title, subtitle, img, dp, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      "INSERT INTO educ_system.courses (title, subtitle, img, dp, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [title, subtitle, img, dp, status]
     );
     res.status(201).json(result.rows[0]);
@@ -276,7 +276,7 @@ app.get("/api/course/:id", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
-       FROM departamento_pessoal.courses 
+       FROM educ_system.courses 
        WHERE id = $1`,
       [id]
     );
@@ -303,11 +303,11 @@ app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
         a.descricao,
         a.nro_aula
        FROM 
-        departamento_pessoal.courses c
+        educ_system.courses c
        JOIN 
-        departamento_pessoal.aulas a ON c.id = a.course_id
+        educ_system.aulas a ON c.id = a.course_id
        JOIN
-        departamento_pessoal.modules m ON a.module_id = m.id
+        educ_system.modules m ON a.module_id = m.id
        WHERE c.id = $1
        ORDER BY m.name, a.nro_aula`,
       [id]
@@ -349,7 +349,7 @@ app.post("/api/course/video-progress", authenticateJWT, async (req, res) => {
 
   try {
     const userResult = await pool.query(
-      "SELECT id FROM departamento_pessoal.educ_users WHERE id = $1",
+      "SELECT id FROM educ_system.educ_users WHERE id = $1",
       [userId]
     );
 
@@ -358,7 +358,7 @@ app.post("/api/course/video-progress", authenticateJWT, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO departamento_pessoal.video_progress (user_id, course_id, nro_aula, progress) 
+      `INSERT INTO educ_system.video_progress (user_id, course_id, nro_aula, progress) 
        VALUES ($1, $2, $3, $4) 
        ON CONFLICT (user_id, course_id, nro_aula) 
        DO UPDATE SET progress = $4, last_watched = CURRENT_TIMESTAMP
@@ -391,9 +391,9 @@ app.get(
     try {
       const result = await pool.query(
         `SELECT DISTINCT ON (c.id) vp.course_id, c.title, c.subtitle, c.img, vp.progress, vp.nro_aula, a.url
-       FROM departamento_pessoal.video_progress vp
-       JOIN departamento_pessoal.courses c ON vp.course_id = c.id
-       JOIN departamento_pessoal.aulas a ON vp.nro_aula = a.nro_aula AND vp.course_id = a.course_id
+       FROM educ_system.video_progress vp
+       JOIN educ_system.courses c ON vp.course_id = c.id
+       JOIN educ_system.aulas a ON vp.nro_aula = a.nro_aula AND vp.course_id = a.course_id
        WHERE vp.user_id = $1 AND vp.progress > 0
        ORDER BY c.id, vp.last_watched DESC`,
         [userId]
@@ -421,7 +421,7 @@ app.post(
 
     try {
       const userResult = await pool.query(
-        "SELECT id FROM departamento_pessoal.educ_users WHERE id = $1",
+        "SELECT id FROM educ_system.educ_users WHERE id = $1",
         [userId]
       );
 
@@ -430,7 +430,7 @@ app.post(
       }
 
       const pontuacaoResult = await pool.query(
-        "SELECT * FROM departamento_pessoal.pontuacoes WHERE user_id = $1 AND course_id = $2 AND nro_aula = $3",
+        "SELECT * FROM educ_system.pontuacoes WHERE user_id = $1 AND course_id = $2 AND nro_aula = $3",
         [userId, courseId, aulaId]
       );
 
@@ -441,7 +441,7 @@ app.post(
       }
 
       const result = await pool.query(
-        `INSERT INTO departamento_pessoal.pontuacoes (user_id, course_id, nro_aula, pontos_obtidos)
+        `INSERT INTO educ_system.pontuacoes (user_id, course_id, nro_aula, pontos_obtidos)
        VALUES ($1, $2, $3, 20)
        RETURNING *`,
         [userId, courseId, aulaId]
@@ -469,7 +469,7 @@ app.post(
 
     try {
       const userResult = await pool.query(
-        "SELECT id FROM departamento_pessoal.educ_users WHERE id = $1",
+        "SELECT id FROM educ_system.educ_users WHERE id = $1",
         [userId]
       );
 
@@ -479,7 +479,7 @@ app.post(
 
       const aulasResult = await pool.query(
         `SELECT a.nro_aula
-       FROM departamento_pessoal.aulas a
+       FROM educ_system.aulas a
        WHERE a.course_id = $1 AND a.modulo = $2`,
         [courseId, moduloId]
       );
@@ -488,7 +488,7 @@ app.post(
 
       const pontuacoesResult = await pool.query(
         `SELECT p.nro_aula
-       FROM departamento_pessoal.pontuacoes p
+       FROM educ_system.pontuacoes p
        WHERE p.user_id = $1 AND p.course_id = $2 AND p.nro_aula = ANY($3::INTEGER[])`,
         [userId, courseId, aulas.map((aula) => aula.nro_aula)]
       );
@@ -497,7 +497,7 @@ app.post(
 
       if (pontuacoes.length === aulas.length) {
         const result = await pool.query(
-          `INSERT INTO departamento_pessoal.pontuacoes (user_id, course_id, nro_aula, pontos_obtidos)
+          `INSERT INTO educ_system.pontuacoes (user_id, course_id, nro_aula, pontos_obtidos)
          VALUES ($1, $2, NULL, 40)
          RETURNING *`,
           [userId, courseId]
@@ -532,13 +532,13 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 
     // Delete from respostas_usuario
     const deleteRespostasUsuarioQuery = `
-      DELETE FROM departamento_pessoal.respostas_usuario 
+      DELETE FROM educ_system.respostas_usuario 
       WHERE id_tentativa IN (
-        SELECT id_tentativa FROM departamento_pessoal.tentativas_prova 
+        SELECT id_tentativa FROM educ_system.tentativas_prova 
         WHERE id_prova IN (
-          SELECT id_prova FROM departamento_pessoal.provas 
+          SELECT id_prova FROM educ_system.provas 
           WHERE id_modulo IN (
-            SELECT id FROM departamento_pessoal.modules WHERE course_id = $1
+            SELECT id FROM educ_system.modules WHERE course_id = $1
           )
         )
       )
@@ -547,11 +547,11 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 
     // Delete from tentativas_prova
     const deleteTentativasProvaQuery = `
-      DELETE FROM departamento_pessoal.tentativas_prova 
+      DELETE FROM educ_system.tentativas_prova 
       WHERE id_prova IN (
-        SELECT id_prova FROM departamento_pessoal.provas 
+        SELECT id_prova FROM educ_system.provas 
         WHERE id_modulo IN (
-          SELECT id FROM departamento_pessoal.modules WHERE course_id = $1
+          SELECT id FROM educ_system.modules WHERE course_id = $1
         )
       )
     `;
@@ -559,13 +559,13 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 
     // Delete from alternativas
     const deleteAlternativasQuery = `
-      DELETE FROM departamento_pessoal.alternativas 
+      DELETE FROM educ_system.alternativas 
       WHERE id_questao IN (
-        SELECT id_questao FROM departamento_pessoal.questoes 
+        SELECT id_questao FROM educ_system.questoes 
         WHERE id_prova IN (
-          SELECT id_prova FROM departamento_pessoal.provas 
+          SELECT id_prova FROM educ_system.provas 
           WHERE id_modulo IN (
-            SELECT id FROM departamento_pessoal.modules WHERE course_id = $1
+            SELECT id FROM educ_system.modules WHERE course_id = $1
           )
         )
       )
@@ -574,11 +574,11 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 
     // Delete from questoes
     const deleteQuestoesQuery = `
-      DELETE FROM departamento_pessoal.questoes 
+      DELETE FROM educ_system.questoes 
       WHERE id_prova IN (
-        SELECT id_prova FROM departamento_pessoal.provas 
+        SELECT id_prova FROM educ_system.provas 
         WHERE id_modulo IN (
-          SELECT id FROM departamento_pessoal.modules WHERE course_id = $1
+          SELECT id FROM educ_system.modules WHERE course_id = $1
         )
       )
     `;
@@ -586,36 +586,36 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 
     // Delete from provas
     const deleteProvasQuery = `
-      DELETE FROM departamento_pessoal.provas 
+      DELETE FROM educ_system.provas 
       WHERE id_modulo IN (
-        SELECT id FROM departamento_pessoal.modules WHERE course_id = $1
+        SELECT id FROM educ_system.modules WHERE course_id = $1
       )
     `;
     await client.query(deleteProvasQuery, [id]);
 
     // Delete from pontuacoes
     const deletePontuacoesQuery =
-      "DELETE FROM departamento_pessoal.pontuacoes WHERE course_id = $1";
+      "DELETE FROM educ_system.pontuacoes WHERE course_id = $1";
     await client.query(deletePontuacoesQuery, [id]);
 
     // Delete from video_progress
     const deleteVideoProgressQuery =
-      "DELETE FROM departamento_pessoal.video_progress WHERE course_id = $1";
+      "DELETE FROM educ_system.video_progress WHERE course_id = $1";
     await client.query(deleteVideoProgressQuery, [id]);
 
     // Delete from aulas
     const deleteAulasQuery =
-      "DELETE FROM departamento_pessoal.aulas WHERE course_id = $1";
+      "DELETE FROM educ_system.aulas WHERE course_id = $1";
     await client.query(deleteAulasQuery, [id]);
 
     // Delete from modules
     const deleteModulesQuery =
-      "DELETE FROM departamento_pessoal.modules WHERE course_id = $1";
+      "DELETE FROM educ_system.modules WHERE course_id = $1";
     await client.query(deleteModulesQuery, [id]);
 
     // Finally, delete the course
     const deleteCourseQuery =
-      "DELETE FROM departamento_pessoal.courses WHERE id = $1 RETURNING *";
+      "DELETE FROM educ_system.courses WHERE id = $1 RETURNING *";
     const result = await client.query(deleteCourseQuery, [id]);
 
     await client.query("COMMIT");
@@ -642,7 +642,7 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 app.get("/api/modules", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM departamento_pessoal.modules ORDER BY name"
+      "SELECT * FROM educ_system.modules ORDER BY name"
     );
     res.json(result.rows);
   } catch (error) {
@@ -662,7 +662,7 @@ app.post("/api/manage-modules", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.modules (name, description, course_id) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO educ_system.modules (name, description, course_id) VALUES ($1, $2, $3) RETURNING *",
       [name, description, course_id]
     );
     res.status(201).json(result.rows[0]);
@@ -686,11 +686,11 @@ app.delete("/api/module/:id", authenticateJWT, async (req, res) => {
     await client.query("BEGIN");
 
     const deleteAulasQuery =
-      "UPDATE departamento_pessoal.aulas SET module_id = NULL WHERE module_id = $1";
+      "UPDATE educ_system.aulas SET module_id = NULL WHERE module_id = $1";
     await client.query(deleteAulasQuery, [id]);
 
     const deleteModuleQuery =
-      "DELETE FROM departamento_pessoal.modules WHERE id = $1 RETURNING *";
+      "DELETE FROM educ_system.modules WHERE id = $1 RETURNING *";
     const result = await client.query(deleteModuleQuery, [id]);
 
     await client.query("COMMIT");
@@ -721,7 +721,7 @@ app.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.aulas (titulo, url, descricao, course_id, module_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      "INSERT INTO educ_system.aulas (titulo, url, descricao, course_id, module_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [title, url, description, course_id, module_id]
     );
     res.status(201).json(result.rows[0]);
@@ -736,7 +736,7 @@ app.get("/api/courses/:courseId/modules", authenticateJWT, async (req, res) => {
   const { courseId } = req.params;
   try {
     const result = await pool.query(
-      "SELECT id, name FROM departamento_pessoal.modules WHERE course_id = $1 ORDER BY name",
+      "SELECT id, name FROM educ_system.modules WHERE course_id = $1 ORDER BY name",
       [courseId]
     );
     res.json(result.rows);
@@ -755,7 +755,7 @@ app.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "DELETE FROM departamento_pessoal.aulas WHERE id = $1 RETURNING *",
+      "DELETE FROM educ_system.aulas WHERE id = $1 RETURNING *",
       [id]
     );
 
@@ -783,11 +783,11 @@ app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
         a.descricao,
         a.nro_aula
        FROM 
-        departamento_pessoal.courses c
+        educ_system.courses c
        JOIN 
-        departamento_pessoal.aulas a ON c.id = a.course_id
+        educ_system.aulas a ON c.id = a.course_id
        JOIN
-        departamento_pessoal.modules m ON a.module_id = m.id
+        educ_system.modules m ON a.module_id = m.id
        WHERE c.id = $1
        ORDER BY m.name, a.nro_aula`,
       [id]
@@ -801,11 +801,11 @@ app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
         p.descricao,
         p.duracao
        FROM 
-        departamento_pessoal.courses c
+        educ_system.courses c
        JOIN 
-        departamento_pessoal.provas p ON c.id = p.id_modulo
+        educ_system.provas p ON c.id = p.id_modulo
        JOIN
-        departamento_pessoal.modules m ON p.id_modulo = m.id
+        educ_system.modules m ON p.id_modulo = m.id
        WHERE c.id = $1
        ORDER BY m.name, p.titulo`,
       [id]
@@ -844,7 +844,7 @@ app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id_questao, tipo_questao, enunciado, pontuacao, ordem
-       FROM departamento_pessoal.questoes
+       FROM educ_system.questoes
        WHERE id_prova = $1
        ORDER BY ordem`,
       [id]
@@ -856,7 +856,7 @@ app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
       questoes.map(async (questao) => {
         const alternativasResult = await pool.query(
           `SELECT id_alternativa, texto_alternativa, correta, ordem
-         FROM departamento_pessoal.alternativas
+         FROM educ_system.alternativas
          WHERE id_questao = $1
          ORDER BY ordem`,
           [questao.id_questao]
@@ -893,7 +893,7 @@ app.post("/api/manage-provas", authenticateJWT, async (req, res) => {
     await client.query("BEGIN");
 
     const resultProva = await client.query(
-      `INSERT INTO departamento_pessoal.provas (id_modulo, titulo, descricao, duracao, nota_minima_aprovacao, data_criacao, data_atualizacao) 
+      `INSERT INTO educ_system.provas (id_modulo, titulo, descricao, duracao, nota_minima_aprovacao, data_criacao, data_atualizacao) 
        VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *`,
       [moduloId, titulo, descricao, duracao, nota_minima_aprovacao]
     );
@@ -902,7 +902,7 @@ app.post("/api/manage-provas", authenticateJWT, async (req, res) => {
 
     for (const questao of questoes) {
       const resultQuestao = await client.query(
-        `INSERT INTO departamento_pessoal.questoes (id_prova, tipo_questao, enunciado, pontuacao, ordem) 
+        `INSERT INTO educ_system.questoes (id_prova, tipo_questao, enunciado, pontuacao, ordem) 
          VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [
           provaId,
@@ -918,7 +918,7 @@ app.post("/api/manage-provas", authenticateJWT, async (req, res) => {
       if (questao.tipo_questao === "multipla_escolha") {
         for (const alternativa of questao.alternativas) {
           await client.query(
-            `INSERT INTO departamento_pessoal.alternativas (id_questao, texto_alternativa, correta, ordem) 
+            `INSERT INTO educ_system.alternativas (id_questao, texto_alternativa, correta, ordem) 
              VALUES ($1, $2, $3, $4)`,
             [
               questaoId,
@@ -948,7 +948,7 @@ app.get("/api/prova/:id_prova/questoes", authenticateJWT, async (req, res) => {
 
   try {
     const questoesResult = await pool.query(
-      "SELECT q.id_questao, q.enunciado, q.tipo_questao, a.id_alternativa, a.texto_alternativa, a.correta FROM departamento_pessoal.questoes q LEFT JOIN departamento_pessoal.alternativas a ON q.id_questao = a.id_questao WHERE q.id_prova = $1 ORDER BY q.ordem, a.ordem",
+      "SELECT q.id_questao, q.enunciado, q.tipo_questao, a.id_alternativa, a.texto_alternativa, a.correta FROM educ_system.questoes q LEFT JOIN educ_system.alternativas a ON q.id_questao = a.id_questao WHERE q.id_prova = $1 ORDER BY q.ordem, a.ordem",
       [id_prova]
     );
 
@@ -990,12 +990,12 @@ app.get("/api/course/:id/provas", authenticateJWT, async (req, res) => {
       `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
               q.id_questao, q.tipo_questao, q.enunciado, q.pontuacao, q.ordem AS questao_ordem, 
               a.id_alternativa, a.texto_alternativa, a.correta, a.ordem AS alternativa_ordem
-       FROM departamento_pessoal.provas p
-       LEFT JOIN departamento_pessoal.questoes q ON q.id_prova = p.id_prova
-       LEFT JOIN departamento_pessoal.alternativas a ON a.id_questao = q.id_questao
+       FROM educ_system.provas p
+       LEFT JOIN educ_system.questoes q ON q.id_prova = p.id_prova
+       LEFT JOIN educ_system.alternativas a ON a.id_questao = q.id_questao
        WHERE p.id_modulo IN (
          SELECT m.id
-         FROM departamento_pessoal.modules m
+         FROM educ_system.modules m
          WHERE m.course_id = $1
        )`,
       [id]
@@ -1081,7 +1081,7 @@ app.post("/api/respostas", authenticateJWT, async (req, res) => {
     await client.query("BEGIN");
 
     const insertTentativaQuery = `
-      INSERT INTO departamento_pessoal.tentativas_prova (id_prova, id_usuario, data_inicio, status)
+      INSERT INTO educ_system.tentativas_prova (id_prova, id_usuario, data_inicio, status)
       VALUES ($1, $2, CURRENT_TIMESTAMP, 'em andamento')
       RETURNING id_tentativa
     `;
@@ -1093,7 +1093,7 @@ app.post("/api/respostas", authenticateJWT, async (req, res) => {
     const tentativaId = tentativaResult.rows[0].id_tentativa;
 
     const insertRespostasQuery = `
-      INSERT INTO departamento_pessoal.respostas_usuario (id_tentativa, id_questao, id_alternativa, resposta_texto, pontuacao_obtida)
+      INSERT INTO educ_system.respostas_usuario (id_tentativa, id_questao, id_alternativa, resposta_texto, pontuacao_obtida)
       VALUES ($1, $2, $3, $4, 0)
     `;
 
@@ -1122,7 +1122,7 @@ app.post("/api/exam/start", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.tentativas_prova (id_prova, id_usuario, data_inicio, status) VALUES ($1, $2, $3, $4) RETURNING id_tentativa",
+      "INSERT INTO educ_system.tentativas_prova (id_prova, id_usuario, data_inicio, status) VALUES ($1, $2, $3, $4) RETURNING id_tentativa",
       [id_prova, id_usuario, data_inicio, status]
     );
 
@@ -1141,19 +1141,19 @@ app.post("/api/exam/submit", authenticateJWT, async (req, res) => {
     await client.query("BEGIN");
 
     await client.query(
-      "UPDATE departamento_pessoal.tentativas_prova SET status = $1, data_fim = $2 WHERE id_tentativa = $3 AND id_usuario = $4",
+      "UPDATE educ_system.tentativas_prova SET status = $1, data_fim = $2 WHERE id_tentativa = $3 AND id_usuario = $4",
       [status, endTime, attemptId, userId]
     );
 
     for (const [questionId, answer] of Object.entries(answers)) {
       if (typeof answer === "string") {
         await client.query(
-          "INSERT INTO departamento_pessoal.respostas_usuario (id_tentativa, id_questao, resposta_texto) VALUES ($1, $2, $3)",
+          "INSERT INTO educ_system.respostas_usuario (id_tentativa, id_questao, resposta_texto) VALUES ($1, $2, $3)",
           [attemptId, questionId, answer]
         );
       } else {
         await client.query(
-          "INSERT INTO departamento_pessoal.respostas_usuario (id_tentativa, id_questao, id_alternativa) VALUES ($1, $2, $3)",
+          "INSERT INTO educ_system.respostas_usuario (id_tentativa, id_questao, id_alternativa) VALUES ($1, $2, $3)",
           [attemptId, questionId, answer]
         );
       }
@@ -1177,7 +1177,7 @@ app.get("/api/rankings", authenticateJWT, async (req, res) => {
   try {
     // Fetch the user details
     const userResult = await pool.query(
-      "SELECT dp FROM departamento_pessoal.educ_users WHERE id = $1",
+      "SELECT dp FROM educ_system.educ_users WHERE id = $1",
       [id]
     );
     const user = userResult.rows[0];
@@ -1190,20 +1190,20 @@ app.get("/api/rankings", authenticateJWT, async (req, res) => {
 
     // Fetch global rankings
     const globalRankingsResult = await pool.query(
-      "SELECT usuario, total_pontos FROM departamento_pessoal.educ_users ORDER BY total_pontos DESC LIMIT 3"
+      "SELECT usuario, total_pontos FROM educ_system.educ_users ORDER BY total_pontos DESC LIMIT 3"
     );
     const globalRankings = globalRankingsResult.rows;
 
     // Fetch personal rank
     const personalRankResult = await pool.query(
-      "SELECT usuario, total_pontos FROM departamento_pessoal.educ_users WHERE id = $1",
+      "SELECT usuario, total_pontos FROM educ_system.educ_users WHERE id = $1",
       [id]
     );
     const personalRank = personalRankResult.rows[0];
 
     // Fetch department rankings
     const departmentRankingsResult = await pool.query(
-      "SELECT usuario, total_pontos FROM departamento_pessoal.educ_users WHERE dp = $1 ORDER BY total_pontos DESC LIMIT 3",
+      "SELECT usuario, total_pontos FROM educ_system.educ_users WHERE dp = $1 ORDER BY total_pontos DESC LIMIT 3",
       [dp]
     );
     const departmentRankings = departmentRankingsResult.rows;
@@ -1229,9 +1229,9 @@ app.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
 
     // Delete from respostas_usuario
     const deleteRespostasUsuarioQuery = `
-      DELETE FROM departamento_pessoal.respostas_usuario 
+      DELETE FROM educ_system.respostas_usuario 
       WHERE id_tentativa IN (
-        SELECT id_tentativa FROM departamento_pessoal.tentativas_prova 
+        SELECT id_tentativa FROM educ_system.tentativas_prova 
         WHERE id_prova = $1
       )
     `;
@@ -1239,16 +1239,16 @@ app.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
 
     // Delete from tentativas_prova
     const deleteTentativasProvaQuery = `
-      DELETE FROM departamento_pessoal.tentativas_prova 
+      DELETE FROM educ_system.tentativas_prova 
       WHERE id_prova = $1
     `;
     await client.query(deleteTentativasProvaQuery, [id_prova]);
 
     // Delete from alternativas
     const deleteAlternativasQuery = `
-      DELETE FROM departamento_pessoal.alternativas 
+      DELETE FROM educ_system.alternativas 
       WHERE id_questao IN (
-        SELECT id_questao FROM departamento_pessoal.questoes 
+        SELECT id_questao FROM educ_system.questoes 
         WHERE id_prova = $1
       )
     `;
@@ -1256,14 +1256,14 @@ app.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
 
     // Delete from questoes
     const deleteQuestoesQuery = `
-      DELETE FROM departamento_pessoal.questoes 
+      DELETE FROM educ_system.questoes 
       WHERE id_prova = $1
     `;
     await client.query(deleteQuestoesQuery, [id_prova]);
 
     // Finally, delete the prova
     const deleteProvaQuery =
-      "DELETE FROM departamento_pessoal.provas WHERE id_prova = $1 RETURNING *";
+      "DELETE FROM educ_system.provas WHERE id_prova = $1 RETURNING *";
     const result = await client.query(deleteProvaQuery, [id_prova]);
 
     await client.query("COMMIT");
@@ -1292,12 +1292,12 @@ app.get("/api/course/:courseId/provas", authenticateJWT, async (req, res) => {
       `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
               q.id_questao, q.tipo_questao, q.enunciado, q.pontuacao, q.ordem AS questao_ordem, 
               a.id_alternativa, a.texto_alternativa, a.correta, a.ordem AS alternativa_ordem
-       FROM departamento_pessoal.provas p
-       LEFT JOIN departamento_pessoal.questoes q ON q.id_prova = p.id_prova
-       LEFT JOIN departamento_pessoal.alternativas a ON a.id_questao = q.id_questao
+       FROM educ_system.provas p
+       LEFT JOIN educ_system.questoes q ON q.id_prova = p.id_prova
+       LEFT JOIN educ_system.alternativas a ON a.id_questao = q.id_questao
        WHERE p.id_modulo IN (
          SELECT m.id
-         FROM departamento_pessoal.modules m
+         FROM educ_system.modules m
          WHERE m.course_id = $1
        )`,
       [courseId]
@@ -1377,7 +1377,7 @@ app.get("/api/course/:courseId/provas", authenticateJWT, async (req, res) => {
 app.get("/api/departamentos", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT DISTINCT dp FROM departamento_pessoal.funcoes ORDER BY dp"
+      "SELECT DISTINCT dp FROM educ_system.funcoes ORDER BY dp"
     );
     res.json(result.rows);
   } catch (error) {
@@ -1391,7 +1391,7 @@ app.get("/api/departamentos/:dp/funcoes", authenticateJWT, async (req, res) => {
   const { dp } = req.params;
   try {
     const result = await pool.query(
-      "SELECT id, funcao FROM departamento_pessoal.funcoes WHERE dp = $1 ORDER BY funcao",
+      "SELECT id, funcao FROM educ_system.funcoes WHERE dp = $1 ORDER BY funcao",
       [dp]
     );
     res.json(result.rows);
@@ -1409,7 +1409,7 @@ app.get(
 
     try {
       const userResult = await pool.query(
-        "SELECT funcao FROM departamento_pessoal.educ_users WHERE id = $1",
+        "SELECT funcao FROM educ_system.educ_users WHERE id = $1",
         [userId]
       );
       if (userResult.rows.length === 0) {
@@ -1420,9 +1420,9 @@ app.get(
 
       const mandatoryCoursesResult = await pool.query(
         `SELECT c.id, c.title, c.subtitle, c.img 
-       FROM departamento_pessoal.courses c
-       JOIN departamento_pessoal.cursos_obrigatorios co ON c.id = co.id_curso
-       JOIN departamento_pessoal.funcoes f ON co.id_funcao = f.id
+       FROM educ_system.courses c
+       JOIN educ_system.cursos_obrigatorios co ON c.id = co.id_curso
+       JOIN educ_system.funcoes f ON co.id_funcao = f.id
        WHERE f.funcao = $1`,
         [userFuncao]
       );
@@ -1445,7 +1445,7 @@ app.post("/api/mandatory-course", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO departamento_pessoal.cursos_obrigatorios (id_curso, id_funcao) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO educ_system.cursos_obrigatorios (id_curso, id_funcao) VALUES ($1, $2) RETURNING *",
       [courseId, funcaoId]
     );
     res.status(201).json({
@@ -1462,7 +1462,7 @@ app.post("/api/mandatory-course", authenticateJWT, async (req, res) => {
 app.get("/api/funcoes", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, funcao, dp FROM departamento_pessoal.funcoes ORDER BY dp, funcao"
+      "SELECT id, funcao, dp FROM educ_system.funcoes ORDER BY dp, funcao"
     );
     res.json(result.rows);
   } catch (error) {
@@ -1475,7 +1475,7 @@ app.get("/api/courses/approval", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, title, subtitle, img, dp, status
-       FROM departamento_pessoal.courses 
+       FROM educ_system.courses 
        WHERE status = 'em aprovacao'`
     );
     res.json(result.rows);
@@ -1529,7 +1529,7 @@ app.post(
     try {
       // Buscar URLs das aulas do curso
       const result = await pool.query(
-        "SELECT url FROM departamento_pessoal.aulas WHERE course_id = $1",
+        "SELECT url FROM educ_system.aulas WHERE course_id = $1",
         [courseId]
       );
 
@@ -1561,14 +1561,14 @@ app.post(
 
       // Inserir documentação na tabela course_docs
       const docResult = await pool.query(
-        "INSERT INTO departamento_pessoal.course_docs (course_id, doc_title, doc_content) VALUES ($1, $2, $3) RETURNING id",
+        "INSERT INTO educ_system.course_docs (course_id, doc_title, doc_content) VALUES ($1, $2, $3) RETURNING id",
         [courseId, docTitle, fullText]
       );
       const docId = docResult.rows[0].id;
 
       // Inserir PDF encriptado na tabela encrypted_docs
       await pool.query(
-        "INSERT INTO departamento_pessoal.encrypted_docs (doc_id, encrypted_pdf) VALUES ($1, $2)",
+        "INSERT INTO educ_system.encrypted_docs (doc_id, encrypted_pdf) VALUES ($1, $2)",
         [docId, encryptedPDF]
       );
 
@@ -1619,7 +1619,7 @@ app.patch("/api/courses/approve", authenticateJWT, async (req, res) => {
     await client.query("BEGIN");
 
     const result = await pool.query(
-      `UPDATE departamento_pessoal.courses
+      `UPDATE educ_system.courses
        SET status = 'aprovado'
        WHERE id = ANY($1::int[])
        RETURNING *`,
@@ -1632,7 +1632,7 @@ app.patch("/api/courses/approve", authenticateJWT, async (req, res) => {
       const { id: courseId } = course;
 
       const resultAulas = await pool.query(
-        "SELECT url FROM departamento_pessoal.aulas WHERE course_id = $1",
+        "SELECT url FROM educ_system.aulas WHERE course_id = $1",
         [courseId]
       );
 
@@ -1717,7 +1717,7 @@ app.post("/api/course/:courseId/rating", authenticateJWT, async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO departamento_pessoal.curso_feedback (course_id, user_id, avaliacao, data_criacao)
+      `INSERT INTO educ_system.curso_feedback (course_id, user_id, avaliacao, data_criacao)
        VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *`,
       [courseId, userId, rating]
     );
