@@ -8,8 +8,27 @@ const Container = styled.div`
   align-items: center;
   margin-top: 200px;
   color: white;
-
   text-align: center; /* Centraliza o texto */
+
+  @media (max-width: 980px) {
+    width: 90%;
+    height: 70%;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    width: 90%;
+    height: 80%;
+    padding: 1em;
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    width: 95%;
+    height: 85%;
+    padding: 0.5em;
+    text-align: center;
+  }
 `;
 
 const Logo = styled.img`
@@ -29,8 +48,8 @@ const About = () => {
     <Container>
       <Logo src={logoProvac} alt="Provac Logo" />
       <Text>
-        A Universidade Provac é um sistema inovador desenvolvido para garantir
-        que o aprendizado dos colaboradores esteja sempre em dia. Com foco no
+        A Universidade Provac é um sistema desenvolvido para garantir que o
+        aprendizado dos colaboradores esteja sempre em dia. Com foco no
         desenvolvimento contínuo, a plataforma oferece uma experiência de
         aprendizado moderna, dinâmica e personalizada. Através de cursos,
         treinamentos e recursos interativos, a Universidade Provac capacita os
