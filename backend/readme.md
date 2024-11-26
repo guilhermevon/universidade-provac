@@ -6,3 +6,5 @@
 ### 2.cd universidade-provac
 ### 3.docker build -t universidade-provac .
 ### 4.docker run -d -p 9220:9220 universidade-provac
+
+*Sempre que for modificar o projeto, entrar no arquivo server-backup e mudar a linha 22 para "true" para ficar em teste e "false" para ambiente de produção...
