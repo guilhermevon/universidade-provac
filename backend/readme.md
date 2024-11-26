@@ -7,4 +7,4 @@
 ### 3.docker build -t universidade-provac .
 ### 4.docker run -d -p 9220:9220 universidade-provac
 
-*Sempre que for modificar o projeto, entrar no arquivo server-backup e mudar a linha 22 para "true" para ficar em teste e "false" para ambiente de produção...
+#### Sempre que for alterar o projeto entre no arquivo server_backup.js e altere a linha 46 para false, pois aí voce alterara apenas o ambiente de teste, porem para subir as alteracoes desfaça e muude para true, para subir para ambiente de desenvolvimento em produção.
