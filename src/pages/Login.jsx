@@ -278,13 +278,10 @@ const LoginPage = () => {
                     required
                   >
                     <option value="">Selecione um departamento</option>
-                    <option value="">RH</option>
-                    <option value="">PMO</option>
-                    {departamentos.map((dp, index) => (
-                      <option key={index} value={dp.dp}>
-                        {dp.dp}
-                      </option>
-                    ))}
+                    <option value="RH">RH</option>
+                    <option value="PMO">PMO</option>
+                    <option value="TI">TI</option>
+                    <option value="Financeiro">Financeiro</option>
                   </Select>
                 </FormField>
                 <FormField>

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import Navbar from '../components/NavBar/NavBar';
-import ReactPlayer from 'react-player';
-import axios from 'axios';
-import { FaStar } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import styled, { createGlobalStyle } from "styled-components";
+import Navbar from "../components/NavBar/NavBar";
+import ReactPlayer from "react-player";
+import axios from "axios";
+import { FaStar } from "react-icons/fa";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -113,12 +113,12 @@ const ModuleTitle = styled.div`
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0.5rem;
-  background-color: ${props => props.active ? '#948f8f' : 'transparent'};
+  background-color: ${(props) => (props.active ? "#948f8f" : "transparent")};
   border-radius: 4px;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: ${props => props.active ? '#634949' : '#333'};
+    background-color: ${(props) => (props.active ? "#634949" : "#333")};
   }
 `;
 
@@ -131,12 +131,12 @@ const AulaItem = styled.div`
   padding: 0.5rem;
   margin-left: 1rem;
   margin-top: 1rem;
-  background-color: ${props => props.active ? '#555' : 'transparent'};
+  background-color: ${(props) => (props.active ? "#555" : "transparent")};
   border-radius: 4px;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: ${props => props.active ? '#666' : '#444'};
+    background-color: ${(props) => (props.active ? "#666" : "#444")};
   }
 `;
 
@@ -146,12 +146,12 @@ const ExamItem = styled.div`
   padding: 0.5rem;
   margin-left: 1rem;
   margin-top: 1rem;
-  background-color: ${props => props.active ? '#555' : 'transparent'};
+  background-color: ${(props) => (props.active ? "#555" : "transparent")};
   border-radius: 4px;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: ${props => props.active ? '#666' : '#444'};
+    background-color: ${(props) => (props.active ? "#666" : "#444")};
   }
 `;
 
@@ -172,7 +172,7 @@ const RatingButton = styled.button`
   padding: 0.5rem 1.5rem;
   font-size: 1.2rem;
   color: #fff;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -188,26 +188,29 @@ const Course = () => {
   const [modules, setModules] = useState({});
   const [openModules, setOpenModules] = useState([]);
   const [selectedAula, setSelectedAula] = useState(null);
-  const [courseInfo, setCourseInfo] = useState({ title: '', descricao: '' });
+  const [courseInfo, setCourseInfo] = useState({ title: "", descricao: "" });
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState(null);
   const [rating, setRating] = useState(0); // Estado para armazenar a avaliação do usuário
-  const userId = sessionStorage.getItem('userId'); // Pegando userId do sessionStorage
+  const userId = sessionStorage.getItem("userId"); // Pegando userId do sessionStorage
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
     if (!token) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     const fetchCourseData = async () => {
       try {
-        const responseAulas = await axios.get(`http://localhost:5000/api/course/${id}/aulas`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const responseAulas = await axios.get(
+          `http://localhost:5000/api/course/${id}/aulas`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setModules(responseAulas.data);
         const firstModule = Object.keys(responseAulas.data)[0];
         if (responseAulas.data[firstModule].length > 0) {
@@ -215,26 +218,32 @@ const Course = () => {
           setSelectedAula(responseAulas.data[firstModule][0]);
         }
 
-        const responseCourse = await axios.get(`http://localhost:5000/api/course/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const responseCourse = await axios.get(
+          `http://localhost:5000/api/course/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setCourseInfo(responseCourse.data);
 
-        const responseExams = await axios.get(`http://localhost:5000/api/course/${id}/provas`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const responseExams = await axios.get(
+          `http://localhost:5000/api/course/${id}/provas`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setExams(responseExams.data);
       } catch (error) {
-        console.error('Erro ao buscar informações do curso:', error);
+        console.error("Erro ao buscar informações do curso:", error);
         // Se ocorrer um erro ao buscar as provas, ainda assim continue com a exibição do curso
         if (error.response && error.response.status === 404) {
           setExams([]); // Define exams como uma lista vazia se não houver provas
         } else {
-          navigate('/login');
+          navigate("/login");
         }
       }
     };
@@ -243,8 +252,10 @@ const Course = () => {
   }, [id, navigate]);
 
   const handleModuleClick = (module) => {
-    setOpenModules(prevState =>
-      prevState.includes(module) ? prevState.filter(m => m !== module) : [...prevState, module]
+    setOpenModules((prevState) =>
+      prevState.includes(module)
+        ? prevState.filter((m) => m !== module)
+        : [...prevState, module]
     );
   };
 
@@ -264,23 +275,30 @@ const Course = () => {
   };
 
   const handleRatingSubmit = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/course/${id}/rating`, {
-        userId,
-        rating,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        `http://localhost:5000/api/course/${id}/rating`,
+        {
+          userId,
+          rating,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
-      alert('Avaliação enviada com sucesso!');
+      alert("Avaliação enviada com sucesso!");
     } catch (error) {
-      console.error('Erro ao enviar avaliação:', error.response ? error.response.data : error.message);
-      alert('Erro ao enviar avaliação. Por favor, tente novamente.');
+      console.error(
+        "Erro ao enviar avaliação:",
+        error.response ? error.response.data : error.message
+      );
+      alert("Erro ao enviar avaliação. Por favor, tente novamente.");
     }
   };
 
@@ -289,21 +307,33 @@ const Course = () => {
       const nroAula = selectedAula.nro_aula;
       try {
         const progress = 0; // Pode-se adicionar um valor real de progresso
-        console.log('Salvando progresso:', { userId, courseId: id, nroAula, progress });
-        const response = await axios.post('http://localhost:5000/api/course/video-progress', {
+        console.log("Salvando progresso:", {
           userId,
           courseId: id,
           nroAula,
           progress,
-        }, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          }
         });
-        console.log('Progresso salvo:', response.data);
+        const response = await axios.post(
+          "http://localhost:5000/api/course/video-progress",
+          {
+            userId,
+            courseId: id,
+            nroAula,
+            progress,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Progresso salvo:", response.data);
       } catch (error) {
-        console.error('Erro ao salvar progresso:', error.response ? error.response.data : error.message);
+        console.error(
+          "Erro ao salvar progresso:",
+          error.response ? error.response.data : error.message
+        );
       }
     }
   };
@@ -346,17 +376,18 @@ const Course = () => {
                 >
                   {module}
                 </ModuleTitle>
-                {openModules.includes(module) && (
+                {openModules.includes(module) &&
                   modules[module].map((aula, aulaIndex) => (
                     <AulaItem
                       key={aulaIndex}
-                      active={selectedAula && selectedAula.titulo === aula.titulo}
+                      active={
+                        selectedAula && selectedAula.titulo === aula.titulo
+                      }
                       onClick={() => handleAulaClick(aula)}
                     >
                       {aula.titulo}
                     </AulaItem>
-                  ))
-                )}
+                  ))}
               </ModuleItem>
             ))}
             {exams.length > 0 && (
@@ -379,12 +410,14 @@ const Course = () => {
                   <FaStar
                     key={i}
                     size={24}
-                    color={i < rating ? '#ffd700' : '#ccc'}
+                    color={i < rating ? "#ffd700" : "#ccc"}
                     onClick={() => handleRatingClick(i + 1)}
                   />
                 ))}
               </StarRating>
-              <RatingButton onClick={handleRatingSubmit}>Enviar Avaliação</RatingButton>
+              <RatingButton onClick={handleRatingSubmit}>
+                Enviar Avaliação
+              </RatingButton>
             </RatingWrapper>
           </ListWrapper>
         </PageContent>

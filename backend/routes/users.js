@@ -1,4 +1,53 @@
-import express from "express";
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { pool } = require("../db/dbConnection.js"); // Importe o pool de conexão
+
+const userRouter = express.Router();
+
+// ? Rota de autenticação e login
+userRouter.post("/login", async (req, res) => {
+  const { matricula, password } = req.body;
+
+  if (!matricula || !password) {
+    return res.status(400).send("Informe a matrícula e a senha");
+  }
+
+  try {
+    // Consulta ao banco de dados para obter o usuário
+    const sql = "SELECT * FROM educ_system.educ_users WHERE matricula = $1";
+    const result = await pool.query(sql, [matricula]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).send("Credenciais inválidas");
+    }
+
+    const user = result.rows[0];
+
+    // Verifica a senha utilizando bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).send("Credenciais inválidas");
+    }
+
+    // Gera um token JWT para autenticação
+    const token = jwt.sign(
+      { id: user.id, matricula: user.matricula },
+      process.env.JWT_SECRET || "fghdfghdfghdfghsfgdfgdfsgsdfhfgchdfghfdg",
+      { expiresIn: "1h" }
+    );
+
+    res.json({ message: "Login bem-sucedido", token, user });
+  } catch (err) {
+    console.error("Erro ao realizar login:", err);
+    res.status(500).send("Erro ao realizar o login");
+  }
+});
+
+module.exports = userRouter;
+
+//------------------------------------------------------------------------------------------------------------------
+/*import express from "express";
 import pkg from "pg";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -140,4 +189,4 @@ app.get(
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   }
-);
+); */
