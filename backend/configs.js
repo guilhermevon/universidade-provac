@@ -16,7 +16,7 @@ switch (process.env.API_MODE) {
     break;
   default:
     console.warn("API_MODE não definido. Usando modo de desenvolvimento.");
-    port = 3000;
+    port = 9301;
 }
 
 // Middleware para processar dados JSON

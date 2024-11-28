@@ -164,7 +164,7 @@ const LoginPage = () => {
       const token = sessionStorage.getItem("token");
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/departamentos",
+          "http://192.168.0.232:9301/users/departamento",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -186,7 +186,7 @@ const LoginPage = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/departamentos/${selectedDepartamento}/funcoes`,
+            `http://192.168.0.232:9301/users/departamento/${selectedDepartamento}/funcoes`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -214,7 +214,7 @@ const LoginPage = () => {
       let response;
       if (formType === "login") {
         response = await axios.post(
-          "http://localhost:5000/api/login",
+          "http://192.168.0.232:9301/users/login",
           formData,
           {
             headers: {
@@ -225,7 +225,7 @@ const LoginPage = () => {
         );
       } else {
         response = await axios.post(
-          "http://localhost:5000/api/register",
+          "http://192.168.0.232:9301/users/register",
           formData,
           {
             headers: {

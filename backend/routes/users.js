@@ -7,9 +7,9 @@ const userRouter = express.Router();
 
 // ? Rota de autenticação e login
 userRouter.post("/login", async (req, res) => {
-  const { matricula, password } = req.body;
+  const { matricula, senha } = req.body;
 
-  if (!matricula || !password) {
+  if (!matricula || !senha) {
     return res.status(400).send("Informe a matrícula e a senha");
   }
 
@@ -25,8 +25,8 @@ userRouter.post("/login", async (req, res) => {
     const user = result.rows[0];
 
     // Verifica a senha utilizando bcrypt
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    const issenhaValid = await bcrypt.compare(senha, user.senha);
+    if (!issenhaValid) {
       return res.status(401).send("Credenciais inválidas");
     }
 
@@ -43,6 +43,106 @@ userRouter.post("/login", async (req, res) => {
     res.status(500).send("Erro ao realizar o login");
   }
 });
+
+userRouter.post("/register", async (req, res) => {
+  const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
+
+  // Verificar se todos os campos obrigatórios foram fornecidos
+  if (
+    !matricula ||
+    !senha ||
+    !usuario ||
+    !email ||
+    !funcao ||
+    !dp ||
+    !role ||
+    !foto
+  ) {
+    return res.status(400).send("Todos os campos são obrigatórios");
+  }
+
+  try {
+    // Verificar se o usuário já existe
+    const checkUserQuery =
+      "SELECT id FROM educ_system.educ_users WHERE matricula = $1";
+    const userExists = await pool.query(checkUserQuery, [matricula]);
+
+    if (userExists.rows.length > 0) {
+      return res.status(409).send("Usuário já existe");
+    }
+
+    // Criptografar a senha
+    const hashedSenha = await bcrypt.hash(senha, 10);
+
+    // Inserir o novo usuário no banco de dados
+    const insertUserQuery = `
+      INSERT INTO educ_system.educ_users 
+      (matricula, senha, usuario, email, funcao, dp, role, foto)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, usuario, matricula, email, funcao, dp, role, foto
+    `;
+
+    const result = await pool.query(insertUserQuery, [
+      matricula,
+      hashedSenha,
+      usuario,
+      email,
+      funcao,
+      dp,
+      role,
+      foto,
+    ]);
+
+    const newUser = result.rows[0];
+
+    // Retornar sucesso com os dados do usuário recém-criado
+    res.status(201).json({
+      message: "Usuário registrado com sucesso",
+      user: newUser,
+    });
+  } catch (err) {
+    console.error("Erro ao registrar o usuário:", err);
+    res.status(500).send("Erro interno do servidor");
+  }
+});
+
+userRouter.get("/departamento", async (req, res) => {
+  try {
+    // Consulta para buscar departamentos distintos
+    const sql =
+      "SELECT DISTINCT dp AS departamento FROM educ_system.educ_users";
+    const result = await pool.query(sql);
+
+    // Retorna os resultados em JSON
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Erro ao consultar os departamentos:", err);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});
+
+userRouter.get(
+  "/departamento/:selectedDepartamento/funcoes",
+  async (req, res) => {
+    const { selectedDepartamento } = req.params;
+
+    try {
+      // Exemplo de consulta ao banco de dados
+      const sql = `
+      SELECT funcao 
+      FROM educ_system.educ_users 
+      WHERE dp = $1
+    `;
+      const result = await pool.query(sql, [selectedDepartamento]);
+
+      // Retorna as funções relacionadas ao departamento selecionado
+      res.status(200).json(result.rows);
+    } catch (err) {
+      console.error("Erro ao consultar as funções:", err);
+      res.status(500).send("Erro ao consultar o banco de dados");
+    }
+  }
+);
 
 module.exports = userRouter;
 
@@ -64,7 +164,7 @@ const pool = new Pool({
   user: "admin_provac",
   host: "192.168.0.232",
   database: "provac_producao",
-  password: "Provac@2024",
+  senha: "Provac@2024",
   port: 5432,
 });
 
@@ -74,18 +174,18 @@ app.post("/api/register", async (req, res) => {
   const {
     usuario,
     email,
-    password,
+    senha,
     funcao,
     departamento,
     role = "user",
   } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedsenha = await bcrypt.hash(senha, 10);
 
     const result = await pool.query(
       "INSERT INTO educ_system.educ_users (usuario, email, senha, funcao, dp, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [usuario, email, hashedPassword, funcao, departamento, role]
+      [usuario, email, hashedsenha, funcao, departamento, role]
     );
 
     const newUser = result.rows[0];
@@ -112,7 +212,7 @@ app.post("/api/register", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, senha } = req.body;
 
   try {
     const result = await pool.query(
@@ -125,9 +225,9 @@ app.post("/api/login", async (req, res) => {
     }
 
     const user = result.rows[0];
-    const isPasswordValid = await bcrypt.compare(password, user.senha);
+    const issenhaValid = await bcrypt.compare(senha, user.senha);
 
-    if (!isPasswordValid) {
+    if (!issenhaValid) {
       return res.status(400).json({ message: "Senha inválida" });
     }
 
