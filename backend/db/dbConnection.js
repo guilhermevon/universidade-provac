@@ -6,7 +6,22 @@ const pool = new Pool({
   host: "192.168.0.232",
   database: "provac_producao",
   password: "Provac@2024",
-  port: 5432,
+});
+
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Erro ao conectar ao banco de dados:", err.stack);
+    return;
+  }
+
+  // Definindo o search_path para o schema educ_system
+  client.query("SET search_path TO educ_system", (err, res) => {
+    if (err) {
+      console.error("Erro ao configurar o search_path:", err.stack);
+    }
+    // Você agora pode fazer as consultas no schema educ_system
+    release();
+  });
 });
 
 // Função para conectar ao banco de dados
