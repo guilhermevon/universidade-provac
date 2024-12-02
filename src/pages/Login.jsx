@@ -210,42 +210,24 @@ const LoginPage = () => {
     const form = event.target;
     const formData = new FormData(form);
 
-    try {
-      let response;
-      if (formType === "login") {
-        response = await axios.post(
-          "http://192.168.0.232:9301/users/login",
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            withCredentials: true,
-          }
-        );
-      } else {
-        response = await axios.post(
-          "http://192.168.0.232:9301/users/register",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            withCredentials: true,
-          }
-        );
-        if (response.status === 201) {
-          setFormType("login");
-          return;
-        }
-      }
+    const payload = {
+      matricula: formData.get("matricula"),
+      senha: formData.get("password"),
+    };
 
+    try {
+      const response = await axios.post(
+        "http://192.168.0.232:9301/users/login",
+        payload, // Envia como JSON
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Payload enviado:", payload);
       if (response.data.token) {
-        console.log("Login bem-sucedido:", response.data);
         sessionStorage.setItem("token", response.data.token);
-        sessionStorage.setItem("userId", response.data.user.id);
-        sessionStorage.setItem("role", response.data.user.role);
-        sessionStorage.setItem("usuario", response.data.user.usuario);
         navigate("/courses");
       } else {
         console.error("Erro de autenticação:", response.data);

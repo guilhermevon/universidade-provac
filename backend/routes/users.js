@@ -2,6 +2,40 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { pool } = require("../db/dbConnection.js"); // Importe o pool de conexão
+const { Pool } = require("pg");
+
+// Configurações do banco de dados
+const pool = new Pool({
+  user: "admin_provac",
+  host: "192.168.0.232",
+  database: "provac_producao",
+  password: "Provac@2024",
+});
+
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Erro ao conectar ao banco de dados:", err.stack);
+  } else {
+    console.log("Conexão bem-sucedida ao banco de dados!");
+    release(); // Libera a conexão de volta ao pool
+  }
+});
+
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Erro ao conectar ao banco de dados:", err.stack);
+    return;
+  }
+
+  // Definindo o search_path para o schema educ_system
+  client.query("SET search_path TO educ_system", (err, res) => {
+    if (err) {
+      console.error("Erro ao configurar o search_path:", err.stack);
+    }
+    // Você agora pode fazer as consultas no schema educ_system
+    release();
+  });
+});
 
 const userRouter = express.Router();
 
@@ -37,6 +71,8 @@ userRouter.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    console.log("Dados recebidos:", req.body);
+    res.send("Login testado!");
     res.json({ message: "Login bem-sucedido", token, user });
   } catch (err) {
     console.error("Erro ao realizar login:", err);
@@ -89,10 +125,9 @@ userRouter.post("/register", async (req, res) => {
       email,
       funcao,
       dp,
-      (role = "user"),
+      role || "user", // Corrigido
       foto,
     ]);
-
     const newUser = result.rows[0];
 
     // Retornar sucesso com os dados do usuário recém-criado

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import { FaArrowLeft, FaArrowRight, FaCrown, FaMedal } from 'react-icons/fa';
-import backgroundImage from '../assets/bg_home.png';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import { FaArrowLeft, FaArrowRight, FaCrown, FaMedal } from "react-icons/fa";
+import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -55,7 +55,6 @@ const SectionTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
   position: relative;
-
 `;
 
 const ScrollWrapper = styled.div`
@@ -118,7 +117,7 @@ const CardSubtitle = styled.p`
 `;
 
 const CardButton = styled.button`
-  background-color: #D32F2F; /* Botão vermelho */
+  background-color: #d32f2f; /* Botão vermelho */
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -132,12 +131,12 @@ const CardButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #B71C1C; /* Vermelho mais escuro ao passar o mouse */
+    background-color: #b71c1c; /* Vermelho mais escuro ao passar o mouse */
   }
 `;
 
 const NavigationButton = styled.button`
-  background: rgba(255, 255, 255, 0.7); 
+  background: rgba(255, 255, 255, 0.7);
   border: none;
   color: #333;
   font-size: 2rem;
@@ -154,11 +153,11 @@ const NavigationButton = styled.button`
   transition: background 0.3s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.9); 
+    background: rgba(255, 255, 255, 0.9);
   }
 
-  ${props => props.left ? 'left: 1rem;' : 'right: 1rem;'}
-  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
+  ${(props) => (props.left ? "left: 1rem;" : "right: 1rem;")}
+  visibility: ${(props) => (props.visible ? "visible" : "hidden")};
 `;
 
 const RankingsSection = styled.div`
@@ -171,7 +170,7 @@ const RankingsSection = styled.div`
 const RankingBox = styled.div`
   background-color: #1c1f23; /* Fundo cinza escuro */
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   width: 30%;
   text-align: center;
@@ -202,7 +201,8 @@ const RankingItem = styled.li`
 `;
 
 const RankingIcon = styled.span`
-  color: ${props => props.color || '#ffffff'}; /* Cor do ícone baseada na posição */
+  color: ${(props) =>
+    props.color || "#ffffff"}; /* Cor do ícone baseada na posição */
   margin-right: 0.5rem;
   font-size: 1.2rem;
 `;
@@ -215,7 +215,7 @@ const PersonalRankBox = styled(RankingBox)`
 
 const PersonalRankIcon = styled.div`
   font-size: 3rem;
-  color: ${props => props.color || '#ffffff'};
+  color: ${(props) => props.color || "#ffffff"};
   margin-bottom: 0.5rem;
 `;
 
@@ -233,69 +233,119 @@ const PersonalRankName = styled.div`
 const Home = () => {
   const [coursesProgress, setCoursesProgress] = useState([]);
   const [mandatoryCourses, setMandatoryCourses] = useState([]);
-  const [rankings, setRankings] = useState({ globalRankings: [], personalRank: {}, departmentRankings: [] });
+  const [rankings, setRankings] = useState({
+    globalRankings: [],
+    personalRank: {},
+    departmentRankings: [],
+  });
   const [scrollVisibility, setScrollVisibility] = useState({});
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
-    const userId = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
+
+    // Validação do token
+    const validateToken = async (token) => {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/validate-token",
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        return response.data.isValid; // A API deve retornar um booleano
+      } catch (error) {
+        console.error("Erro ao validar token:", error);
+        return false;
+      }
+    };
+
     if (!token) {
-      navigate('/login');
+      console.log("Token ausente. Redirecionando para login.");
+      navigate("/login");
       return;
     }
 
-    const fetchCoursesProgress = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/user/${userId}/courses-progress`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCoursesProgress(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
-        navigate('/login');
+    validateToken(token).then((isValid) => {
+      if (!isValid) {
+        console.log("Token inválido. Redirecionando para login.");
+        navigate("/login");
+      } else {
+        console.log("Token válido. Buscando dados...");
+        fetchCoursesProgress();
+        fetchMandatoryCourses();
+        fetchRankings();
       }
-    };
-
-    const fetchMandatoryCourses = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/user/${userId}/mandatory-courses`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setMandatoryCourses(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar cursos obrigatórios:', error);
-      }
-    };
-
-    const fetchRankings = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/rankings', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setRankings(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar rankings:', error);
-      }
-    };
-
-    fetchCoursesProgress();
-    fetchMandatoryCourses();
-    fetchRankings();
+    });
   }, [navigate]);
 
+  // Fetch dos dados
+  const fetchCoursesProgress = async () => {
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/user/${userId}/courses-progress`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCoursesProgress(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar cursos:", error);
+      if (error.response && error.response.status === 401) {
+        navigate("/login");
+      }
+    }
+  };
+
+  const fetchMandatoryCourses = async () => {
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/user/${userId}/mandatory-courses`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMandatoryCourses(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar cursos obrigatórios:", error);
+    }
+  };
+
+  const fetchRankings = async () => {
+    const token = sessionStorage.getItem("token");
+
+    try {
+      const response = await axios.get("http://localhost:5000/api/rankings", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRankings(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar rankings:", error);
+    }
+  };
+
+  // Lógica de scroll
   const scroll = (direction) => {
     const container = scrollRef.current;
     const scrollAmount = 300;
     if (container) {
-      container.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
+      container.scrollLeft +=
+        direction === "left" ? -scrollAmount : scrollAmount;
       updateScrollVisibility();
     }
   };
@@ -304,7 +354,9 @@ const Home = () => {
     const container = scrollRef.current;
     if (container) {
       const atStart = container.scrollLeft <= 0;
-      const atEnd = container.scrollLeft + container.offsetWidth >= container.scrollWidth - 1;
+      const atEnd =
+        container.scrollLeft + container.offsetWidth >=
+        container.scrollWidth - 1;
       setScrollVisibility({
         left: !atStart,
         right: !atEnd,
@@ -321,8 +373,8 @@ const Home = () => {
       updateScrollVisibility();
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const navigateToCourse = (id, nroAula, progress) => {
@@ -340,22 +392,27 @@ const Home = () => {
           <ScrollWrapper>
             <NavigationButton
               left
-              onClick={() => scroll('left')}
+              onClick={() => scroll("left")}
               visible={scrollVisibility.left}
             >
               <FaArrowLeft />
             </NavigationButton>
-            <ScrollContainer 
-              ref={scrollRef}
-              onScroll={updateScrollVisibility}
-            >
+            <ScrollContainer ref={scrollRef} onScroll={updateScrollVisibility}>
               {coursesProgress.map((course, index) => (
                 <StyledCard key={index}>
                   <CardImage src={course.img} alt={course.title} />
                   <CardContent>
                     <CardTitle>{course.title}</CardTitle>
                     <CardSubtitle>{course.subtitle}</CardSubtitle>
-                    <CardButton onClick={() => navigateToCourse(course.course_id, course.nro_aula, course.progress)}>
+                    <CardButton
+                      onClick={() =>
+                        navigateToCourse(
+                          course.course_id,
+                          course.nro_aula,
+                          course.progress
+                        )
+                      }
+                    >
                       Continuar
                     </CardButton>
                   </CardContent>
@@ -363,7 +420,7 @@ const Home = () => {
               ))}
             </ScrollContainer>
             <NavigationButton
-              onClick={() => scroll('right')}
+              onClick={() => scroll("right")}
               visible={scrollVisibility.right}
             >
               <FaArrowRight />
@@ -376,12 +433,12 @@ const Home = () => {
               <ScrollWrapper>
                 <NavigationButton
                   left
-                  onClick={() => scroll('left')}
+                  onClick={() => scroll("left")}
                   visible={scrollVisibility.left}
                 >
                   <FaArrowLeft />
                 </NavigationButton>
-                <ScrollContainer 
+                <ScrollContainer
                   ref={scrollRef}
                   onScroll={updateScrollVisibility}
                 >
@@ -391,7 +448,9 @@ const Home = () => {
                       <CardContent>
                         <CardTitle>{course.title}</CardTitle>
                         <CardSubtitle>{course.subtitle}</CardSubtitle>
-                        <CardButton onClick={() => navigateToCourse(course.id, 0, 0)}>
+                        <CardButton
+                          onClick={() => navigateToCourse(course.id, 0, 0)}
+                        >
                           Assistir
                         </CardButton>
                       </CardContent>
@@ -399,7 +458,7 @@ const Home = () => {
                   ))}
                 </ScrollContainer>
                 <NavigationButton
-                  onClick={() => scroll('right')}
+                  onClick={() => scroll("right")}
                   visible={scrollVisibility.right}
                 >
                   <FaArrowRight />
@@ -415,7 +474,11 @@ const Home = () => {
               <RankingList>
                 {rankings.globalRankings.map((user, index) => (
                   <RankingItem key={index}>
-                    <RankingIcon color={index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}>
+                    <RankingIcon
+                      color={
+                        index === 0 ? "gold" : index === 1 ? "silver" : "bronze"
+                      }
+                    >
                       {index === 0 ? <FaCrown /> : <FaMedal />}
                     </RankingIcon>
                     {user.usuario}: {user.total_pontos}
@@ -428,15 +491,23 @@ const Home = () => {
               <PersonalRankIcon color="gold">
                 <FaCrown />
               </PersonalRankIcon>
-              <PersonalRankPoints>{rankings.personalRank.total_pontos}</PersonalRankPoints>
-              <PersonalRankName>{rankings.personalRank.usuario}</PersonalRankName>
+              <PersonalRankPoints>
+                {rankings.personalRank.total_pontos}
+              </PersonalRankPoints>
+              <PersonalRankName>
+                {rankings.personalRank.usuario}
+              </PersonalRankName>
             </PersonalRankBox>
             <RankingBox>
               <RankingTitle>Ranking Departamento</RankingTitle>
               <RankingList>
                 {rankings.departmentRankings.map((user, index) => (
                   <RankingItem key={index}>
-                    <RankingIcon color={index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}>
+                    <RankingIcon
+                      color={
+                        index === 0 ? "gold" : index === 1 ? "silver" : "bronze"
+                      }
+                    >
                       {index === 0 ? <FaCrown /> : <FaMedal />}
                     </RankingIcon>
                     {user.usuario}: {user.total_pontos}
