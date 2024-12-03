@@ -7,11 +7,12 @@ services:
     ports:
       - "9301:9301" # Porta exposta pelo backend
     environment:
-      - DATABASE_URL=postgresql://postgres:Provac@2024@db:5432/educ_system
+      - DATABASE_URL=postgresql://postgres:Provac%402024@db:5432/educ_system
     depends_on:
       - db # Aguarda o banco iniciar antes de subir o backend
     volumes:
       - ./backend:/app # Sincroniza arquivos locais com o contêiner
+    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"] # Script para esperar o banco de dados
 
   db:
     image: postgres:15 # Certifique-se de usar a versão que prefere
