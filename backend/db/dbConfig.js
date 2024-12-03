@@ -1,7 +1,7 @@
 const dbOffConfig = {
   host: "localhost",
-  user: "root",
-  password: "admin",
+  user: "admin_provac",
+  password: "Provac@2024",
   database: "educ_system",
 };
 

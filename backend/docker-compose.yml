@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "9301:9301" # Porta exposta pelo backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:Provac@2024@db:5432/educ_system
+    depends_on:
+      - db # Aguarda o banco iniciar antes de subir o backend
+    volumes:
+      - ./backend:/app # Sincroniza arquivos locais com o contêiner
+
+  db:
+    image: postgres:15 # Certifique-se de usar a versão que prefere
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: admin_provac
+      POSTGRES_PASSWORD: Provac@2024
+      POSTGRES_DB: provac_producao
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Dados persistentes
+
+volumes:
+  postgres_data:
