@@ -455,7 +455,7 @@ app.post(
 
       const pontuacaoResult = await pool.query(
         "SELECT * FROM educ_system.pontuacoes WHERE user_id = $1 AND course_id = $2 AND nro_aula = $3",
-        [userId, courseId, aulaId]
+        s[(userId, courseId, aulaId)]
       );
 
       if (pontuacaoResult.rows.length > 0) {
