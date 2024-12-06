@@ -16,6 +16,7 @@ const pool = new Pool({
   host: "192.168.0.232",
   database: "provac_producao",
   password: "Provac@2024",
+  port: "5432",
 });
 
 pool.connect((err, client, release) => {
@@ -54,7 +55,7 @@ app.use((req, res, next) => {
 // Configuração de CORS
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:4000"], // Adicione todas as origens necessárias
+    origin: ["http://192.168.0.232:9220"], // Adicione todas as origens necessárias
     credentials: true,
   })
 );

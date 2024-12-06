@@ -1,15 +1,17 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { pool } = require("../db/dbConnection.js"); // Importe o pool de conexão
 const { Pool } = require("pg");
+const rateLimit = require("express-rate-limit");
+require("dotenv").config(); // Para usar variáveis de ambiente
 
 // Configurações do banco de dados
 const pool = new Pool({
-  user: "admin_provac",
-  host: "192.168.0.232",
-  database: "provac_producao",
-  password: "Provac@2024",
+  user: process.env.DB_USER || "admin_provac",
+  host: process.env.DB_HOST || "192.168.0.232",
+  database: process.env.DB_NAME || "provac_producao",
+  password: process.env.DB_PASSWORD || "Provac@2024",
+  port: process.env.DB_PORT || "5432",
 });
 
 pool.connect((err, client, release) => {
@@ -17,73 +19,22 @@ pool.connect((err, client, release) => {
     console.error("Erro ao conectar ao banco de dados:", err.stack);
   } else {
     console.log("Conexão bem-sucedida ao banco de dados!");
-    release(); // Libera a conexão de volta ao pool
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-    return;
-  }
-
-  // Definindo o search_path para o schema educ_system
-  client.query("SET search_path TO educ_system", (err, res) => {
-    if (err) {
-      console.error("Erro ao configurar o search_path:", err.stack);
-    }
-    // Você agora pode fazer as consultas no schema educ_system
     release();
-  });
+  }
 });
 
 const userRouter = express.Router();
 
-// ? Rota de autenticação e login
-userRouter.post("/login", async (req, res) => {
-  const { matricula, senha } = req.body;
-
-  if (!matricula || !senha) {
-    return res.status(400).send("Informe a matrícula e a senha");
-  }
-
-  try {
-    // Consulta ao banco de dados para obter o usuário
-    const sql = "SELECT * FROM educ_system.educ_users WHERE matricula = $1";
-    const result = await pool.query(sql, [matricula]);
-
-    if (result.rows.length === 0) {
-      return res.status(401).send("Credenciais inválidas");
-    }
-
-    const user = result.rows[0];
-
-    // Verifica a senha utilizando bcrypt
-    const issenhaValid = await bcrypt.compare(senha, user.senha);
-    if (!issenhaValid) {
-      return res.status(401).send("Credenciais inválidas");
-    }
-
-    // Gera um token JWT para autenticação
-    const token = jwt.sign(
-      { id: user.id, matricula: user.matricula },
-      process.env.JWT_SECRET || "fghdfghdfghdfghsfgdfgdfsgsdfhfgchdfghfdg",
-      { expiresIn: "1h" }
-    );
-
-    console.log("Dados recebidos:", req.body);
-    res.send("Login testado!");
-    res.json({ message: "Login bem-sucedido", token, user });
-  } catch (err) {
-    console.error("Erro ao realizar login:", err);
-    res.status(500).send("Erro ao realizar o login");
-  }
+// Middleware de rate limit para login
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 10, // Limite de 10 requisições por IP
+  message: { error: "Muitas tentativas de login. Tente novamente mais tarde." },
 });
 
-userRouter.post("/register", async (req, res) => {
+// Middleware para validação de dados
+const validateRegisterData = (req, res, next) => {
   const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
-
-  // Verificar se todos os campos obrigatórios foram fornecidos
   if (
     !matricula ||
     !senha ||
@@ -94,29 +45,70 @@ userRouter.post("/register", async (req, res) => {
     !role ||
     !foto
   ) {
-    return res.status(400).send("Todos os campos são obrigatórios");
+    return res.status(400).json({ error: "Todos os campos são obrigatórios" });
+  }
+  // Validação de e-mail
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: "E-mail inválido" });
+  }
+  next();
+};
+
+// ? Rota de autenticação e login
+userRouter.post("/login", loginLimiter, async (req, res, next) => {
+  const { matricula, senha } = req.body;
+
+  if (!matricula || !senha) {
+    return res.status(400).json({ error: "Informe a matrícula e a senha" });
   }
 
   try {
-    // Verificar se o usuário já existe
+    const sql = "SELECT * FROM educ_system.educ_users WHERE matricula = $1";
+    const result = await pool.query(sql, [matricula]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Credenciais inválidas" });
+    }
+
+    const user = result.rows[0];
+    const isSenhaValid = await bcrypt.compare(senha, user.senha);
+    if (!isSenhaValid) {
+      return res.status(401).json({ error: "Credenciais inválidas" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, matricula: user.matricula },
+      process.env.JWT_SECRET || "defaultSecret",
+      { expiresIn: "1h" }
+    );
+
+    res.json({ message: "Login bem-sucedido", token, user });
+  } catch (err) {
+    next(err); // Envia para o middleware de erro
+  }
+});
+
+// ? Rota de registro de usuário
+userRouter.post("/register", validateRegisterData, async (req, res, next) => {
+  const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
+
+  try {
     const checkUserQuery =
       "SELECT id FROM educ_system.educ_users WHERE matricula = $1";
     const userExists = await pool.query(checkUserQuery, [matricula]);
 
     if (userExists.rows.length > 0) {
-      return res.status(409).send("Usuário já existe");
+      return res.status(409).json({ error: "Usuário já existe" });
     }
 
-    // Criptografar a senha
     const hashedSenha = await bcrypt.hash(senha, 10);
-
-    // Inserir o novo usuário no banco de dados
     const insertUserQuery = `
-      INSERT INTO educ_system.educ_users 
-      (matricula, senha, usuario, email, funcao, dp, role, foto)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id, usuario, matricula, email, funcao, dp, role, foto
-    `;
+        INSERT INTO educ_system.educ_users 
+        (matricula, senha, usuario, email, funcao, dp, role, foto)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id, usuario, matricula, email, funcao, dp, role, foto
+      `;
 
     const result = await pool.query(insertUserQuery, [
       matricula,
@@ -125,59 +117,63 @@ userRouter.post("/register", async (req, res) => {
       email,
       funcao,
       dp,
-      role || "user", // Corrigido
+      role || "user",
       foto,
     ]);
-    const newUser = result.rows[0];
 
-    // Retornar sucesso com os dados do usuário recém-criado
+    const newUser = result.rows[0];
     res.status(201).json({
       message: "Usuário registrado com sucesso",
       user: newUser,
     });
   } catch (err) {
-    console.error("Erro ao registrar o usuário:", err);
-    res.status(500).send("Erro interno do servidor");
+    next(err); // Envia para o middleware de erro
   }
 });
 
-userRouter.get("/departamento", async (req, res) => {
+// ? Rota para buscar departamentos
+userRouter.get("/departamento", async (req, res, next) => {
   try {
-    // Consulta para buscar departamentos distintos
     const sql =
       "SELECT DISTINCT dp AS departamento FROM educ_system.educ_users";
     const result = await pool.query(sql);
-
-    // Retorna os resultados em JSON
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error("Erro ao consultar os departamentos:", err);
-    res.status(500).send("Erro ao consultar o banco de dados");
+    next(err); // Envia para o middleware de erro
   }
 });
 
+// ? Rota para buscar funções por departamento
 userRouter.get(
   "/departamento/:selectedDepartamento/funcoes",
-  async (req, res) => {
+  async (req, res, next) => {
     const { selectedDepartamento } = req.params;
 
-    try {
-      // Exemplo de consulta ao banco de dados
-      const sql = `
-      SELECT funcao 
-      FROM educ_system.educ_users 
-      WHERE dp = $1
-    `;
-      const result = await pool.query(sql, [selectedDepartamento]);
+    if (!selectedDepartamento) {
+      return res
+        .status(400)
+        .json({ error: "Departamento não fornecido na URL" });
+    }
 
-      // Retorna as funções relacionadas ao departamento selecionado
+    try {
+      const sql = `
+        SELECT funcao 
+        FROM educ_system.educ_users 
+        WHERE dp = $1
+      `;
+      const result = await pool.query(sql, [selectedDepartamento]);
       res.status(200).json(result.rows);
     } catch (err) {
-      console.error("Erro ao consultar as funções:", err);
-      res.status(500).send("Erro ao consultar o banco de dados");
+      next(err); // Envia para o middleware de erro
     }
   }
 );
+
+// Middleware de erro
+userRouter.use((err, req, res, next) => {
+  console.error("Erro:", err.stack);
+  res.status(500).json({ error: "Erro interno do servidor" });
+});
 
 module.exports = userRouter;
 
@@ -200,6 +196,7 @@ const pool = new Pool({
   host: "192.168.0.232",
   database: "provac_producao",
   password: "Provac@2024", 
+  port: "5432",
 });
 
 pool.connect((err, client, release) => {

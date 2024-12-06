@@ -7,7 +7,7 @@ services:
     ports:
       - "9301:9301" # Porta exposta pelo backend
     environment:
-      - DATABASE_URL=postgresql://postgres:Provac%402024@db:5432/educ_system
+      - DATABASE_URL=postgresql://admin_provac:Provac%402024@192.168.0.232:5432/provac_producao
     depends_on:
       - db # Aguarda o banco iniciar antes de subir o backend
     volumes:

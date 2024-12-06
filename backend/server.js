@@ -24,6 +24,7 @@ const pool = new Pool({
   host: "192.168.0.232",
   database: "provac_producao",
   password: "Provac@2024",
+  port: "5432",
 });
 
 pool.connect((err, client, release) => {
@@ -69,7 +70,7 @@ const upload = multer({ storage });
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:4000"],
+    origin: ["http://192.168.0.232:9220"],
     credentials: true,
   })
 );

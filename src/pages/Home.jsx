@@ -243,80 +243,29 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const userId = sessionStorage.getItem("userId");
-
-    // Validação do token
-    const validateToken = async (token) => {
-      try {
-        const response = await axios.post(
-          "http://localhost:5000/api/validate-token",
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        return response.data.isValid; // A API deve retornar um booleano
-      } catch (error) {
-        console.error("Erro ao validar token:", error);
-        return false;
-      }
-    };
-
-    if (!token) {
-      console.log("Token ausente. Redirecionando para login.");
-      navigate("/login");
-      return;
-    }
-
-    validateToken(token).then((isValid) => {
-      if (!isValid) {
-        console.log("Token inválido. Redirecionando para login.");
-        navigate("/login");
-      } else {
-        console.log("Token válido. Buscando dados...");
-        fetchCoursesProgress();
-        fetchMandatoryCourses();
-        fetchRankings();
-      }
-    });
-  }, [navigate]);
+    fetchCoursesProgress();
+    fetchMandatoryCourses();
+    fetchRankings();
+  }, []);
 
   // Fetch dos dados
   const fetchCoursesProgress = async () => {
-    const token = sessionStorage.getItem("token");
-    const userId = sessionStorage.getItem("userId");
-
     try {
+      const userId = sessionStorage.getItem("userId");
       const response = await axios.get(
-        `http://localhost:5000/api/user/${userId}/courses-progress`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `http://localhost:5000/api/user/${userId}/courses-progress`
       );
       setCoursesProgress(response.data);
     } catch (error) {
       console.error("Erro ao buscar cursos:", error);
-      if (error.response && error.response.status === 401) {
-        navigate("/login");
-      }
     }
   };
 
   const fetchMandatoryCourses = async () => {
-    const token = sessionStorage.getItem("token");
-    const userId = sessionStorage.getItem("userId");
-
     try {
+      const userId = sessionStorage.getItem("userId");
       const response = await axios.get(
-        `http://localhost:5000/api/user/${userId}/mandatory-courses`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `http://localhost:5000/api/user/${userId}/mandatory-courses`
       );
       setMandatoryCourses(response.data);
     } catch (error) {
@@ -325,14 +274,8 @@ const Home = () => {
   };
 
   const fetchRankings = async () => {
-    const token = sessionStorage.getItem("token");
-
     try {
-      const response = await axios.get("http://localhost:5000/api/rankings", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get("http://localhost:5000/api/rankings");
       setRankings(response.data);
     } catch (error) {
       console.error("Erro ao buscar rankings:", error);
