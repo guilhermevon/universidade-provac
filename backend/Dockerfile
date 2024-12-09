@@ -1,22 +1,20 @@
-# Usar a imagem do Node.js
+# Use a imagem base do Node.js
 FROM node:18 AS backend
 
-# Instalar dependências do backend
+# Definir o diretório de trabalho dentro do contêiner
 WORKDIR /usr/src/app
+
+# Copiar os arquivos package.json e package-lock.json da raiz do projeto para o contêiner
 COPY ../package*.json ./
+
+# Instalar as dependências
 RUN npm install
-COPY . .
 
-# Baixar e configurar o PostgreSQL
-FROM postgres:15 AS db
+# Copiar o restante dos arquivos do backend para o contêiner
+COPY ./backend .
 
-# Configurar o banco de dados no mesmo contêiner
-ENV POSTGRES_USER=admin_provac
-ENV POSTGRES_PASSWORD=Provac@2024
-ENV POSTGRES_DB=provac_producao
+# Expor a porta que a aplicação irá usar
+EXPOSE 9301
 
-# Expor as portas do backend e do banco de dados
-EXPOSE 9301 5432
-
-# Rodar o banco e o backend
-CMD ["sh", "-c", "pg_ctlcluster 15 main start && npm start"]
+# Comando para iniciar o servidor
+CMD ["npm", "start"]
