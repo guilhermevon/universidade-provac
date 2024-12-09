@@ -184,32 +184,18 @@ const RatingButton = styled.button`
 
 const Course = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [modules, setModules] = useState({});
   const [openModules, setOpenModules] = useState([]);
   const [selectedAula, setSelectedAula] = useState(null);
   const [courseInfo, setCourseInfo] = useState({ title: "", descricao: "" });
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState(null);
-  const [rating, setRating] = useState(0); // Estado para armazenar a avaliação do usuário
-  const userId = sessionStorage.getItem("userId"); // Pegando userId do sessionStorage
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
     const fetchCourseData = async () => {
       try {
         const responseAulas = await axios.get(
-          `http://localhost:5000/api/course/${id}/aulas`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `http://localhost:5000/api/course/${id}/aulas`
         );
         setModules(responseAulas.data);
         const firstModule = Object.keys(responseAulas.data)[0];
@@ -219,22 +205,12 @@ const Course = () => {
         }
 
         const responseCourse = await axios.get(
-          `http://localhost:5000/api/course/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `http://localhost:5000/api/course/${id}`
         );
         setCourseInfo(responseCourse.data);
 
         const responseExams = await axios.get(
-          `http://localhost:5000/api/course/${id}/provas`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `http://localhost:5000/api/course/${id}/provas`
         );
         setExams(responseExams.data);
       } catch (error) {
@@ -242,14 +218,12 @@ const Course = () => {
         // Se ocorrer um erro ao buscar as provas, ainda assim continue com a exibição do curso
         if (error.response && error.response.status === 404) {
           setExams([]); // Define exams como uma lista vazia se não houver provas
-        } else {
-          navigate("/login");
         }
       }
     };
 
     fetchCourseData();
-  }, [id, navigate]);
+  }, [id]);
 
   const handleModuleClick = (module) => {
     setOpenModules((prevState) =>
@@ -270,45 +244,12 @@ const Course = () => {
     setSelectedAula(null); // Desseleciona a aula ao selecionar uma prova
   };
 
-  const handleRatingClick = (rate) => {
-    setRating(rate);
-  };
-
-  const handleRatingSubmit = async () => {
-    const token = sessionStorage.getItem("token");
-
-    try {
-      const response = await axios.post(
-        `http://localhost:5000/api/course/${id}/rating`,
-        {
-          userId,
-          rating,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      alert("Avaliação enviada com sucesso!");
-    } catch (error) {
-      console.error(
-        "Erro ao enviar avaliação:",
-        error.response ? error.response.data : error.message
-      );
-      alert("Erro ao enviar avaliação. Por favor, tente novamente.");
-    }
-  };
-
   const saveProgress = async () => {
     if (selectedAula) {
       const nroAula = selectedAula.nro_aula;
       try {
         const progress = 0; // Pode-se adicionar um valor real de progresso
         console.log("Salvando progresso:", {
-          userId,
           courseId: id,
           nroAula,
           progress,
@@ -316,16 +257,9 @@ const Course = () => {
         const response = await axios.post(
           "http://localhost:5000/api/course/video-progress",
           {
-            userId,
             courseId: id,
             nroAula,
             progress,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-              "Content-Type": "application/json",
-            },
           }
         );
         console.log("Progresso salvo:", response.data);
@@ -404,21 +338,6 @@ const Course = () => {
                 ))}
               </>
             )}
-            <RatingWrapper>
-              <StarRating>
-                {[...Array(5)].map((_, i) => (
-                  <FaStar
-                    key={i}
-                    size={24}
-                    color={i < rating ? "#ffd700" : "#ccc"}
-                    onClick={() => handleRatingClick(i + 1)}
-                  />
-                ))}
-              </StarRating>
-              <RatingButton onClick={handleRatingSubmit}>
-                Enviar Avaliação
-              </RatingButton>
-            </RatingWrapper>
           </ListWrapper>
         </PageContent>
       </PageWrapper>

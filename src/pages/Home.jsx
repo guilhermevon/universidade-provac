@@ -415,6 +415,19 @@ const Home = () => {
             <RankingBox>
               <RankingTitle>Ranking Global</RankingTitle>
               <RankingList>
+                <div style={{ textAlign: "left" }}>
+                  <h4>1° Guilherme Von-Randow Carvalho - 235 Pontos</h4>
+                  <br />
+                  <h4>2° Ismael Luiz Borges da Silva - 220 Pontos</h4>
+                  <br />
+                  <h4>3° Carlos Gonçalves - 215 Pontos</h4>
+                  <br />
+                  <h4>4° Russell Nunez - 212 Pontos</h4>
+                  <br />
+                  <h4>5° TI Betim - 210 Pontos</h4>
+                  <br />
+                  <h4>6° TI São Paulo - 201 - Pontos</h4>
+                </div>
                 {rankings.globalRankings.map((user, index) => (
                   <RankingItem key={index}>
                     <RankingIcon
@@ -431,10 +444,12 @@ const Home = () => {
             </RankingBox>
             <PersonalRankBox>
               <RankingTitle>Teu Rank</RankingTitle>
+
               <PersonalRankIcon color="gold">
                 <FaCrown />
               </PersonalRankIcon>
               <PersonalRankPoints>
+                <h4>1° Colocação</h4>
                 {rankings.personalRank.total_pontos}
               </PersonalRankPoints>
               <PersonalRankName>
@@ -444,6 +459,16 @@ const Home = () => {
             <RankingBox>
               <RankingTitle>Ranking Departamento</RankingTitle>
               <RankingList>
+                <div style={{ textAlign: "left" }}>
+                  <br />
+                  <h3>1° TI</h3>
+                  <br />
+                  <h3>2° RH</h3>
+                  <br />
+                  <h3>3° PMO</h3>
+                  <br />
+                  <h3>4° Financeiro</h3>
+                </div>
                 {rankings.departmentRankings.map((user, index) => (
                   <RankingItem key={index}>
                     <RankingIcon

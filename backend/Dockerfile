@@ -1,31 +1,24 @@
-# Use a imagem base do Node.js
-FROM node:18
+# Dockerfile para o Backend e Banco de Dados (PostgreSQL) no mesmo contêiner
 
-# Define o diretório de trabalho dentro do contêiner
+# Etapa 1: Configuração do Backend com Node.js
+FROM node:18 AS backend
+
+# Instalar dependências do backend
 WORKDIR /usr/src/app
-
-# Copie apenas o package.json e package-lock.json para instalar dependências
 COPY package*.json ./
-
-# Instalar dependências
 RUN npm install
-
-# Copiar todos os arquivos do backend
-COPY ./backend .
-
-# Copiar o resto dos arquivos do projeto para o diretório de trabalho
 COPY . .
 
-# Remover o diretório node_modules de qualquer pasta não usada para evitar conflitos
-RUN rm -rf node_modules
+# Etapa 2: Configuração do PostgreSQL
+FROM postgres:15 AS db
 
-# Expondo a porta que a aplicação usará
-# 9109 para teste, 9301 para produção
-EXPOSE 9301
+# Configurar o PostgreSQL
+ENV POSTGRES_USER=admin_provac
+ENV POSTGRES_PASSWORD=Provac@2024
+ENV POSTGRES_DB=provac_producao
 
-# Definindo a variável de ambiente API_MODE
-# test = teste, production = produção
-ENV API_MODE=production
+# Expor as portas do backend e do PostgreSQL
+EXPOSE 9301 5432
 
-# Comando para iniciar o servidor
-CMD ["npm", "start"]
+# Rodar o PostgreSQL e o Backend
+CMD ["sh", "-c", "pg_ctlcluster 15 main start && npm start"]

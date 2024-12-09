@@ -1,4 +1,6 @@
-# Dockerfile para configurar a base de dados do projeto
+# Dockerfile para o Frontend (React com Nginx)
+
+# Etapa 1: Build do frontend com Node.js
 FROM node:17.9.1 AS build
 
 WORKDIR /app
@@ -11,7 +13,7 @@ COPY . .
 
 RUN npm run build
 
-# Run stage
+# Etapa 2: Servir o frontend com Nginx
 FROM nginx:1.19
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx-novo.conf /etc/nginx/conf.d/default.conf

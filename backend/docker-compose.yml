@@ -1,30 +1,31 @@
 version: "3.9"
 services:
-  backend:
+  # Backend e Banco de Dados (PostgreSQL) no mesmo serviço
+  backend-db:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: . # O caminho onde está o Dockerfile
+      dockerfile: Dockerfile # Dockerfile para o backend e db
     ports:
-      - "9301:9301" # Porta exposta pelo backend
+      - "9301:9301" # Porta do backend
+      - "5432:5432" # Porta do PostgreSQL
     environment:
-      - DATABASE_URL=postgresql://admin_provac:Provac%402024@192.168.0.232:5432/provac_producao
-    depends_on:
-      - db # Aguarda o banco iniciar antes de subir o backend
+      - DATABASE_URL=postgresql://admin_provac:Provac%402024@localhost:5432/provac_producao
     volumes:
-      - ./backend:/app # Sincroniza arquivos locais com o contêiner
-    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"] # Script para esperar o banco de dados
+      - ./backend:/usr/src/app # Sincroniza os arquivos do backend
+      - postgres_data:/var/lib/postgresql/data # Persistência dos dados do banco
+    command: ["sh", "-c", "pg_ctlcluster 15 main start && npm start"] # Comando para rodar o DB e o Backend juntos
 
-  db:
-    image: postgres:15 # Certifique-se de usar a versão que prefere
-    container_name: postgres-db
-    environment:
-      POSTGRES_USER: admin_provac
-      POSTGRES_PASSWORD: Provac@2024
-      POSTGRES_DB: provac_producao
+  # Frontend
+  frontend:
+    build:
+      context: ./src # Caminho para o diretório do frontend (src)
+      dockerfile: Dockerfile # Dockerfile do frontend
     ports:
-      - "5432:5432"
+      - "9220:9220" # Porta do frontend
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Dados persistentes
+      - ./src:/usr/share/nginx/html # Sincroniza os arquivos do frontend
+    depends_on:
+      - backend-db # Garante que o backend e o db estejam prontos antes de rodar o frontend
 
 volumes:
-  postgres_data:
+  postgres_data: # Volume para persistência dos dados do banco
