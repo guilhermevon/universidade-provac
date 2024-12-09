@@ -5,7 +5,8 @@ FROM node:18 AS backend
 WORKDIR /usr/src/app
 
 # Copiar os arquivos package.json e package-lock.json da raiz do projeto para o contêiner
-COPY ../package*.json ./
+# Usando o caminho correto para a raiz do projeto.
+COPY package*.json ./
 
 # Instalar as dependências
 RUN npm install
