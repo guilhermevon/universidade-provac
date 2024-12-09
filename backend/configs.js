@@ -1,41 +1,7 @@
-const express = require("express");
-const cors = require("cors");
+const ipv4Address = "192.168.0.232"; // Defina o IP correto
+const port = 9301;
 
-const server = express();
-
-// Defina o IP e porta fixos
-const ipv4Address = "192.168.0.232";
-let port;
-
-switch (process.env.API_MODE) {
-  case "production":
-    port = process.env.PORT_SERVER_PROD || 9301;
-    break;
-  case "test":
-    port = process.env.PORT_SERVER_TEST || 9300;
-    break;
-  default:
-    console.warn("API_MODE não definido. Usando modo de desenvolvimento.");
-    port = 9301;
-}
-
-// Middleware para processar dados JSON
-server.use(cors());
-server.use(express.json({ limit: "10mb" })); // Ajuste o limite de payload, se necessário
-
-const cursosRouter = require("./routes/cursos.js");
-const funcoesRouter = require("./routes/funcoes.js");
-const provasRouter = require("./routes/provas.js");
-const rankingRouter = require("./routes/ranking.js");
-const usersRouter = require("./routes/users.js");
-
-server.use("/cursos", cursosRouter);
-server.use("/funcoes", funcoesRouter);
-server.use("/provas", provasRouter);
-server.use("/ranking", rankingRouter);
-server.use("/users", usersRouter);
-
-server.get("/", (req, res) => {
+app.get("/", (req, res) => {
   res.json({
     solicitacao: "Hello world!",
     mensagem: "Olá, eu sou o servidor!",
@@ -46,7 +12,28 @@ server.get("/", (req, res) => {
   console.log(`Solicitação processada em http://${ipv4Address}:${port}`);
 });
 
-// Inicie o servidor na porta e IP fixos
-server.listen(port, ipv4Address, () => {
-  console.log(`Servidor em execução em http://${ipv4Address}:${port}`);
+// Defina outras rotas conforme necessário
+app.get("/cursos", (req, res) => {
+  res.send("Cursos route");
+});
+
+app.get("/funcoes", (req, res) => {
+  res.send("Funções route");
+});
+
+app.get("/provas", (req, res) => {
+  res.send("Provas route");
+});
+
+app.get("/ranking", (req, res) => {
+  res.send("Ranking route");
+});
+
+app.get("/users", (req, res) => {
+  res.send("Users route");
+});
+
+// Iniciando o servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://${ipv4Address}:${port}`);
 });
