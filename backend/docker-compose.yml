@@ -1,31 +1,41 @@
 version: "3.9"
 services:
-  # Backend e Banco de Dados (PostgreSQL) no mesmo serviço
-  backend-db:
+  backend:
     build:
-      context: . # O caminho onde está o Dockerfile
-      dockerfile: Dockerfile # Dockerfile para o backend e db
+      context: ./backend # Diretório do backend
+      dockerfile: Dockerfile
     ports:
-      - "9301:9301" # Porta do backend
-      - "5432:5432" # Porta do PostgreSQL
+      - "9301:9301" # Porta exposta do backend
     environment:
-      - DATABASE_URL=postgresql://admin_provac:Provac%402024@localhost:5432/provac_producao
+      - DATABASE_URL=postgresql://admin_provac:Provac%402024@192.168.0.232:5432/provac_producao
+    depends_on:
+      - db # O backend depende do banco de dados
     volumes:
-      - ./backend:/usr/src/app # Sincroniza os arquivos do backend
-      - postgres_data:/var/lib/postgresql/data # Persistência dos dados do banco
-    command: ["sh", "-c", "pg_ctlcluster 15 main start && npm start"] # Comando para rodar o DB e o Backend juntos
+      - ./backend:/app # Mapeia o diretório local para o contêiner
+    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"]
 
-  # Frontend
   frontend:
     build:
-      context: ./src # Caminho para o diretório do frontend (src)
-      dockerfile: Dockerfile # Dockerfile do frontend
+      context: ./src # Diretório do frontend (src)
+      dockerfile: Dockerfile
     ports:
-      - "9220:9220" # Porta do frontend
+      - "9220:9220" # Porta exposta do frontend (nginx)
     volumes:
-      - ./src:/usr/share/nginx/html # Sincroniza os arquivos do frontend
+      - ./src:/usr/share/nginx/html # Sincroniza o frontend no contêiner
     depends_on:
-      - backend-db # Garante que o backend e o db estejam prontos antes de rodar o frontend
+      - backend # O frontend depende do backend
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: admin_provac
+      POSTGRES_PASSWORD: Provac@2024
+      POSTGRES_DB: provac_producao
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data: # Volume para persistência dos dados do banco
+  postgres_data:
