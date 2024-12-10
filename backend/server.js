@@ -1,13 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const os = require("os");
-const dotenv = require("dotenv");
-const cursos = require("./routes/cursos");
-const funcoes = require("./routes/funcoes");
-const provas = require("./routes/provas");
-const ranking = require("./routes/ranking");
-const users = require("./routes/users");
-const { Pool } = require("pg");
+import express from "express";
+import cors from "cors";
+import os from "os";
+import dotenv from "dotenv";
+import cursos from "./routes/cursos.js";
+import funcoes from "./routes/funcoes.js";
+import provas from "./routes/provas.js";
+import ranking from "./routes/ranking.js";
+import users from "./routes/users.js";
+import { Pool } from "pg";
 
 dotenv.config();
 
