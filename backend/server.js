@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import os from "os";
 import dotenv from "dotenv";
-import cursos from "./routes/cursos";
-import funcoes from "./routes/funcoes";
-import provas from "./routes/provas";
-import ranking from "./routes/ranking";
-import users from "./routes/users";
+import cursos from "./routes/cursos.js";
+import funcoes from "./routes/funcoes.js";
+import provas from "./routes/provas.js";
+import ranking from "./routes/ranking.js";
+import users from "./routes/users.js";
 
 dotenv.config();
 
