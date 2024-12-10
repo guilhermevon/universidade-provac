@@ -480,3 +480,6 @@ app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
+
+export default app; // Exporta apenas a aplicação Express
+

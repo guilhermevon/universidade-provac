@@ -177,6 +177,8 @@ userRouter.use((err, req, res, next) => {
 
 module.exports = userRouter;
 
+export default app; // Exporta apenas a aplicação Express
+
 //------------------------------------------------------------------------------------------------------------------
 /*import express from "express";
 import pkg from "pg";
