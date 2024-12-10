@@ -67,3 +67,5 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor em execução no endereço http://${ipv4Address}:${port}`);
 });
+
+export default express;
