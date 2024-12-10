@@ -1,17 +1,15 @@
-import express from "express";
-import cors from "cors";
-import os from "os";
-import dotenv from "dotenv";
-import cursos from "./routes/cursos.js";
-import funcoes from "./routes/funcoes.js";
-import provas from "./routes/provas.js";
-import ranking from "./routes/ranking.js";
-import users from "./routes/users.js";
+const express = require("express");
+const cors = require("cors");
+const os = require("os");
+const dotenv = require("dotenv");
+const cursos = require("./routes/cursos");
+const funcoes = require("./routes/funcoes");
+const provas = require("./routes/provas");
+const ranking = require("./routes/ranking");
+const users = require("./routes/users");
+const { Pool } = require("pg");
 
 dotenv.config();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const { Pool } = pkg;
 
 const pool = new Pool({
   user: "admin_provac",
@@ -26,32 +24,13 @@ pool.connect((err, client, release) => {
     console.error("Erro ao conectar ao banco de dados:", err.stack);
   } else {
     console.log("Conexão bem-sucedida ao banco de dados!");
-    release(); // Libera a conexão de volta ao pool
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-    return;
-  }
-
-  // Definindo o search_path para o schema educ_system
-  client.query("SET search_path TO educ_system", (err, res) => {
-    if (err) {
-      console.error("Erro ao configurar o search_path:", err.stack);
-    }
-    // Você agora pode fazer as consultas no schema educ_system
     release();
-  });
+  }
 });
-//-------------------------------------------------------------------------------------------
 
 const app = express();
-const networkInterfaces = os.networkInterfaces();
-const ipv4Address = "192.168.0.232"; // Altere se necessário
+const ipv4Address = "192.168.0.232";
 
-// Configuração da porta baseada no ambiente
 let port;
 if (process.env.API_MODE === "production") {
   port = process.env.PORT_SERVER_PROD || 9310;
@@ -62,9 +41,8 @@ if (process.env.API_MODE === "production") {
   process.exit(1);
 }
 
-// Middlewares
 app.use(cors());
-app.use(express.json({ limit: "10mb" })); // Limite de payload JSON
+app.use(express.json({ limit: "10mb" }));
 
 app.use("/cursos", cursos);
 app.use("/funcoes", funcoes);
@@ -84,9 +62,6 @@ app.get("/", (req, res) => {
       `http://${ipv4Address}:${port}/users`,
     ],
   });
-  console.log(
-    `Solicitação processada pelo processo http://${ipv4Address}:${port}`
-  );
 });
 
 app.listen(port, () => {
