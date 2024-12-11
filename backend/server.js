@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import os from "os";
 import dotenv from "dotenv";
-import cursos from "./routes/cursos.js";
-import funcoes from "./routes/funcoes.js";
-import provas from "./routes/provas.js";
-import ranking from "./routes/ranking.js";
-import users from "./routes/users.js";
+import cursosRouter from "./routes/cursos.js";
+import funcoesRouter from "./routes/funcoes.js";
+import provasRouter from "./routes/provas.js";
+import rankingRouter from "./routes/ranking.js";
+import usersRouter from "./routes/users.js";
 import pkg from "pg";
 const { Pool } = pkg;
 
@@ -45,11 +45,11 @@ if (process.env.API_MODE === "production") {
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-app.use("/cursos", cursos);
-app.use("/funcoes", funcoes);
-app.use("/provas", provas);
-app.use("/ranking", ranking);
-app.use("/users", users);
+app.use("/cursos", cursosRouter);
+app.use("/funcoes", funcoesRouter);
+app.use("/provas", provasRouter);
+app.use("/ranking", rankingRouter);
+app.use("/users", usersRouter);
 
 app.get("/", (req, res) => {
   res.json({

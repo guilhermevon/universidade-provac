@@ -1,11 +1,13 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Pool } from "pg";
+import pkg from "pg"; // Importando como um pacote CommonJS
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+const { Pool } = pkg; // Extraindo Pool do módulo pg
 
 const pool = new Pool({
   user: process.env.DB_USER || "admin_provac",

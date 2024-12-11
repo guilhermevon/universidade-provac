@@ -44,7 +44,7 @@ pool.connect((err, client, release) => {
   });
 });
 
-const cursosRouter = Router();
+const cursosRouter = express.Router();
 
 cursosRouter.get("/api/courses", authenticateJWT, async (req, res) => {
   try {

@@ -11,6 +11,8 @@ dotenv.config();
 
 const { Pool } = pkg;
 
+const funcoesRouter = express.Router();
+
 const pool = new Pool({
   user: "admin_provac",
   host: "192.168.0.232",
@@ -44,9 +46,7 @@ pool.connect((err, client, release) => {
   });
 });
 
-const app = express();
-
-app.get("/api/departamentos/:dp/funcoes", authenticateJWT, async (req, res) => {
+funcoesRouter.get("/api/departamentos/:dp/funcoes", authenticateJWT, async (req, res) => {
   const { dp } = req.params;
   try {
     const result = await pool.query(
@@ -60,7 +60,7 @@ app.get("/api/departamentos/:dp/funcoes", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/departamentos", authenticateJWT, async (req, res) => {
+funcoesRouter.get("/api/departamentos", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT DISTINCT dp FROM educ_system.funcoes ORDER BY dp"
@@ -73,7 +73,7 @@ app.get("/api/departamentos", authenticateJWT, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+funcoesRouter.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
-export default app; // Exporta apenas a aplicação Express
+export default funcoesRouter; // Exporta apenas a aplicação Express
 

@@ -1,11 +1,6 @@
 import express from "express";
 import pkg from "pg";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import cors from "cors";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import session from "express-session";
 
 dotenv.config();
 
@@ -44,9 +39,9 @@ pool.connect((err, client, release) => {
   });
 });
 
-const app = express();
+const rankingRouter = express.Router();
 
-app.get("/api/rankings", authenticateJWT, async (req, res) => {
+rankingRouter.get("/api/rankings", authenticateJWT, async (req, res) => {
   const { id } = req.user;
 
   try {
@@ -91,7 +86,7 @@ app.get("/api/rankings", authenticateJWT, async (req, res) => {
 });
 
 // Rota para registrar pontuação ao completar um módulo
-app.post(
+rankingRouter.post(
   "/api/course/:courseId/modulo/:moduloId/pontuacao",
   authenticateJWT,
   async (req, res) => {
@@ -152,6 +147,6 @@ app.post(
 );
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+rankingRouter.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
-export default app; // Exporta apenas a aplicação Express
+export default rankingRouter; // Exporta apenas a aplicação Express

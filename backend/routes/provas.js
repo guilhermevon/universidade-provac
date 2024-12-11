@@ -1,11 +1,6 @@
 import express from "express";
 import pkg from "pg";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import cors from "cors";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import session from "express-session";
 
 dotenv.config();
 
@@ -44,9 +39,9 @@ pool.connect((err, client, release) => {
   });
 });
 
-const app = express();
+const provasRouter = express.Router();
 
-app.post("/api/manage-provas", authenticateJWT, async (req, res) => {
+provasRouter.post("/api/manage-provas", authenticateJWT, async (req, res) => {
   const {
     titulo,
     descricao,
@@ -117,7 +112,7 @@ app.post("/api/manage-provas", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/prova/:id_prova/questoes", authenticateJWT, async (req, res) => {
+provasRouter.get("/api/prova/:id_prova/questoes", authenticateJWT, async (req, res) => {
   const { id_prova } = req.params;
 
   try {
@@ -156,7 +151,7 @@ app.get("/api/prova/:id_prova/questoes", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/course/:id/provas", authenticateJWT, async (req, res) => {
+provasRouter.get("/api/course/:id/provas", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   console.log(`Buscando provas para o curso com ID: ${id}`); // Log para depuração
   try {
@@ -247,7 +242,7 @@ app.get("/api/course/:id/provas", authenticateJWT, async (req, res) => {
   }
 });
 
-app.post("/api/respostas", authenticateJWT, async (req, res) => {
+provasRouter.post("/api/respostas", authenticateJWT, async (req, res) => {
   const { userId, provaId, respostas } = req.body;
 
   try {
@@ -291,7 +286,7 @@ app.post("/api/respostas", authenticateJWT, async (req, res) => {
   }
 });
 
-app.post("/api/exam/start", authenticateJWT, async (req, res) => {
+provasRouter.post("/api/exam/start", authenticateJWT, async (req, res) => {
   const { id_prova, id_usuario, data_inicio, status } = req.body;
 
   try {
@@ -307,7 +302,7 @@ app.post("/api/exam/start", authenticateJWT, async (req, res) => {
   }
 });
 
-app.post("/api/exam/submit", authenticateJWT, async (req, res) => {
+provasRouter.post("/api/exam/submit", authenticateJWT, async (req, res) => {
   const { attemptId, userId, answers, endTime, status } = req.body;
 
   const client = await pool.connect();
@@ -345,7 +340,7 @@ app.post("/api/exam/submit", authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
+provasRouter.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
   const { id_prova } = req.params;
   const { role } = req.user;
 
@@ -414,7 +409,7 @@ app.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
+provasRouter.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -448,7 +443,7 @@ app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
 });
 
 // Rota para buscar questões de uma prova específica
-app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
+provasRouter.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -481,5 +476,5 @@ app.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
   }
 });
 
-export default app; // Exporta apenas a aplicação Express
+export default provasRouter; // Exporta apenas a aplicação Express
 
