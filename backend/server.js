@@ -7,7 +7,8 @@ import funcoes from "./routes/funcoes.js";
 import provas from "./routes/provas.js";
 import ranking from "./routes/ranking.js";
 import users from "./routes/users.js";
-import { Pool } from "pg";
+import pkg from "pg";
+const { Pool } = pkg;
 
 dotenv.config();
 

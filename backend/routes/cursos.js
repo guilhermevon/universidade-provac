@@ -44,9 +44,9 @@ pool.connect((err, client, release) => {
   });
 });
 
-const app = express();
+const cursosRouter = Router();
 
-app.get("/api/courses", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/courses", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
@@ -70,7 +70,7 @@ app.get("/api/courses", authenticateJWT, async (req, res) => {
   }
 });
 
-app.post("/api/manage-courses", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-courses", authenticateJWT, async (req, res) => {
   const { title, subtitle, img, dp } = req.body;
   const { role } = req.user;
 
@@ -90,7 +90,7 @@ app.post("/api/manage-courses", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/course/:id", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -111,7 +111,7 @@ app.get("/api/course/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -155,7 +155,7 @@ app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
 });
 
 // Nova rota para salvar progresso do vídeo
-app.post("/api/course/video-progress", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/course/video-progress", authenticateJWT, async (req, res) => {
   const { userId, courseId, nroAula, progress } = req.body;
 
   console.log("Recebendo progresso do vídeo:", req.body);
@@ -199,7 +199,7 @@ app.post("/api/course/video-progress", authenticateJWT, async (req, res) => {
   }
 });
 
-app.get(
+cursosRouter.get(
   "/api/user/:userId/courses-progress",
   authenticateJWT,
   async (req, res) => {
@@ -229,7 +229,7 @@ app.get(
 );
 
 // Rota para registrar pontuação ao assistir uma aula
-app.post(
+cursosRouter.post(
   "/api/course/:courseId/aula/:aulaId/pontuacao",
   authenticateJWT,
   async (req, res) => {
@@ -276,7 +276,7 @@ app.post(
   }
 );
 
-app.get("/api/course/:courseId/provas", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:courseId/provas", authenticateJWT, async (req, res) => {
   const { courseId } = req.params;
 
   try {
@@ -367,7 +367,7 @@ app.get("/api/course/:courseId/provas", authenticateJWT, async (req, res) => {
 });
 
 // Rota para buscar todas as funções de um departamento específico
-app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const resultAulas = await pool.query(
@@ -433,7 +433,7 @@ app.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -460,7 +460,7 @@ app.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/course/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -580,7 +580,7 @@ app.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 // Adicionando as rotas de módulos diretamente no server.js
 
 // Rota para listar módulos
-app.get("/api/modules", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/modules", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM educ_system.modules ORDER BY name"
@@ -593,7 +593,7 @@ app.get("/api/modules", authenticateJWT, async (req, res) => {
 });
 
 // Rota para criar um novo módulo
-app.post("/api/manage-modules", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-modules", authenticateJWT, async (req, res) => {
   const { name, description, course_id } = req.body;
   const { role } = req.user;
 
@@ -614,7 +614,7 @@ app.post("/api/manage-modules", authenticateJWT, async (req, res) => {
 });
 
 // Rota para deletar um módulo
-app.delete("/api/module/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/module/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -652,7 +652,7 @@ app.delete("/api/module/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-app.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
   const { title, url, description, course_id, module_id } = req.body;
   const { role } = req.user;
 
@@ -673,7 +673,7 @@ app.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
 });
 
 // Rota para listar módulos de um curso específico
-app.get("/api/courses/:courseId/modules", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/courses/:courseId/modules", authenticateJWT, async (req, res) => {
   const { courseId } = req.params;
   try {
     const result = await pool.query(
@@ -688,6 +688,6 @@ app.get("/api/courses/:courseId/modules", authenticateJWT, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+cursosRouter.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
-export default app; // Exporta apenas a aplicação Express
+export default cursosRouter; // Exporta apenas a aplicação Express

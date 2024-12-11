@@ -1,9 +1,13 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { Pool } = require("pg");
-const rateLimit = require("express-rate-limit");
-require("dotenv").config(); // Para usar variáveis de ambiente
+import express from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import pkg from "pg";
+import rateLimit from "express-rate-limit";
+import dotenv from "dotenv"; // Para usar variáveis de ambiente
+
+dotenv.config();
+
+const { Pool } = pkg;
 
 // Configurações do banco de dados
 const pool = new Pool({
@@ -176,7 +180,6 @@ userRouter.use((err, req, res, next) => {
 });
 
 module.exports = userRouter;
-
 export default app; // Exporta apenas a aplicação Express
 
 //------------------------------------------------------------------------------------------------------------------
