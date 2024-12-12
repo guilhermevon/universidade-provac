@@ -17,5 +17,9 @@ COPY ./backend .
 # Expor a porta que a aplicação irá usar
 EXPOSE 9301
 
+# Definindo a variável de ambiente API_MODE
+# test = teste produção = production
+ENV API_MODE=production
+
 # Comando para iniciar o servidor
 CMD ["npm", "start"]
