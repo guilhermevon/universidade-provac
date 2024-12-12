@@ -15,7 +15,7 @@ RUN npm install
 COPY ./backend .
 
 # Expor a porta que a aplicação irá usar
-EXPOSE 9301
+EXPOSE 9310
 
 # Definindo a variável de ambiente API_MODE
 # test = teste produção = production

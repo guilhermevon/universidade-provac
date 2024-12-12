@@ -1,5 +1,5 @@
 const ipv4Address = "192.168.0.232"; // Defina o IP correto
-const port = 9301;
+const port = 9310;
 
 app.get("/", (req, res) => {
   res.json({

@@ -5,7 +5,7 @@ services:
       context: ./backend # Diretório do backend
       dockerfile: Dockerfile
     ports:
-      - "9301:9301" # Porta exposta do backend
+      - "9310:9310" # Porta exposta do backend
     environment:
       - DATABASE_URL=postgresql://admin_provac:Provac%402024@192.168.0.232:5432/provac_producao
     depends_on:

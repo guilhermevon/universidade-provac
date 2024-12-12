@@ -164,7 +164,7 @@ const LoginPage = () => {
       const token = sessionStorage.getItem("token");
       try {
         const response = await axios.get(
-          "http://192.168.0.232:9301/users/departamento",
+          "http://192.168.0.232:9310/users/departamento",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -186,7 +186,7 @@ const LoginPage = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9301/users/departamento/${selectedDepartamento}/funcoes`,
+            `http://192.168.0.232:9310/users/departamento/${selectedDepartamento}/funcoes`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -217,7 +217,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9301/users/login",
+        "http://192.168.0.232:9310/users/login",
         payload, // Envia como JSON
         {
           headers: {

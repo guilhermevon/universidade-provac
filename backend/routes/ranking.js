@@ -2,10 +2,11 @@ import express from "express";
 import pkg from "pg";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import pool from ("../db/dbConfig.js")
 
 dotenv.config();
 
-const { Pool } = pkg;
+/*const { Pool } = pkg;
 
 const pool = new Pool({
   user: "admin_provac",
@@ -38,7 +39,7 @@ pool.connect((err, client, release) => {
     // Você agora pode fazer as consultas no schema educ_system
     release();
   });
-});
+});*/
 
 const rankingRouter = express.Router();
 const app = express();

@@ -3,10 +3,11 @@ import pkg from "pg";
 import jwt from "jsonwebtoken";
 //import cors from "cors";
 import dotenv from "dotenv";
+import pool from ("../db/dbConfig.js")
 
 dotenv.config();
 
-const { Pool } = pkg;
+/*const { Pool } = pkg;
 
 const pool = new Pool({
   user: "admin_provac",
@@ -39,7 +40,7 @@ pool.connect((err, client, release) => {
     // Você agora pode fazer as consultas no schema educ_system
     release();
   });
-});
+});*/
 
 const app = express();
 const cursosRouter = express.Router();

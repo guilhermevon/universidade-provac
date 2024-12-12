@@ -26,7 +26,7 @@ export const UserProvider = ({ children }) => {
   const login = async (matricula, senha) => {
     try {
       const response = await axios.post(
-        `http://192.168.0.232:9301/users/login`,
+        `http://192.168.0.232:9310/users/login`,
         {
           matricula: matricula,
           senha: senha,

@@ -1,33 +1,10 @@
 import express from "express";
 import cors from "cors";
-import os from "os";
-import dotenv from "dotenv";
 import cursosRouter from "./routes/cursos.js";
 import funcoesRouter from "./routes/funcoes.js";
 import provasRouter from "./routes/provas.js";
 import rankingRouter from "./routes/ranking.js";
 import usersRouter from "./routes/users.js";
-import pkg from "pg";
-const { Pool } = pkg;
-
-dotenv.config();
-
-const pool = new Pool({
-  user: "admin_provac",
-  host: "192.168.0.232",
-  database: "provac_producao",
-  password: "Provac@2024",
-  port: "5432",
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-  } else {
-    console.log("Conexão bem-sucedida ao banco de dados!");
-    release();
-  }
-});
 
 const app = express();
 const ipv4Address = "192.168.0.232";

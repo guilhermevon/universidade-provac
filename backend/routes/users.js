@@ -1,13 +1,14 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import pkg from "pg"; // Importando como um pacote CommonJS
+//import pkg from "pg"; // Importando como um pacote CommonJS
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
+import pool from ("../db/dbConfig.js")
 
 dotenv.config();
 
-const { Pool } = pkg; // Extraindo Pool do módulo pg
+/*const { Pool } = pkg; // Extraindo Pool do módulo pg
 
 const pool = new Pool({
   user: process.env.DB_USER || "admin_provac",
@@ -24,7 +25,7 @@ pool.connect((err, client, release) => {
     console.log("Conexão bem-sucedida ao banco de dados!");
     release();
   }
-});
+});*/
 
 const userRouter = express.Router();
 const app = express();
