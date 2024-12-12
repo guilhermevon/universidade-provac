@@ -15,3 +15,7 @@
 ### 2. cd universidade-provac
 ### 3. docker build -t universidade-provac-backend -f ./backend/Dockerfile .
 ### 4. docker run -d -p 9310:9310 universidade-provac-backend
+
+
+### obs: git pull --no-rebase origin main
+no server
