@@ -125,6 +125,6 @@ userRouter.post("/register", validateRegisterData, async (req, res, next) => {
 app.use((err, req, res, next) => {
   console.error("Erro:", err.stack);
   res.status(500).json({ error: "Erro interno do servidor" });
-});
+});f
 
 export default userRouter;

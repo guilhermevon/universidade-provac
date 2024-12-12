@@ -172,9 +172,4 @@ rankingRouter.post(
   }
 );
 
-const PORT = process.env.PORT || 9301;
-app.listen(PORT, () =>
-  console.log(`Servidor rodando na porta ${PORT}`)
-);
-
 export default rankingRouter; // Exporta apenas a aplicação Express

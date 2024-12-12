@@ -726,7 +726,4 @@ cursosRouter.get(
   }
 );
 
-const PORT = process.env.PORT || 9301;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
-
 export default cursosRouter; // Exporta apenas a aplicação Express

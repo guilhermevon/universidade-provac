@@ -98,7 +98,4 @@ funcoesRouter.get("/api/departamentos", authenticateJWT, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 9301;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
-
 export default funcoesRouter; // Exporta apenas a aplicação Express
