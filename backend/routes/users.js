@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 //import pkg from "pg"; // Importando como um pacote CommonJS
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-import pool from ("../db/dbConfig.js")
+import pool from "../db/dbConnection.js";
 
 dotenv.config();
 

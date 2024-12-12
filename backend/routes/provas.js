@@ -1,8 +1,8 @@
 import express from "express";
-import pkg from "pg";
+//import pkg from "pg";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import pool from ("../db/dbConfig.js")
+import pool from "../db/dbConnection.js";
 
 dotenv.config();
 
