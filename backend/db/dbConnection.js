@@ -48,4 +48,10 @@ const fetchData = async () => {
   }
 };
 
-export { pool, connectDB, fetchData };
+const dbConnection = {
+  pool,
+  connectDB,
+  fetchData,
+};
+
+export default dbConnection;
