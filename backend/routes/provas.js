@@ -1,6 +1,7 @@
 import express from "express";
 import pkg from "pg";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -40,6 +41,30 @@ pool.connect((err, client, release) => {
 });
 
 const provasRouter = express.Router();
+
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    console.log("Acesso não autorizado: Cabeçalho de autorização ausente");
+    return res.status(401).json({ message: "Acesso não autorizado" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET || "fallback_secret",
+    (err, user) => {
+      if (err) {
+        console.log("Token inválido:", err.message);
+        return res.status(403).json({ message: "Token inválido" });
+      }
+      req.user = user;
+      next();
+    }
+  );
+};
 
 provasRouter.post("/api/manage-provas", authenticateJWT, async (req, res) => {
   const {
@@ -112,51 +137,58 @@ provasRouter.post("/api/manage-provas", authenticateJWT, async (req, res) => {
   }
 });
 
-provasRouter.get("/api/prova/:id_prova/questoes", authenticateJWT, async (req, res) => {
-  const { id_prova } = req.params;
+provasRouter.get(
+  "/api/prova/:id_prova/questoes",
+  authenticateJWT,
+  async (req, res) => {
+    const { id_prova } = req.params;
 
-  try {
-    const questoesResult = await pool.query(
-      "SELECT q.id_questao, q.enunciado, q.tipo_questao, a.id_alternativa, a.texto_alternativa, a.correta FROM educ_system.questoes q LEFT JOIN educ_system.alternativas a ON q.id_questao = a.id_questao WHERE q.id_prova = $1 ORDER BY q.ordem, a.ordem",
-      [id_prova]
-    );
+    try {
+      const questoesResult = await pool.query(
+        "SELECT q.id_questao, q.enunciado, q.tipo_questao, a.id_alternativa, a.texto_alternativa, a.correta FROM educ_system.questoes q LEFT JOIN educ_system.alternativas a ON q.id_questao = a.id_questao WHERE q.id_prova = $1 ORDER BY q.ordem, a.ordem",
+        [id_prova]
+      );
 
-    const questoesMap = questoesResult.rows.reduce((acc, row) => {
-      if (!acc[row.id_questao]) {
-        acc[row.id_questao] = {
-          id_questao: row.id_questao,
-          enunciado: row.enunciado,
-          tipo_questao: row.tipo_questao,
-          alternativas: [],
-        };
-      }
+      const questoesMap = questoesResult.rows.reduce((acc, row) => {
+        if (!acc[row.id_questao]) {
+          acc[row.id_questao] = {
+            id_questao: row.id_questao,
+            enunciado: row.enunciado,
+            tipo_questao: row.tipo_questao,
+            alternativas: [],
+          };
+        }
 
-      if (row.id_alternativa) {
-        acc[row.id_questao].alternativas.push({
-          id_alternativa: row.id_alternativa,
-          texto_alternativa: row.texto_alternativa,
-          correta: row.correta,
-        });
-      }
+        if (row.id_alternativa) {
+          acc[row.id_questao].alternativas.push({
+            id_alternativa: row.id_alternativa,
+            texto_alternativa: row.texto_alternativa,
+            correta: row.correta,
+          });
+        }
 
-      return acc;
-    }, {});
+        return acc;
+      }, {});
 
-    const questoes = Object.values(questoesMap);
+      const questoes = Object.values(questoesMap);
 
-    res.json(questoes);
-  } catch (error) {
-    console.error("Erro ao buscar questões:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
+      res.json(questoes);
+    } catch (error) {
+      console.error("Erro ao buscar questões:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
   }
-});
+);
 
-provasRouter.get("/api/course/:id/provas", authenticateJWT, async (req, res) => {
-  const { id } = req.params;
-  console.log(`Buscando provas para o curso com ID: ${id}`); // Log para depuração
-  try {
-    const result = await pool.query(
-      `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
+provasRouter.get(
+  "/api/course/:id/provas",
+  authenticateJWT,
+  async (req, res) => {
+    const { id } = req.params;
+    console.log(`Buscando provas para o curso com ID: ${id}`); // Log para depuração
+    try {
+      const result = await pool.query(
+        `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
                 q.id_questao, q.tipo_questao, q.enunciado, q.pontuacao, q.ordem AS questao_ordem, 
                 a.id_alternativa, a.texto_alternativa, a.correta, a.ordem AS alternativa_ordem
          FROM educ_system.provas p
@@ -167,39 +199,18 @@ provasRouter.get("/api/course/:id/provas", authenticateJWT, async (req, res) => 
            FROM educ_system.modules m
            WHERE m.course_id = $1
          )`,
-      [id]
-    );
+        [id]
+      );
 
-    if (result.rows.length === 0) {
-      console.log("Nenhuma prova encontrada para este curso"); // Log para depuração
-      return res
-        .status(404)
-        .json({ message: "Nenhuma prova encontrada para este curso" });
-    }
+      if (result.rows.length === 0) {
+        console.log("Nenhuma prova encontrada para este curso"); // Log para depuração
+        return res
+          .status(404)
+          .json({ message: "Nenhuma prova encontrada para este curso" });
+      }
 
-    const provas = result.rows.reduce((acc, row) => {
-      const {
-        id_prova,
-        titulo,
-        descricao,
-        duracao,
-        nota_minima_aprovacao,
-        data_criacao,
-        data_atualizacao,
-        id_modulo,
-        id_questao,
-        tipo_questao,
-        enunciado,
-        pontuacao,
-        questao_ordem,
-        id_alternativa,
-        texto_alternativa,
-        correta,
-        alternativa_ordem,
-      } = row;
-      let prova = acc.find((p) => p.id_prova === id_prova);
-      if (!prova) {
-        prova = {
+      const provas = result.rows.reduce((acc, row) => {
+        const {
           id_prova,
           titulo,
           descricao,
@@ -208,39 +219,61 @@ provasRouter.get("/api/course/:id/provas", authenticateJWT, async (req, res) => 
           data_criacao,
           data_atualizacao,
           id_modulo,
-          questoes: [],
-        };
-        acc.push(prova);
-      }
-      let questao = prova.questoes.find((q) => q.id_questao === id_questao);
-      if (!questao && id_questao) {
-        questao = {
           id_questao,
           tipo_questao,
           enunciado,
           pontuacao,
-          ordem: questao_ordem,
-          alternativas: [],
-        };
-        prova.questoes.push(questao);
-      }
-      if (id_alternativa) {
-        questao.alternativas.push({
+          questao_ordem,
           id_alternativa,
           texto_alternativa,
           correta,
-          ordem: alternativa_ordem,
-        });
-      }
-      return acc;
-    }, []);
+          alternativa_ordem,
+        } = row;
+        let prova = acc.find((p) => p.id_prova === id_prova);
+        if (!prova) {
+          prova = {
+            id_prova,
+            titulo,
+            descricao,
+            duracao,
+            nota_minima_aprovacao,
+            data_criacao,
+            data_atualizacao,
+            id_modulo,
+            questoes: [],
+          };
+          acc.push(prova);
+        }
+        let questao = prova.questoes.find((q) => q.id_questao === id_questao);
+        if (!questao && id_questao) {
+          questao = {
+            id_questao,
+            tipo_questao,
+            enunciado,
+            pontuacao,
+            ordem: questao_ordem,
+            alternativas: [],
+          };
+          prova.questoes.push(questao);
+        }
+        if (id_alternativa) {
+          questao.alternativas.push({
+            id_alternativa,
+            texto_alternativa,
+            correta,
+            ordem: alternativa_ordem,
+          });
+        }
+        return acc;
+      }, []);
 
-    res.json(provas);
-  } catch (error) {
-    console.error("Erro ao buscar provas:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
+      res.json(provas);
+    } catch (error) {
+      console.error("Erro ao buscar provas:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
   }
-});
+);
 
 provasRouter.post("/api/respostas", authenticateJWT, async (req, res) => {
   const { userId, provaId, respostas } = req.body;
@@ -340,141 +373,152 @@ provasRouter.post("/api/exam/submit", authenticateJWT, async (req, res) => {
   }
 });
 
-provasRouter.delete("/api/prova/:id_prova", authenticateJWT, async (req, res) => {
-  const { id_prova } = req.params;
-  const { role } = req.user;
+provasRouter.delete(
+  "/api/prova/:id_prova",
+  authenticateJWT,
+  async (req, res) => {
+    const { id_prova } = req.params;
+    const { role } = req.user;
 
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
+    if (role !== "1") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
 
-    // Delete from respostas_usuario
-    const deleteRespostasUsuarioQuery = `
+      // Delete from respostas_usuario
+      const deleteRespostasUsuarioQuery = `
         DELETE FROM educ_system.respostas_usuario 
         WHERE id_tentativa IN (
           SELECT id_tentativa FROM educ_system.tentativas_prova 
           WHERE id_prova = $1
         )
       `;
-    await client.query(deleteRespostasUsuarioQuery, [id_prova]);
+      await client.query(deleteRespostasUsuarioQuery, [id_prova]);
 
-    // Delete from tentativas_prova
-    const deleteTentativasProvaQuery = `
+      // Delete from tentativas_prova
+      const deleteTentativasProvaQuery = `
         DELETE FROM educ_system.tentativas_prova 
         WHERE id_prova = $1
       `;
-    await client.query(deleteTentativasProvaQuery, [id_prova]);
+      await client.query(deleteTentativasProvaQuery, [id_prova]);
 
-    // Delete from alternativas
-    const deleteAlternativasQuery = `
+      // Delete from alternativas
+      const deleteAlternativasQuery = `
         DELETE FROM educ_system.alternativas 
         WHERE id_questao IN (
           SELECT id_questao FROM educ_system.questoes 
           WHERE id_prova = $1
         )
       `;
-    await client.query(deleteAlternativasQuery, [id_prova]);
+      await client.query(deleteAlternativasQuery, [id_prova]);
 
-    // Delete from questoes
-    const deleteQuestoesQuery = `
+      // Delete from questoes
+      const deleteQuestoesQuery = `
         DELETE FROM educ_system.questoes 
         WHERE id_prova = $1
       `;
-    await client.query(deleteQuestoesQuery, [id_prova]);
+      await client.query(deleteQuestoesQuery, [id_prova]);
 
-    // Finally, delete the prova
-    const deleteProvaQuery =
-      "DELETE FROM educ_system.provas WHERE id_prova = $1 RETURNING *";
-    const result = await client.query(deleteProvaQuery, [id_prova]);
+      // Finally, delete the prova
+      const deleteProvaQuery =
+        "DELETE FROM educ_system.provas WHERE id_prova = $1 RETURNING *";
+      const result = await client.query(deleteProvaQuery, [id_prova]);
 
-    await client.query("COMMIT");
+      await client.query("COMMIT");
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Prova não encontrada" });
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Prova não encontrada" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Prova deletada com sucesso", prova: result.rows[0] });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Erro ao deletar prova:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    } finally {
+      client.release();
     }
-
-    res
-      .status(200)
-      .json({ message: "Prova deletada com sucesso", prova: result.rows[0] });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Erro ao deletar prova:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
-  } finally {
-    client.release();
   }
-});
+);
 
-provasRouter.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query(
-      `SELECT id_questao, tipo_questao, enunciado, pontuacao, ordem
+provasRouter.get(
+  "/api/prova/:id/questoes",
+  authenticateJWT,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        `SELECT id_questao, tipo_questao, enunciado, pontuacao, ordem
          FROM educ_system.questoes
          WHERE id_prova = $1
          ORDER BY ordem`,
-      [id]
-    );
+        [id]
+      );
 
-    const questoes = result.rows;
+      const questoes = result.rows;
 
-    const questoesComAlternativas = await Promise.all(
-      questoes.map(async (questao) => {
-        const alternativasResult = await pool.query(
-          `SELECT id_alternativa, texto_alternativa, correta, ordem
+      const questoesComAlternativas = await Promise.all(
+        questoes.map(async (questao) => {
+          const alternativasResult = await pool.query(
+            `SELECT id_alternativa, texto_alternativa, correta, ordem
            FROM educ_system.alternativas
            WHERE id_questao = $1
            ORDER BY ordem`,
-          [questao.id_questao]
-        );
-        return { ...questao, alternativas: alternativasResult.rows };
-      })
-    );
+            [questao.id_questao]
+          );
+          return { ...questao, alternativas: alternativasResult.rows };
+        })
+      );
 
-    res.json(questoesComAlternativas);
-  } catch (error) {
-    console.error("Erro ao buscar questões:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
+      res.json(questoesComAlternativas);
+    } catch (error) {
+      console.error("Erro ao buscar questões:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
   }
-});
+);
 
 // Rota para buscar questões de uma prova específica
-provasRouter.get("/api/prova/:id/questoes", authenticateJWT, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query(
-      `SELECT id_questao, tipo_questao, enunciado, pontuacao, ordem
+provasRouter.get(
+  "/api/prova/:id/questoes",
+  authenticateJWT,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = await pool.query(
+        `SELECT id_questao, tipo_questao, enunciado, pontuacao, ordem
          FROM educ_system.questoes
          WHERE id_prova = $1
          ORDER BY ordem`,
-      [id]
-    );
+        [id]
+      );
 
-    const questoes = result.rows;
+      const questoes = result.rows;
 
-    const questoesComAlternativas = await Promise.all(
-      questoes.map(async (questao) => {
-        const alternativasResult = await pool.query(
-          `SELECT id_alternativa, texto_alternativa, correta, ordem
+      const questoesComAlternativas = await Promise.all(
+        questoes.map(async (questao) => {
+          const alternativasResult = await pool.query(
+            `SELECT id_alternativa, texto_alternativa, correta, ordem
            FROM educ_system.alternativas
            WHERE id_questao = $1
            ORDER BY ordem`,
-          [questao.id_questao]
-        );
-        return { ...questao, alternativas: alternativasResult.rows };
-      })
-    );
+            [questao.id_questao]
+          );
+          return { ...questao, alternativas: alternativasResult.rows };
+        })
+      );
 
-    res.json(questoesComAlternativas);
-  } catch (error) {
-    console.error("Erro ao buscar questões:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
+      res.json(questoesComAlternativas);
+    } catch (error) {
+      console.error("Erro ao buscar questões:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
   }
-});
+);
 
 export default provasRouter; // Exporta apenas a aplicação Express
-

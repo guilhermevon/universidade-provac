@@ -1,6 +1,7 @@
 import express from "express";
 import pkg from "pg";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -40,6 +41,30 @@ pool.connect((err, client, release) => {
 });
 
 const rankingRouter = express.Router();
+
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    console.log("Acesso não autorizado: Cabeçalho de autorização ausente");
+    return res.status(401).json({ message: "Acesso não autorizado" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET || "fallback_secret",
+    (err, user) => {
+      if (err) {
+        console.log("Token inválido:", err.message);
+        return res.status(403).json({ message: "Token inválido" });
+      }
+      req.user = user;
+      next();
+    }
+  );
+};
 
 rankingRouter.get("/api/rankings", authenticateJWT, async (req, res) => {
   const { id } = req.user;
@@ -147,6 +172,8 @@ rankingRouter.post(
 );
 
 const PORT = process.env.PORT || 5000;
-rankingRouter.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+rankingRouter.listen(PORT, () =>
+  console.log(`Servidor rodando na porta ${PORT}`)
+);
 
 export default rankingRouter; // Exporta apenas a aplicação Express
