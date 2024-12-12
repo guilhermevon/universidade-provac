@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 //import cors from "cors";
 import dotenv from "dotenv";
 
-
 dotenv.config();
 
 const { Pool } = pkg;
@@ -42,6 +41,7 @@ pool.connect((err, client, release) => {
   });
 });
 
+const app = express();
 const cursosRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {
@@ -726,9 +726,7 @@ cursosRouter.get(
   }
 );
 
-const PORT = process.env.PORT || 5000;
-cursosRouter.listen(PORT, () =>
-  console.log(`Servidor rodando na porta ${PORT}`)
-);
+const PORT = process.env.PORT || 9301;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 export default cursosRouter; // Exporta apenas a aplicação Express

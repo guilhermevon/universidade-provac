@@ -40,6 +40,7 @@ pool.connect((err, client, release) => {
   });
 });
 
+const app = express();
 const provasRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {

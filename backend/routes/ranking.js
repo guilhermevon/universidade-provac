@@ -41,6 +41,7 @@ pool.connect((err, client, release) => {
 });
 
 const rankingRouter = express.Router();
+const app = express();
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -171,8 +172,8 @@ rankingRouter.post(
   }
 );
 
-const PORT = process.env.PORT || 5000;
-rankingRouter.listen(PORT, () =>
+const PORT = process.env.PORT || 9301;
+app.listen(PORT, () =>
   console.log(`Servidor rodando na porta ${PORT}`)
 );
 

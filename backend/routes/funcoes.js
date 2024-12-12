@@ -8,6 +8,7 @@ dotenv.config();
 
 const { Pool } = pkg;
 
+const app = express();
 const funcoesRouter = express.Router();
 
 const pool = new Pool({
@@ -97,9 +98,7 @@ funcoesRouter.get("/api/departamentos", authenticateJWT, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-funcoesRouter.listen(PORT, () =>
-  console.log(`Servidor rodando na porta ${PORT}`)
-);
+const PORT = process.env.PORT || 9301;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 export default funcoesRouter; // Exporta apenas a aplicação Express
