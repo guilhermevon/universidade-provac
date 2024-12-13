@@ -1,4 +1,5 @@
-import { Pool } from "pg"; // Usando 'import' em vez de 'require'
+import pkg from "pg"; // Importação do módulo como padrão
+const { Pool } = pkg; // Desestruturação para obter Pool
 
 // Configurações do banco de dados
 const pool = new Pool({
@@ -39,7 +40,7 @@ const connectDB = async () => {
 const fetchData = async () => {
   const client = await pool.connect();
   try {
-    const result = await client.query("SELECT * FROM some_table");
+    const result = await client.query("SELECT * FROM educ_system.educ_users");
     console.log(result.rows);
   } catch (err) {
     console.error("Erro ao executar a consulta:", err.stack);
