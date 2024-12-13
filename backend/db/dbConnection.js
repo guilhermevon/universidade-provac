@@ -49,11 +49,8 @@ const fetchData = async () => {
   }
 };
 
-// Exportação usando 'export default'
-const dbConnection = {
+export default {
   pool,
   connectDB,
   fetchData,
 };
-
-export default dbConnection;
