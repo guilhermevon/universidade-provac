@@ -7,41 +7,6 @@ import pool from "../db/dbConnection.js";
 
 dotenv.config();
 
-/*const { Pool } = pkg;
-
-const pool = new Pool({
-  user: "admin_provac",
-  host: "192.168.0.232",
-  database: "provac_producao",
-  password: "Provac@2024",
-  port: "5432",
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-  } else {
-    console.log("Conexão bem-sucedida ao banco de dados!");
-    release(); // Libera a conexão de volta ao pool
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-    return;
-  }
-
-  // Definindo o search_path para o schema educ_system
-  client.query("SET search_path TO educ_system", (err, res) => {
-    if (err) {
-      console.error("Erro ao configurar o search_path:", err.stack);
-    }
-    // Você agora pode fazer as consultas no schema educ_system
-    release();
-  });
-});*/
-
 const cursosRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {
@@ -67,6 +32,21 @@ const authenticateJWT = (req, res, next) => {
     }
   );
 };
+
+cursosRouter.get("/", async (req, res) => {
+  try {
+    // Consulta SQL
+    const sql = "SELECT * FROM educ_system.courses";
+
+    // Conexão com o banco e execução da query
+    const result = await pool.query(sql);
+
+    res.json(result.rows); // Retorna apenas os dados das linhas
+  } catch (err) {
+    console.error("Erro ao consultar o banco de dados:", err);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});
 
 cursosRouter.get("/api/courses", authenticateJWT, async (req, res) => {
   try {

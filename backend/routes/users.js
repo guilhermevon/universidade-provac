@@ -57,6 +57,21 @@ const validateRegisterData = (req, res, next) => {
   next();
 };
 
+userRouter.get("/", async (req, res) => {
+  try {
+    // Consulta SQL
+    const sql = "SELECT * FROM educ_system.educ_users";
+
+    // Conexão com o banco e execução da query
+    const result = await pool.query(sql);
+
+    res.json(result.rows); // Retorna apenas os dados das linhas
+  } catch (err) {
+    console.error("Erro ao consultar o banco de dados:", err);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});
+
 // Login
 userRouter.post("/login", loginLimiter, async (req, res, next) => {
   try {
