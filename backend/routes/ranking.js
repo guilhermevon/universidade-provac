@@ -42,7 +42,6 @@ pool.connect((err, client, release) => {
 });*/
 
 const rankingRouter = express.Router();
-const app = express();
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;

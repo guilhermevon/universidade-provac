@@ -28,7 +28,6 @@ pool.connect((err, client, release) => {
 });*/
 
 const userRouter = express.Router();
-const app = express();
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
@@ -120,12 +119,6 @@ userRouter.post("/register", validateRegisterData, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
-
-// Middleware de erro
-app.use((err, req, res, next) => {
-  console.error("Erro:", err.stack);
-  res.status(500).json({ error: "Erro interno do servidor" });
 });
 
 export default userRouter;

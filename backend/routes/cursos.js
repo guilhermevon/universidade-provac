@@ -42,7 +42,6 @@ pool.connect((err, client, release) => {
   });
 });*/
 
-const app = express();
 const cursosRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {
