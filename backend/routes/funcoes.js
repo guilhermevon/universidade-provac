@@ -9,9 +9,6 @@ dotenv.config();
 
 /*const { Pool } = pkg;
 
-const app = express();
-const funcoesRouter = express.Router();
-
 const pool = new Pool({
   user: "admin_provac",
   host: "192.168.0.232",
@@ -44,6 +41,9 @@ pool.connect((err, client, release) => {
     release();
   });
 });*/
+
+const app = express();
+const funcoesRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
