@@ -1,4 +1,4 @@
-const { Pool } = require("pg");
+import { Pool } from "pg"; // Usando 'import' em vez de 'require'
 
 // Configurações do banco de dados
 const pool = new Pool({
@@ -48,6 +48,7 @@ const fetchData = async () => {
   }
 };
 
+// Exportação usando 'export default'
 const dbConnection = {
   pool,
   connectDB,
