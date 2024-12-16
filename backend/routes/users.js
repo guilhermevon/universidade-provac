@@ -93,6 +93,22 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
   }
 });
 
+// Rota GET para retornar todos os usuários
+userRouter.get("/departamento", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT dp FROM educ_system.educ_users"); // Usando pool.query diretamente
+
+    if (result.rows.length > 0) {
+      return res.json(result.rows);
+    } else {
+      return res.status(404).json({ message: "Nenhum usuário encontrado." });
+    }
+  } catch (err) {
+    console.error("Erro ao consultar o banco de dados:", err.stack);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});
+
 // Registro
 userRouter.post("/register", validateRegisterData, async (req, res, next) => {
   const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
