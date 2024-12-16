@@ -60,7 +60,7 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
 
     // Consultar usuário pelo email
     const result = await pool.query(
-      "SELECT * FROM educ_system.educ_users WHERE email = $1", // Alterado para buscar por email
+      "SELECT * FROM educ_system.educ_users WHERE email = $1 AND senha = ?", // Alterado para buscar por email
       [email]
     );
 
