@@ -1,31 +1,11 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-//import pkg from "pg"; // Importando como um pacote CommonJS
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-import pool from "../db/dbConnection.js";
+import pool from "../db/dbConnection.js"; // Certifique-se de que o pool está funcionando
 
 dotenv.config();
-
-/*const { Pool } = pkg; // Extraindo Pool do módulo pg
-
-const pool = new Pool({
-  user: process.env.DB_USER || "admin_provac",
-  host: process.env.DB_HOST || "192.168.0.232",
-  database: process.env.DB_NAME || "provac_producao",
-  password: process.env.DB_PASSWORD || "Provac@2024",
-  port: process.env.DB_PORT || 5432,
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-  } else {
-    console.log("Conexão bem-sucedida ao banco de dados!");
-    release();
-  }
-});*/
 
 const userRouter = express.Router();
 
@@ -57,17 +37,22 @@ const validateRegisterData = (req, res, next) => {
   next();
 };
 
+// Rota GET para retornar todos os usuários
 userRouter.get("/", async (req, res) => {
   try {
-    // Consulta SQL
-    const sql = "SELECT * FROM educ_system.educ_users";
+    const sql = "SELECT * FROM educ_system.educ_users"; // Certifique-se de que a tabela existe
 
     // Conexão com o banco e execução da query
     const result = await pool.query(sql);
 
-    res.json(result.rows); // Retorna apenas os dados das linhas
+    // Verifica se existem resultados e retorna
+    if (result.rows.length > 0) {
+      return res.json(result.rows); // Retorna os dados das linhas
+    } else {
+      return res.status(404).json({ message: "Nenhum usuário encontrado." });
+    }
   } catch (err) {
-    console.error("Erro ao consultar o banco de dados:", err);
+    console.error("Erro ao consultar o banco de dados:", err.stack);
     res.status(500).send("Erro ao consultar o banco de dados");
   }
 });

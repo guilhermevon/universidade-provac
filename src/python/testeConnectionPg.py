@@ -14,7 +14,7 @@ try:
     try:
         # Criando um cursor e executando a query
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM educ_system.ranking_usuarios ;")  # Query corrigida
+            cur.execute("SELECT * FROM educ_system.educ_users ;")  # Query corrigida
             users = cur.fetchall()
             print("Registros disponíveis na tabela educ_users:", users)
     except Exception as e:
