@@ -34,5 +34,5 @@ const fetchData = async () => {
   }
 };
 
-// Exporta o pool diretamente
-export { pool, connectDB, fetchData };
+// Exportação padrão
+export default pool;
