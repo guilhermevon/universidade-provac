@@ -5,7 +5,9 @@ import funcoesRouter from "./routes/funcoes.js";
 import provasRouter from "./routes/provas.js";
 import rankingRouter from "./routes/ranking.js";
 import usersRouter from "./routes/users.js";
+import dotenv from "dotenv";
 
+dotenv.config(); // Carrega variáveis do .env
 const app = express();
 const ipv4Address = "192.168.0.232";
 
