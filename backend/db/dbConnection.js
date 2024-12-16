@@ -21,11 +21,11 @@ const connectDB = async () => {
   }
 };
 
-// Exemplo de consulta
+// Exemplo de consulta utilizando pool diretamente
 const fetchData = async () => {
-  const client = await pool.connect();
+  const client = await pool.connect(); // Obtém um cliente do pool
   try {
-    const result = await client.query("SELECT * FROM educ_system.educ_users");
+    const result = await client.query("SELECT * FROM educ_system.educ_users"); // Usa o client para executar a query
     console.log(result.rows);
   } catch (err) {
     console.error("Erro ao executar a consulta:", err.stack);
@@ -34,8 +34,5 @@ const fetchData = async () => {
   }
 };
 
-export default {
-  pool,
-  connectDB,
-  fetchData,
-};
+// Exporta o pool diretamente
+export { pool, connectDB, fetchData };

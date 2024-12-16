@@ -40,14 +40,10 @@ const validateRegisterData = (req, res, next) => {
 // Rota GET para retornar todos os usuários
 userRouter.get("/", async (req, res) => {
   try {
-    const sql = "SELECT * FROM educ_system.educ_users"; // Certifique-se de que a tabela existe
+    const result = await pool.query("SELECT * FROM educ_system.educ_users"); // Usando pool.query diretamente
 
-    // Conexão com o banco e execução da query
-    const result = await pool.query(sql);
-
-    // Verifica se existem resultados e retorna
     if (result.rows.length > 0) {
-      return res.json(result.rows); // Retorna os dados das linhas
+      return res.json(result.rows);
     } else {
       return res.status(404).json({ message: "Nenhum usuário encontrado." });
     }

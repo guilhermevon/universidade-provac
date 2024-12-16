@@ -69,11 +69,10 @@ const authenticateJWT = (req, res, next) => {
 
 rankingRouter.get("/", async (req, res) => {
   try {
-    // Consulta SQL
-    const sql = "SELECT * FROM educ_system.ranking_usuarios";
-
     // Conexão com o banco e execução da query
-    const result = await pool.query(sql);
+    const result = await pool.query(
+      "SELECT * FROM educ_system.ranking_usuarios"
+    );
 
     res.json(result.rows); // Retorna apenas os dados das linhas
   } catch (err) {

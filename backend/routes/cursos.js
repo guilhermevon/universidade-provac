@@ -35,11 +35,8 @@ const authenticateJWT = (req, res, next) => {
 
 cursosRouter.get("/", async (req, res) => {
   try {
-    // Consulta SQL
-    const sql = "SELECT * FROM educ_system.courses";
-
     // Conexão com o banco e execução da query
-    const result = await pool.query(sql);
+    const result = await pool.query("SELECT * FROM educ_system.courses");
 
     res.json(result.rows); // Retorna apenas os dados das linhas
   } catch (err) {
