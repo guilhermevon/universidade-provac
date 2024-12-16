@@ -56,10 +56,12 @@ userRouter.get("/", async (req, res) => {
 // Login
 userRouter.post("/login", loginLimiter, async (req, res, next) => {
   try {
-    const { matricula, senha } = req.body;
+    const { email, senha } = req.body; // Agora estamos pegando o email e a senha
+
+    // Consultar usuário pelo email
     const result = await pool.query(
-      "SELECT * FROM educ_system.educ_users WHERE matricula = $1",
-      [matricula]
+      "SELECT * FROM educ_system.educ_users WHERE email = $1", // Alterado para buscar por email
+      [email]
     );
 
     if (!result.rows.length) {
@@ -67,18 +69,22 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
     }
 
     const user = result.rows[0];
+
+    // Verificar se a senha é válida
     const isSenhaValid = await bcrypt.compare(senha, user.senha);
 
     if (!isSenhaValid) {
       return res.status(401).json({ error: "Credenciais inválidas" });
     }
 
+    // Gerar o token JWT
     const token = jwt.sign(
-      { id: user.id, matricula: user.matricula },
+      { id: user.id, email: user.email }, // Alterado para usar o email
       process.env.JWT_SECRET || "defaultSecret",
-      { expiresIn: "1h" }
+      { expiresIn: "1h" } // Token expira em 1 hora
     );
 
+    // Retornar o token e as informações do usuário
     res.json({ message: "Login bem-sucedido", token, user });
   } catch (err) {
     next(err);
