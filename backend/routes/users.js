@@ -53,14 +53,16 @@ userRouter.get("/", async (req, res) => {
   }
 });
 
-// Login
 userRouter.post("/login", loginLimiter, async (req, res, next) => {
   try {
-    const { email, senha } = req.body; // Agora estamos pegando o email e a senha
+    const { email, senha } = req.body; // Recebe o email e senha
+
+    // Verifique se a senha é uma string, caso contrário, converta-a para string
+    const senhaStr = String(senha);
 
     // Consultar usuário pelo email
     const result = await pool.query(
-      "SELECT * FROM educ_system.educ_users WHERE email = $1 AND senha = ?", // Alterado para buscar por email
+      "SELECT * FROM educ_system.educ_users WHERE email = $1", // Busca pelo email
       [email]
     );
 
@@ -70,8 +72,8 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
 
     const user = result.rows[0];
 
-    // Verificar se a senha é válida
-    const isSenhaValid = await bcrypt.compare(senha, user.senha);
+    // Verificar se a senha é válida, usando bcrypt
+    const isSenhaValid = await bcrypt.compare(senhaStr, user.senha); // Aqui comparamos a senha
 
     if (!isSenhaValid) {
       return res.status(401).json({ error: "Credenciais inválidas" });
@@ -79,9 +81,9 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
 
     // Gerar o token JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email }, // Alterado para usar o email
+      { id: user.id, email: user.email },
       process.env.JWT_SECRET || "defaultSecret",
-      { expiresIn: "1h" } // Token expira em 1 hora
+      { expiresIn: "1h" }
     );
 
     // Retornar o token e as informações do usuário
