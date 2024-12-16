@@ -53,7 +53,7 @@ userRouter.get("/", async (req, res) => {
   }
 });
 
-userRouter.post("/login", loginLimiter, async (req, res, next) => {
+/*userRouter.post("/login", loginLimiter, async (req, res, next) => {
   try {
     const { email, senha } = req.body; // Recebe o email e senha
 
@@ -90,6 +90,35 @@ userRouter.post("/login", loginLimiter, async (req, res, next) => {
     res.json({ message: "Login bem-sucedido", token, user });
   } catch (err) {
     next(err);
+  }
+});*/
+
+userRouter.post("/login", async (req, res) => {
+  try {
+    const { email, senha } = req.body; // Receber email e senha do corpo da requisição
+
+    // Consultar usuário pelo email
+    const result = await pool.query(
+      "SELECT senha FROM educ_system.educ_users WHERE email = $1",
+      [email]
+    );
+
+    if (!result.rows.length) {
+      return res.status(401).json({ error: "Email ou senha inválidos" });
+    }
+
+    const senhaCorreta = result.rows[0].senha;
+
+    // Verificar se a senha corresponde exatamente (sem bcrypt)
+    if (senha !== senhaCorreta) {
+      return res.status(401).json({ error: "Email ou senha inválidos" });
+    }
+
+    // Login bem-sucedido
+    res.json({ message: "Login realizado com sucesso" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro no servidor" });
   }
 });
 
