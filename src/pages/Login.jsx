@@ -211,8 +211,8 @@ const LoginPage = () => {
     const formData = new FormData(form);
 
     const payload = {
-      matricula: formData.get("matricula"),
-      senha: formData.get("password"),
+      email: formData.get("email"), // Pegando o email do formulário
+      senha: formData.get("password"), // Pegando a senha do formulário
     };
 
     try {
@@ -225,15 +225,22 @@ const LoginPage = () => {
           },
         }
       );
+
       console.log("Payload enviado:", payload);
+
       if (response.data.token) {
+        // Armazene o token de autenticação no sessionStorage
         sessionStorage.setItem("token", response.data.token);
-        navigate("/courses");
+
+        // Redireciona para a página desejada após login
+        navigate("/courses"); // Página para a qual você deseja redirecionar após login
       } else {
         console.error("Erro de autenticação:", response.data);
+        alert("Credenciais inválidas. Tente novamente.");
       }
     } catch (error) {
       console.error("Erro:", error);
+      alert("Houve um erro ao tentar fazer login. Tente novamente.");
     }
   };
 
