@@ -22,4 +22,5 @@ EXPOSE 9310
 ENV API_MODE=production
 
 # Comando para iniciar o servidor
-CMD ["npm", "start"]
+#CMD ["npm", "start"]
+CMD ["node", "server.js"]
