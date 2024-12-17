@@ -26,6 +26,7 @@ const App = () => {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/welcome" element={<Welcome />} />
         <Route
           path="/areagest"
           element={
@@ -96,14 +97,6 @@ const App = () => {
           element={
             <PrivateRoute>
               <Course />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/welcome"
-          element={
-            <PrivateRoute>
-              <Welcome />
             </PrivateRoute>
           }
         />
