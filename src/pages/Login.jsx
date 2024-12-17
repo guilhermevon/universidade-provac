@@ -211,14 +211,16 @@ const LoginPage = () => {
     const formData = new FormData(form);
 
     const payload = {
-      email: formData.get("email"), // Pegando o email do formulário
-      senha: formData.get("password"), // Pegando a senha do formulário
+      email: formData.get("email"), // Captura o email do campo do formulário
+      senha: formData.get("password"), // Captura a senha do campo do formulário
     };
 
     try {
+      console.log("Payload enviado:", payload); // Log para depuração
+
       const response = await axios.post(
-        "http://192.168.0.232:9310/users/login",
-        payload, // Envia como JSON
+        "http://192.168.0.232:9310/users/login", // Altere para sua URL correta
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -226,21 +228,24 @@ const LoginPage = () => {
         }
       );
 
-      console.log("Payload enviado:", payload);
-
-      if (response.data.token) {
-        // Armazene o token de autenticação no sessionStorage
+      if (response.status === 200 && response.data.token) {
+        // Armazena o token no sessionStorage
         sessionStorage.setItem("token", response.data.token);
 
         // Redireciona para a página desejada após login
-        navigate("/courses"); // Página para a qual você deseja redirecionar após login
+        const navigate = useNavigate();
+        navigate("/courses");
       } else {
-        console.error("Erro de autenticação:", response.data);
         alert("Credenciais inválidas. Tente novamente.");
       }
     } catch (error) {
-      console.error("Erro:", error);
-      alert("Houve um erro ao tentar fazer login. Tente novamente.");
+      console.error("Erro durante o login:", error);
+
+      if (error.response && error.response.status === 401) {
+        alert("Email ou senha inválidos. Tente novamente.");
+      } else {
+        alert("Erro no servidor. Tente novamente mais tarde.");
+      }
     }
   };
 
