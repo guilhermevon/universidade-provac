@@ -188,7 +188,7 @@ const Aprovacao = () => {
     const fetchCourses = async () => {
       const token = sessionStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:5000/api/courses/approval', {
+        const response = await axios.get('http://192.168.0.232:9310/api/courses/approval', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -214,7 +214,7 @@ const Aprovacao = () => {
     const token = sessionStorage.getItem('token');
     try {
       await axios.patch(
-        'http://localhost:5000/api/courses/approve',
+        'http://192.168.0.232:9310/api/courses/approve',
         { courseIds: selectedCourses },
         {
           headers: {
@@ -242,7 +242,7 @@ const Aprovacao = () => {
   const handleDeleteCourse = async (courseId) => {
     const token = sessionStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:5000/api/course/${courseId}`, {
+      await axios.delete(`http://192.168.0.232:9310/api/course/${courseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

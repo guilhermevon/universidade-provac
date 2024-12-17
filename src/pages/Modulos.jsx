@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../assets/bg_home.png';
+import React, { useState, useEffect } from "react";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import { useNavigate } from "react-router-dom";
+import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
   html, body {
@@ -132,7 +132,7 @@ const FormWrapper = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  color: #FFF;
+  color: #fff;
   text-align: center;
   margin-bottom: 1.5rem;
 `;
@@ -170,7 +170,7 @@ const Select = styled.select`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #0D47A1; /* Azul escuro */
+  background-color: #0d47a1; /* Azul escuro */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -190,7 +190,7 @@ const DeleteModuleForm = styled.div`
   padding: 2rem;
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
 `;
@@ -200,7 +200,7 @@ const SelectWithMargin = styled(Select)`
 `;
 
 const DeleteButton = styled.button`
-  background-color: #E74C3C; /* Vermelho */
+  background-color: #e74c3c; /* Vermelho */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -211,92 +211,108 @@ const DeleteButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #C0392B; /* Vermelho mais escuro ao passar o mouse */
+    background-color: #c0392b; /* Vermelho mais escuro ao passar o mouse */
   }
 `;
 
 const Modulos = () => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [modules, setModules] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [selectedModule, setSelectedModule] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [deleteCourse, setDeleteCourse] = useState('');
+  const [selectedModule, setSelectedModule] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [deleteCourse, setDeleteCourse] = useState("");
   const [deleteModules, setDeleteModules] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
 
       const user = JSON.parse(jsonPayload);
-      console.log('User payload:', user);
-      console.log('User role:', user.role);
+      console.log("User payload:", user);
+      console.log("User role:", user.role);
 
-      if (user.role !== '1') {
-        navigate('/login');
+      if (user.role !== "1") {
+        navigate("/login");
       }
     } catch (error) {
-      console.error('Erro ao verificar o token:', error);
-      navigate('/login');
+      console.error("Erro ao verificar o token:", error);
+      navigate("/login");
     }
   }, [navigate]);
 
   const fetchModules = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get('http://localhost:5000/api/modules', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/modules",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setModules(response.data);
     } catch (error) {
-      console.error('Erro ao buscar módulos:', error);
+      console.error("Erro ao buscar módulos:", error);
     }
   };
 
   const fetchCourses = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get('http://localhost:5000/api/courses', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const coursesData = Object.keys(response.data).flatMap(key => response.data[key]);
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/courses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const coursesData = Object.keys(response.data).flatMap(
+        (key) => response.data[key]
+      );
       setCourses(coursesData);
     } catch (error) {
-      console.error('Erro ao buscar cursos:', error);
+      console.error("Erro ao buscar cursos:", error);
     }
   };
 
   const fetchDeleteModules = async (courseId) => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/courses/${courseId}/modules`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://192.168.0.232:9310/api/courses/${courseId}/modules`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setDeleteModules(response.data);
     } catch (error) {
-      console.error('Erro ao buscar módulos para exclusão:', error);
+      console.error("Erro ao buscar módulos para exclusão:", error);
     }
   };
 
@@ -313,11 +329,11 @@ const Modulos = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/manage-modules',
+        "http://192.168.0.232:9310/api/manage-modules",
         { name, description, course_id: selectedCourse },
         {
           headers: {
@@ -326,35 +342,38 @@ const Modulos = () => {
         }
       );
       if (response.status === 201) {
-        alert('Módulo cadastrado com sucesso!');
-        setName('');
-        setDescription('');
-        setSelectedCourse('');
+        alert("Módulo cadastrado com sucesso!");
+        setName("");
+        setDescription("");
+        setSelectedCourse("");
         fetchModules();
       }
     } catch (error) {
-      console.error('Erro ao cadastrar módulo:', error);
-      alert('Erro ao cadastrar módulo. Por favor, tente novamente.');
+      console.error("Erro ao cadastrar módulo:", error);
+      alert("Erro ao cadastrar módulo. Por favor, tente novamente.");
     }
   };
 
   const handleDeleteModule = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/module/${selectedModule}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://192.168.0.232:9310/api/module/${selectedModule}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 200) {
-        alert('Módulo deletado com sucesso!');
-        setSelectedModule('');
+        alert("Módulo deletado com sucesso!");
+        setSelectedModule("");
         fetchModules();
       }
     } catch (error) {
-      console.error('Erro ao deletar módulo:', error);
-      alert('Erro ao deletar módulo. Por favor, tente novamente.');
+      console.error("Erro ao deletar módulo:", error);
+      alert("Erro ao deletar módulo. Por favor, tente novamente.");
     }
   };
 
@@ -386,9 +405,15 @@ const Modulos = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 required
               />
-              <Select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} required>
-                <option value="" disabled>Selecione um curso</option>
-                {courses.map(course => (
+              <Select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione um curso
+                </option>
+                {courses.map((course) => (
                   <option key={course.id} value={course.id}>
                     {course.title}
                   </option>
@@ -399,17 +424,30 @@ const Modulos = () => {
           </FormWrapper>
           <DeleteModuleForm>
             <FormTitle>Apagar Módulo</FormTitle>
-            <SelectWithMargin value={deleteCourse} onChange={(e) => setDeleteCourse(e.target.value)} required>
-              <option value="" disabled>Selecione um curso</option>
-              {courses.map(course => (
+            <SelectWithMargin
+              value={deleteCourse}
+              onChange={(e) => setDeleteCourse(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Selecione um curso
+              </option>
+              {courses.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.title}
                 </option>
               ))}
             </SelectWithMargin>
-            <SelectWithMargin value={selectedModule} onChange={(e) => setSelectedModule(e.target.value)} required disabled={!deleteCourse}>
-              <option value="" disabled>Selecione um módulo</option>
-              {deleteModules.map(module => (
+            <SelectWithMargin
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              required
+              disabled={!deleteCourse}
+            >
+              <option value="" disabled>
+                Selecione um módulo
+              </option>
+              {deleteModules.map((module) => (
                 <option key={module.id} value={module.id}>
                   {module.name}
                 </option>

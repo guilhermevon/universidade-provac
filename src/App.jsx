@@ -12,6 +12,7 @@ import Aulas from "./pages/Aulas";
 import Provas from "./pages/Provas";
 import Aprovacao from "./pages/Aprovacao";
 import AreaColab from "./pages/AreaColab";
+import Welcome from "./pages/Welcome";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import RoleBasedRoute from "./components/RoleBasedRout/RoleBasedRout";
 import "./App.css";
@@ -95,6 +96,14 @@ const App = () => {
           element={
             <PrivateRoute>
               <Course />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/welcome"
+          element={
+            <PrivateRoute>
+              <Welcome />
             </PrivateRoute>
           }
         />

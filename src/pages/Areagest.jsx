@@ -1,12 +1,12 @@
 // src/pages/Areagest.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styled, { keyframes } from 'styled-components';
-import Navbar from '../components/NavBar/NavBar';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import styled, { keyframes } from "styled-components";
+import Navbar from "../components/NavBar/NavBar";
 
 const Container = styled.div`
   padding: 20px;
-  margin-left: 250px;  // Adicione margem para não sobrepor o sidebar
+  margin-left: 250px; // Adicione margem para não sobrepor o sidebar
   z-index: 1;
   position: relative;
 `;
@@ -129,22 +129,25 @@ const StarWrapper = styled.div`
 `;
 
 const Areagest = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [courses, setCourses] = useState([]);
-  const token = sessionStorage.getItem('token');
+  const token = sessionStorage.getItem("token");
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/manage-courses', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://192.168.0.232:9310/api/manage-courses",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setCourses(response.data || []); // Garante que `courses` seja uma array
       } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
+        console.error("Erro ao buscar cursos:", error);
       }
     };
 
@@ -155,15 +158,15 @@ const Areagest = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/manage-courses',
+        "http://192.168.0.232:9310/api/manage-courses",
         { title, description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCourses([...courses, response.data]);
-      setTitle('');
-      setDescription('');
+      setTitle("");
+      setDescription("");
     } catch (error) {
-      console.error('Erro ao adicionar curso:', error);
+      console.error("Erro ao adicionar curso:", error);
     }
   };
 
@@ -196,12 +199,13 @@ const Areagest = () => {
           </Form>
           <div>
             <h2>Lista de Cursos</h2>
-            {Array.isArray(courses) && courses.map((course) => (
-              <div key={course.id}>
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
-              </div>
-            ))}
+            {Array.isArray(courses) &&
+              courses.map((course) => (
+                <div key={course.id}>
+                  <h3>{course.title}</h3>
+                  <p>{course.description}</p>
+                </div>
+              ))}
           </div>
         </Container>
       </PageWrapper>

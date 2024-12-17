@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../assets/bg_home.png';
+import React, { useState, useEffect } from "react";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import { useNavigate } from "react-router-dom";
+import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
   html, body {
@@ -132,7 +132,7 @@ const FormWrapper = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  color: #FFF;
+  color: #fff;
   text-align: center;
   margin-bottom: 1.5rem;
 `;
@@ -170,7 +170,7 @@ const Select = styled.select`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #0D47A1; /* Azul escuro */
+  background-color: #0d47a1; /* Azul escuro */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -190,14 +190,14 @@ const DeleteAulaForm = styled.div`
   padding: 2rem;
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 1rem;
 `;
 
 const DeleteButton = styled.button`
-  background-color: #E74C3C; /* Vermelho */
+  background-color: #e74c3c; /* Vermelho */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -208,93 +208,109 @@ const DeleteButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #C0392B; /* Vermelho mais escuro ao passar o mouse */
+    background-color: #c0392b; /* Vermelho mais escuro ao passar o mouse */
   }
 `;
 
 const Aulas = () => {
-  const [title, setTitle] = useState('');
-  const [url, setUrl] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const [description, setDescription] = useState("");
   const [courses, setCourses] = useState([]);
   const [modules, setModules] = useState([]);
   const [aulas, setAulas] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [selectedModule, setSelectedModule] = useState('');
-  const [selectedAula, setSelectedAula] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedModule, setSelectedModule] = useState("");
+  const [selectedAula, setSelectedAula] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
 
       const user = JSON.parse(jsonPayload);
-      console.log('User payload:', user);
-      console.log('User role:', user.role);
+      console.log("User payload:", user);
+      console.log("User role:", user.role);
 
-      if (user.role !== '1') {
-        navigate('/login');
+      if (user.role !== "1") {
+        navigate("/login");
       }
     } catch (error) {
-      console.error('Erro ao verificar o token:', error);
-      navigate('/login');
+      console.error("Erro ao verificar o token:", error);
+      navigate("/login");
     }
   }, [navigate]);
 
   const fetchCourses = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get('http://localhost:5000/api/courses', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const coursesData = Object.keys(response.data).flatMap(key => response.data[key]);
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/courses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const coursesData = Object.keys(response.data).flatMap(
+        (key) => response.data[key]
+      );
       setCourses(coursesData);
     } catch (error) {
-      console.error('Erro ao buscar cursos:', error);
+      console.error("Erro ao buscar cursos:", error);
     }
   };
 
   const fetchModules = async (courseId) => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/courses/${courseId}/modules`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://192.168.0.232:9310/api/courses/${courseId}/modules`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setModules(response.data);
     } catch (error) {
-      console.error('Erro ao buscar módulos:', error);
+      console.error("Erro ao buscar módulos:", error);
     }
   };
 
   const fetchAulas = async (moduleId) => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/modules/${moduleId}/aulas`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://192.168.0.232:9310/api/modules/${moduleId}/aulas`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setAulas(response.data);
     } catch (error) {
-      console.error('Erro ao buscar aulas:', error);
+      console.error("Erro ao buscar aulas:", error);
     }
   };
 
@@ -316,12 +332,18 @@ const Aulas = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/manage-aulas',
-        { title, url, description, course_id: selectedCourse, module_id: selectedModule },
+        "http://192.168.0.232:9310/api/manage-aulas",
+        {
+          title,
+          url,
+          description,
+          course_id: selectedCourse,
+          module_id: selectedModule,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -329,36 +351,39 @@ const Aulas = () => {
         }
       );
       if (response.status === 201) {
-        alert('Aula cadastrada com sucesso!');
-        setTitle('');
-        setUrl('');
-        setDescription('');
-        setSelectedCourse('');
-        setSelectedModule('');
+        alert("Aula cadastrada com sucesso!");
+        setTitle("");
+        setUrl("");
+        setDescription("");
+        setSelectedCourse("");
+        setSelectedModule("");
       }
     } catch (error) {
-      console.error('Erro ao cadastrar aula:', error);
-      alert('Erro ao cadastrar aula. Por favor, tente novamente.');
+      console.error("Erro ao cadastrar aula:", error);
+      alert("Erro ao cadastrar aula. Por favor, tente novamente.");
     }
   };
 
   const handleDeleteAula = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/aulas/${selectedAula}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://192.168.0.232:9310/api/aulas/${selectedAula}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 200) {
-        alert('Aula deletada com sucesso!');
-        setSelectedAula('');
+        alert("Aula deletada com sucesso!");
+        setSelectedAula("");
         fetchAulas(selectedModule);
       }
     } catch (error) {
-      console.error('Erro ao deletar aula:', error);
-      alert('Erro ao deletar aula. Por favor, tente novamente.');
+      console.error("Erro ao deletar aula:", error);
+      alert("Erro ao deletar aula. Por favor, tente novamente.");
     }
   };
 
@@ -397,17 +422,29 @@ const Aulas = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 required
               />
-              <Select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} required>
-                <option value="" disabled>Selecione um curso</option>
-                {courses.map(course => (
+              <Select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione um curso
+                </option>
+                {courses.map((course) => (
                   <option key={course.id} value={course.id}>
                     {course.title}
                   </option>
                 ))}
               </Select>
-              <Select value={selectedModule} onChange={(e) => setSelectedModule(e.target.value)} required>
-                <option value="" disabled>Selecione um módulo</option>
-                {modules.map(module => (
+              <Select
+                value={selectedModule}
+                onChange={(e) => setSelectedModule(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione um módulo
+                </option>
+                {modules.map((module) => (
                   <option key={module.id} value={module.id}>
                     {module.name}
                   </option>
@@ -418,25 +455,43 @@ const Aulas = () => {
           </FormWrapper>
           <DeleteAulaForm>
             <FormTitle>Apagar Aula</FormTitle>
-            <Select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} required>
-              <option value="" disabled>Selecione um curso</option>
-              {courses.map(course => (
+            <Select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Selecione um curso
+              </option>
+              {courses.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.title}
                 </option>
               ))}
             </Select>
-            <Select value={selectedModule} onChange={(e) => setSelectedModule(e.target.value)} required>
-              <option value="" disabled>Selecione um módulo</option>
-              {modules.map(module => (
+            <Select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Selecione um módulo
+              </option>
+              {modules.map((module) => (
                 <option key={module.id} value={module.id}>
                   {module.name}
                 </option>
               ))}
             </Select>
-            <Select value={selectedAula} onChange={(e) => setSelectedAula(e.target.value)} required>
-              <option value="" disabled>Selecione uma aula</option>
-              {aulas.map(aula => (
+            <Select
+              value={selectedAula}
+              onChange={(e) => setSelectedAula(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Selecione uma aula
+              </option>
+              {aulas.map((aula) => (
                 <option key={aula.id} value={aula.id}>
                   {aula.titulo}
                 </option>

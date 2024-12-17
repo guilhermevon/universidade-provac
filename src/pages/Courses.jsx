@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import backgroundImage from '../assets/bg_home.png'; // Import the background image
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import backgroundImage from "../assets/bg_home.png"; // Import the background image
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -189,7 +189,7 @@ const CardSubtitle = styled.p`
 `;
 
 const CardButton = styled.button`
-  background-color: #0D47A1; 
+  background-color: #0d47a1;
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -203,7 +203,7 @@ const CardButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #0D47A1; /* Darker red on hover */
+    background-color: #0d47a1; /* Darker red on hover */
   }
 `;
 
@@ -228,8 +228,8 @@ const NavigationButton = styled.button`
     background: rgba(255, 255, 255, 0.9); /* Even lighter on hover */
   }
 
-  ${props => props.left ? 'left: 1rem;' : 'right: 1rem;'}
-  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
+  ${(props) => (props.left ? "left: 1rem;" : "right: 1rem;")}
+  visibility: ${(props) => (props.visible ? "visible" : "hidden")};
 `;
 
 const Courses = () => {
@@ -240,22 +240,28 @@ const Courses = () => {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.get('http://localhost:5000/api/courses', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://192.168.0.232:9310/api/courses",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        );
 
-        if (response.data && typeof response.data === 'object') {
+        if (response.data && typeof response.data === "object") {
           setCoursesByDepartment(response.data);
         } else {
-          console.error('Resposta da API não é um objeto válido:', response.data);
+          console.error(
+            "Resposta da API não é um objeto válido:",
+            response.data
+          );
         }
       } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
+        console.error("Erro ao buscar cursos:", error);
       }
     };
 
@@ -266,7 +272,8 @@ const Courses = () => {
     const container = scrollRefs.current[department];
     const scrollAmount = 300;
     if (container) {
-      container.scrollLeft += direction === 'left' ? -scrollAmount : scrollAmount;
+      container.scrollLeft +=
+        direction === "left" ? -scrollAmount : scrollAmount;
       updateScrollVisibility(department);
     }
   };
@@ -275,32 +282,34 @@ const Courses = () => {
     const container = scrollRefs.current[department];
     if (container) {
       const atStart = container.scrollLeft <= 0;
-      const atEnd = container.scrollLeft + container.offsetWidth >= container.scrollWidth - 1;
-      setScrollVisibility(prev => ({
+      const atEnd =
+        container.scrollLeft + container.offsetWidth >=
+        container.scrollWidth - 1;
+      setScrollVisibility((prev) => ({
         ...prev,
         [department]: {
           left: !atStart,
           right: !atEnd,
-        }
+        },
       }));
     }
   };
 
   useEffect(() => {
-    Object.keys(coursesByDepartment).forEach(department => {
+    Object.keys(coursesByDepartment).forEach((department) => {
       updateScrollVisibility(department);
     });
   }, [coursesByDepartment]);
 
   useEffect(() => {
     const handleResize = () => {
-      Object.keys(coursesByDepartment).forEach(department => {
+      Object.keys(coursesByDepartment).forEach((department) => {
         updateScrollVisibility(department);
       });
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [coursesByDepartment]);
 
   const navigateToCourse = (id) => {
@@ -318,19 +327,19 @@ const Courses = () => {
           <Stars3 />
         </StarWrapper>
         <PageContent>
-          {Object.keys(coursesByDepartment).map(department => (
+          {Object.keys(coursesByDepartment).map((department) => (
             <div key={department}>
               <DepartmentTitle>{department}</DepartmentTitle>
               <ScrollWrapper>
                 <NavigationButton
                   left
-                  onClick={() => scroll(department, 'left')}
+                  onClick={() => scroll(department, "left")}
                   visible={scrollVisibility[department]?.left}
                 >
                   <FaArrowLeft />
                 </NavigationButton>
-                <ScrollContainer 
-                  ref={el => (scrollRefs.current[department] = el)}
+                <ScrollContainer
+                  ref={(el) => (scrollRefs.current[department] = el)}
                   onScroll={() => updateScrollVisibility(department)}
                 >
                   {coursesByDepartment[department].map((course, index) => (
@@ -339,13 +348,15 @@ const Courses = () => {
                       <CardContent>
                         <CardTitle>{course.title}</CardTitle>
                         <CardSubtitle>{course.subtitle}</CardSubtitle>
-                        <CardButton onClick={() => navigateToCourse(course.id)}>Avançar</CardButton>
+                        <CardButton onClick={() => navigateToCourse(course.id)}>
+                          Avançar
+                        </CardButton>
                       </CardContent>
                     </StyledCard>
                   ))}
                 </ScrollContainer>
                 <NavigationButton
-                  onClick={() => scroll(department, 'right')}
+                  onClick={() => scroll(department, "right")}
                   visible={scrollVisibility[department]?.right}
                 >
                   <FaArrowRight />

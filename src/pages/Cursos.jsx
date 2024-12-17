@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import backgroundImage from '../assets/bg_home.png';
+import React, { useState, useEffect } from "react";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -133,7 +133,7 @@ const FormWrapper = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  color: #FFF;
+  color: #fff;
   text-align: center;
   margin-bottom: 1.5rem;
 `;
@@ -171,7 +171,7 @@ const Select = styled.select`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #0D47A1; /* Azul escuro */
+  background-color: #0d47a1; /* Azul escuro */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -191,13 +191,13 @@ const DeleteCourseForm = styled.div`
   padding: 2rem;
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
 `;
 
 const DeleteButton = styled.button`
-  background-color: #E74C3C; /* Vermelho */
+  background-color: #e74c3c; /* Vermelho */
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -208,7 +208,7 @@ const DeleteButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #C0392B; /* Vermelho mais escuro ao passar o mouse */
+    background-color: #c0392b; /* Vermelho mais escuro ao passar o mouse */
   }
 `;
 
@@ -217,48 +217,54 @@ const MandatoryCourseForm = styled.div`
   padding: 2rem;
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
 `;
 
 const Cursos = () => {
-  const [title, setTitle] = useState('');
-  const [subtitle, setSubtitle] = useState('');
-  const [img, setImg] = useState('');
-  const [dp, setDp] = useState('');
+  const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [img, setImg] = useState("");
+  const [dp, setDp] = useState("");
   const [courses, setCourses] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [selectedFuncao, setSelectedFuncao] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedFuncao, setSelectedFuncao] = useState("");
 
   const fetchCourses = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get('http://localhost:5000/api/courses', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/courses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setCourses(response.data);
     } catch (error) {
-      console.error('Erro ao buscar cursos:', error);
+      console.error("Erro ao buscar cursos:", error);
     }
   };
 
   const fetchFuncoes = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get('http://localhost:5000/api/funcoes', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/funcoes",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setFuncoes(response.data);
     } catch (error) {
-      console.error('Erro ao buscar funções:', error);
+      console.error("Erro ao buscar funções:", error);
     }
   };
 
@@ -269,11 +275,11 @@ const Cursos = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/manage-courses',
+        "http://192.168.0.232:9310/api/manage-courses",
         { title, subtitle, img, dp },
         {
           headers: {
@@ -282,46 +288,49 @@ const Cursos = () => {
         }
       );
       if (response.status === 201) {
-        alert('Curso cadastrado com sucesso!');
-        setTitle('');
-        setSubtitle('');
-        setImg('');
-        setDp('');
+        alert("Curso cadastrado com sucesso!");
+        setTitle("");
+        setSubtitle("");
+        setImg("");
+        setDp("");
         fetchCourses();
       }
     } catch (error) {
-      console.error('Erro ao cadastrar curso:', error);
-      alert('Erro ao cadastrar curso. Por favor, tente novamente.');
+      console.error("Erro ao cadastrar curso:", error);
+      alert("Erro ao cadastrar curso. Por favor, tente novamente.");
     }
   };
 
   const handleDeleteCourse = async () => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/course/${selectedCourse}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://192.168.0.232:9310/api/course/${selectedCourse}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.status === 200) {
-        alert('Curso deletado com sucesso!');
-        setSelectedCourse('');
+        alert("Curso deletado com sucesso!");
+        setSelectedCourse("");
         fetchCourses();
       }
     } catch (error) {
-      console.error('Erro ao deletar curso:', error);
-      alert('Erro ao deletar curso. Por favor, tente novamente.');
+      console.error("Erro ao deletar curso:", error);
+      alert("Erro ao deletar curso. Por favor, tente novamente.");
     }
   };
 
   const handleMandatoryCourseSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/mandatory-course',
+        "http://192.168.0.232:9310/api/mandatory-course",
         { courseId: selectedCourse, funcaoId: selectedFuncao },
         {
           headers: {
@@ -330,13 +339,13 @@ const Cursos = () => {
         }
       );
       if (response.status === 201) {
-        alert('Curso obrigatório atribuído com sucesso!');
-        setSelectedCourse('');
-        setSelectedFuncao('');
+        alert("Curso obrigatório atribuído com sucesso!");
+        setSelectedCourse("");
+        setSelectedFuncao("");
       }
     } catch (error) {
-      console.error('Erro ao atribuir curso obrigatório:', error);
-      alert('Erro ao atribuir curso obrigatório. Por favor, tente novamente.');
+      console.error("Erro ao atribuir curso obrigatório:", error);
+      alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
     }
   };
 
@@ -375,8 +384,14 @@ const Cursos = () => {
                 onChange={(e) => setImg(e.target.value)}
                 required
               />
-              <Select value={dp} onChange={(e) => setDp(e.target.value)} required>
-                <option value="" disabled>Departamento</option>
+              <Select
+                value={dp}
+                onChange={(e) => setDp(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Departamento
+                </option>
                 <option value="RH">RH</option>
                 <option value="PMO">PMO</option>
                 <option value="Financeiro">Financeiro</option>
@@ -392,34 +407,52 @@ const Cursos = () => {
           </FormWrapper>
           <DeleteCourseForm>
             <FormTitle>Apagar Curso</FormTitle>
-            <Select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} required>
-              <option value="" disabled>Selecione um curso</option>
-              {Object.keys(courses).map(dp => (
-                courses[dp].map(course => (
+            <Select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Selecione um curso
+              </option>
+              {Object.keys(courses).map((dp) =>
+                courses[dp].map((course) => (
                   <option key={course.id} value={course.id}>
                     {course.title} - {dp}
                   </option>
                 ))
-              ))}
+              )}
             </Select>
             <DeleteButton onClick={handleDeleteCourse}>Deletar</DeleteButton>
           </DeleteCourseForm>
           <MandatoryCourseForm>
             <FormTitle>Atribuir Curso Obrigatório</FormTitle>
             <Form onSubmit={handleMandatoryCourseSubmit}>
-              <Select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} required>
-                <option value="" disabled>Selecione um curso</option>
-                {Object.keys(courses).map(dp => (
-                  courses[dp].map(course => (
+              <Select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione um curso
+                </option>
+                {Object.keys(courses).map((dp) =>
+                  courses[dp].map((course) => (
                     <option key={course.id} value={course.id}>
                       {course.title} - {dp}
                     </option>
                   ))
-                ))}
+                )}
               </Select>
-              <Select value={selectedFuncao} onChange={(e) => setSelectedFuncao(e.target.value)} required>
-                <option value="" disabled>Selecione uma função</option>
-                {funcoes.map(funcao => (
+              <Select
+                value={selectedFuncao}
+                onChange={(e) => setSelectedFuncao(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione uma função
+                </option>
+                {funcoes.map((funcao) => (
                   <option key={funcao.id} value={funcao.id}>
                     {funcao.funcao} - {funcao.dp}
                   </option>

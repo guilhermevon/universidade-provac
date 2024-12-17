@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
+import React, { useState, useEffect } from "react";
+import styled, { createGlobalStyle } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -41,7 +41,7 @@ const FormWrapper = styled.div`
   padding: 2rem;
   background-color: #2c2c2c;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   width: 80%;
@@ -49,7 +49,7 @@ const FormWrapper = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  color: #FFF;
+  color: #fff;
   text-align: center;
   margin-bottom: 1.5rem;
 `;
@@ -87,7 +87,7 @@ const Select = styled.select`
 `;
 
 const Button = styled.button`
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -103,7 +103,7 @@ const Button = styled.button`
 `;
 
 const DeleteButton = styled.button`
-  background-color: #E74C3C;
+  background-color: #e74c3c;
   border: none;
   color: white;
   padding: 0.75rem 1rem;
@@ -114,7 +114,7 @@ const DeleteButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #C0392B;
+    background-color: #c0392b;
   }
 `;
 
@@ -140,36 +140,46 @@ const ButtonGroup = styled.div`
 
 const Provas = () => {
   const [prova, setProva] = useState({
-    titulo: '',
-    descricao: '',
-    duracao: '',
-    nota_minima_aprovacao: '',
-    cursoId: '',
-    moduloId: ''
+    titulo: "",
+    descricao: "",
+    duracao: "",
+    nota_minima_aprovacao: "",
+    cursoId: "",
+    moduloId: "",
   });
   const [questoes, setQuestoes] = useState([
-    { enunciado: '', tipo_questao: 'multipla_escolha', pontuacao: '', alternativas: [{ texto_alternativa: '', correta: false }] }
+    {
+      enunciado: "",
+      tipo_questao: "multipla_escolha",
+      pontuacao: "",
+      alternativas: [{ texto_alternativa: "", correta: false }],
+    },
   ]);
-  const [cursoId, setCursoId] = useState('');
-  const [moduloId, setModuloId] = useState('');
-  const [provaId, setProvaId] = useState('');
+  const [cursoId, setCursoId] = useState("");
+  const [moduloId, setModuloId] = useState("");
+  const [provaId, setProvaId] = useState("");
   const [cursos, setCursos] = useState([]);
   const [modulos, setModulos] = useState([]);
   const [provas, setProvas] = useState([]);
 
   useEffect(() => {
     const fetchCursos = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.get('http://localhost:5000/api/courses', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const cursosData = Object.keys(response.data).flatMap(key => response.data[key]);
+        const response = await axios.get(
+          "http://192.168.0.232:9310/api/courses",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const cursosData = Object.keys(response.data).flatMap(
+          (key) => response.data[key]
+        );
         setCursos(cursosData);
       } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
+        console.error("Erro ao buscar cursos:", error);
       }
     };
 
@@ -179,16 +189,19 @@ const Provas = () => {
   useEffect(() => {
     if (prova.cursoId) {
       const fetchModulos = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem("token");
         try {
-          const response = await axios.get(`http://localhost:5000/api/courses/${prova.cursoId}/modules`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `http://192.168.0.232:9310/api/courses/${prova.cursoId}/modules`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           setModulos(response.data);
         } catch (error) {
-          console.error('Erro ao buscar módulos:', error);
+          console.error("Erro ao buscar módulos:", error);
         }
       };
 
@@ -199,16 +212,19 @@ const Provas = () => {
   useEffect(() => {
     if (cursoId) {
       const fetchModulos = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem("token");
         try {
-          const response = await axios.get(`http://localhost:5000/api/courses/${cursoId}/modules`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `http://192.168.0.232:9310/api/courses/${cursoId}/modules`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           setModulos(response.data);
         } catch (error) {
-          console.error('Erro ao buscar módulos:', error);
+          console.error("Erro ao buscar módulos:", error);
         }
       };
 
@@ -219,19 +235,22 @@ const Provas = () => {
   useEffect(() => {
     if (moduloId) {
       const fetchProvas = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem("token");
         try {
-          const response = await axios.get(`http://localhost:5000/api/course/${cursoId}/provas`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setProvas(response.data.filter(p => p.id_modulo === moduloId));
+          const response = await axios.get(
+            `http://192.168.0.232:9310/api/course/${cursoId}/provas`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setProvas(response.data.filter((p) => p.id_modulo === moduloId));
         } catch (error) {
-          console.error('Erro ao buscar provas:', error);
+          console.error("Erro ao buscar provas:", error);
         }
       };
-  
+
       fetchProvas();
     }
   }, [cursoId, moduloId]);
@@ -253,13 +272,21 @@ const Provas = () => {
     const newQuestoes = [...questoes];
     newQuestoes[qIndex].alternativas[aIndex] = {
       ...newQuestoes[qIndex].alternativas[aIndex],
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     };
     setQuestoes(newQuestoes);
   };
 
   const addQuestao = () => {
-    setQuestoes([...questoes, { enunciado: '', tipo_questao: 'multipla_escolha', pontuacao: '', alternativas: [{ texto_alternativa: '', correta: false }] }]);
+    setQuestoes([
+      ...questoes,
+      {
+        enunciado: "",
+        tipo_questao: "multipla_escolha",
+        pontuacao: "",
+        alternativas: [{ texto_alternativa: "", correta: false }],
+      },
+    ]);
   };
 
   const deleteQuestao = (qIndex) => {
@@ -268,23 +295,28 @@ const Provas = () => {
 
   const addAlternativa = (qIndex) => {
     const newQuestoes = [...questoes];
-    newQuestoes[qIndex].alternativas.push({ texto_alternativa: '', correta: false });
+    newQuestoes[qIndex].alternativas.push({
+      texto_alternativa: "",
+      correta: false,
+    });
     setQuestoes(newQuestoes);
   };
 
   const deleteAlternativa = (qIndex, aIndex) => {
     const newQuestoes = [...questoes];
-    newQuestoes[qIndex].alternativas = newQuestoes[qIndex].alternativas.filter((_, index) => index !== aIndex);
+    newQuestoes[qIndex].alternativas = newQuestoes[qIndex].alternativas.filter(
+      (_, index) => index !== aIndex
+    );
     setQuestoes(newQuestoes);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
       const responseProva = await axios.post(
-        'http://localhost:5000/api/manage-provas',
+        "http://192.168.0.232:9310/api/manage-provas",
         { ...prova, questoes },
         {
           headers: {
@@ -294,33 +326,47 @@ const Provas = () => {
       );
 
       if (responseProva.status === 201) {
-        alert('Prova cadastrada com sucesso!');
-        setProva({ titulo: '', descricao: '', duracao: '', nota_minima_aprovacao: '', cursoId: '', moduloId: '' });
-        setQuestoes([{ enunciado: '', tipo_questao: 'multipla_escolha', pontuacao: '', alternativas: [{ texto_alternativa: '', correta: false }] }]);
+        alert("Prova cadastrada com sucesso!");
+        setProva({
+          titulo: "",
+          descricao: "",
+          duracao: "",
+          nota_minima_aprovacao: "",
+          cursoId: "",
+          moduloId: "",
+        });
+        setQuestoes([
+          {
+            enunciado: "",
+            tipo_questao: "multipla_escolha",
+            pontuacao: "",
+            alternativas: [{ texto_alternativa: "", correta: false }],
+          },
+        ]);
       }
     } catch (error) {
-      console.error('Erro ao cadastrar prova:', error);
-      alert('Erro ao cadastrar prova. Por favor, tente novamente.');
+      console.error("Erro ao cadastrar prova:", error);
+      alert("Erro ao cadastrar prova. Por favor, tente novamente.");
     }
   };
 
   const handleDeleteProva = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
 
     try {
-      await axios.delete(`http://localhost:5000/api/prova/${provaId}`, {
+      await axios.delete(`http://192.168.0.232:9310/api/prova/${provaId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      alert('Prova deletada com sucesso!');
-      setProvaId('');
-      setProvas(provas.filter(p => p.id_prova !== provaId));
+      alert("Prova deletada com sucesso!");
+      setProvaId("");
+      setProvas(provas.filter((p) => p.id_prova !== provaId));
     } catch (error) {
-      console.error('Erro ao deletar prova:', error);
-      alert('Erro ao deletar prova. Por favor, tente novamente.');
+      console.error("Erro ao deletar prova:", error);
+      alert("Erro ao deletar prova. Por favor, tente novamente.");
     }
   };
 
@@ -371,7 +417,9 @@ const Provas = () => {
                 onChange={handleProvaChange}
                 required
               >
-                <option value="" disabled>Selecione um curso</option>
+                <option value="" disabled>
+                  Selecione um curso
+                </option>
                 {cursos.map((curso) => (
                   <option key={curso.id} value={curso.id}>
                     {curso.title}
@@ -384,7 +432,9 @@ const Provas = () => {
                 onChange={handleProvaChange}
                 required
               >
-                <option value="" disabled>Selecione um módulo</option>
+                <option value="" disabled>
+                  Selecione um módulo
+                </option>
                 {modulos.map((modulo) => (
                   <option key={modulo.id} value={modulo.id}>
                     {modulo.name}
@@ -420,37 +470,59 @@ const Provas = () => {
                     <option value="discursiva">Discursiva</option>
                   </Select>
 
-                  {questao.tipo_questao === 'multipla_escolha' && questao.alternativas.map((alternativa, aIndex) => (
-                    <AlternativaWrapper key={aIndex}>
-                      <Input
-                        type="text"
-                        placeholder="Texto da Alternativa"
-                        name="texto_alternativa"
-                        value={alternativa.texto_alternativa}
-                        onChange={(e) => handleAlternativaChange(qIndex, aIndex, e)}
-                        required
-                      />
-                      <FlagLabel>
-                        <input
-                          type="checkbox"
-                          name="correta"
-                          checked={alternativa.correta}
-                          onChange={(e) => handleAlternativaChange(qIndex, aIndex, e)}
+                  {questao.tipo_questao === "multipla_escolha" &&
+                    questao.alternativas.map((alternativa, aIndex) => (
+                      <AlternativaWrapper key={aIndex}>
+                        <Input
+                          type="text"
+                          placeholder="Texto da Alternativa"
+                          name="texto_alternativa"
+                          value={alternativa.texto_alternativa}
+                          onChange={(e) =>
+                            handleAlternativaChange(qIndex, aIndex, e)
+                          }
+                          required
                         />
-                        Correta
-                      </FlagLabel>
-                      <DeleteButton type="button" onClick={() => deleteAlternativa(qIndex, aIndex)}>Apagar</DeleteButton>
-                    </AlternativaWrapper>
-                  ))}
-                  {questao.tipo_questao === 'multipla_escolha' && (
+                        <FlagLabel>
+                          <input
+                            type="checkbox"
+                            name="correta"
+                            checked={alternativa.correta}
+                            onChange={(e) =>
+                              handleAlternativaChange(qIndex, aIndex, e)
+                            }
+                          />
+                          Correta
+                        </FlagLabel>
+                        <DeleteButton
+                          type="button"
+                          onClick={() => deleteAlternativa(qIndex, aIndex)}
+                        >
+                          Apagar
+                        </DeleteButton>
+                      </AlternativaWrapper>
+                    ))}
+                  {questao.tipo_questao === "multipla_escolha" && (
                     <ButtonGroup>
-                      <Button type="button" onClick={() => addAlternativa(qIndex)}>Adicionar Alternativa</Button>
-                      <DeleteButton type="button" onClick={() => deleteQuestao(qIndex)}>Apagar Questão</DeleteButton>
+                      <Button
+                        type="button"
+                        onClick={() => addAlternativa(qIndex)}
+                      >
+                        Adicionar Alternativa
+                      </Button>
+                      <DeleteButton
+                        type="button"
+                        onClick={() => deleteQuestao(qIndex)}
+                      >
+                        Apagar Questão
+                      </DeleteButton>
                     </ButtonGroup>
                   )}
                 </div>
               ))}
-              <Button type="button" onClick={addQuestao}>Adicionar Questão</Button>
+              <Button type="button" onClick={addQuestao}>
+                Adicionar Questão
+              </Button>
               <Button type="submit">Cadastrar Prova</Button>
             </Form>
           </FormWrapper>
@@ -462,7 +534,9 @@ const Provas = () => {
                 onChange={(e) => setCursoId(e.target.value)}
                 required
               >
-                <option value="" disabled>Selecione um curso</option>
+                <option value="" disabled>
+                  Selecione um curso
+                </option>
                 {cursos.map((curso) => (
                   <option key={curso.id} value={curso.id}>
                     {curso.title}
@@ -474,7 +548,9 @@ const Provas = () => {
                 onChange={(e) => setModuloId(e.target.value)}
                 required
               >
-                <option value="" disabled>Selecione um módulo</option>
+                <option value="" disabled>
+                  Selecione um módulo
+                </option>
                 {modulos.map((modulo) => (
                   <option key={modulo.id} value={modulo.id}>
                     {modulo.name}
@@ -486,7 +562,9 @@ const Provas = () => {
                 onChange={(e) => setProvaId(e.target.value)}
                 required
               >
-                <option value="" disabled>Selecione uma prova</option>
+                <option value="" disabled>
+                  Selecione uma prova
+                </option>
                 {provas.map((prova) => (
                   <option key={prova.id_prova} value={prova.id_prova}>
                     {prova.titulo}

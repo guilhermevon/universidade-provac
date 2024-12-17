@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled, { createGlobalStyle, keyframes } from 'styled-components';
-import axios from 'axios';
-import Navbar from '../components/NavBar/NavBar';
-import mestre from '../assets/mestre.png';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
+import axios from "axios";
+import Navbar from "../components/NavBar/NavBar";
+import mestre from "../assets/mestre.png";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -122,7 +122,7 @@ const PageContent = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  color: #FFF;
+  color: #fff;
   text-align: left;
   margin: 2rem 0 1rem;
   font-size: 1.5rem;
@@ -154,7 +154,7 @@ const StyledCard = styled.div`
   background-color: #333; /* Alterado para um fundo sólido */
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -227,18 +227,23 @@ const UserImageContainer = styled.div`
   align-items: center;
   justify-content: center;
   border: 4px solid transparent;
-  background: linear-gradient(white, white), radial-gradient(circle at top left, #ff0080, #8000ff);
+  background: linear-gradient(white, white),
+    radial-gradient(circle at top left, #ff0080, #8000ff);
   background-origin: border-box;
   background-clip: content-box, border-box;
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -10px;
     left: -10px;
     width: calc(100% + 20px);
     height: calc(100% + 20px);
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(138, 43, 226, 0.6), rgba(138, 43, 226, 0.2));
+    background: radial-gradient(
+      circle,
+      rgba(138, 43, 226, 0.6),
+      rgba(138, 43, 226, 0.2)
+    );
     animation: ${aura} 3s infinite ease-in-out;
     z-index: 0;
   }
@@ -297,57 +302,69 @@ const UserRole = styled.p`
 
 const AreaColab = () => {
   const [finalizedCourses, setFinalizedCourses] = useState([]);
-  const [userInfo, setUserInfo] = useState({ name: '', role: '', foto: '' });
+  const [userInfo, setUserInfo] = useState({ name: "", role: "", foto: "" });
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFinalizedCourses = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/user/finalized-courses', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://192.168.0.232:9310/api/user/finalized-courses",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setFinalizedCourses(response.data);
       } catch (error) {
-        console.error('Erro ao buscar cursos finalizados:', error);
+        console.error("Erro ao buscar cursos finalizados:", error);
         if (error.response && error.response.status === 401) {
-          navigate('/login');
+          navigate("/login");
         }
       }
     };
 
     const fetchUserInfo = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/user/info', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://192.168.0.232:9310/api/user/info",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setUserInfo(response.data);
 
         // Fetch user photo separately
-        const photoResponse = await axios.get('http://localhost:5000/api/user/photo', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserInfo(prevInfo => ({ ...prevInfo, foto: photoResponse.data.foto }));
+        const photoResponse = await axios.get(
+          "http://192.168.0.232:9310/api/user/photo",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUserInfo((prevInfo) => ({
+          ...prevInfo,
+          foto: photoResponse.data.foto,
+        }));
       } catch (error) {
-        console.error('Erro ao buscar informações do usuário:', error);
+        console.error("Erro ao buscar informações do usuário:", error);
       }
     };
 
@@ -368,7 +385,15 @@ const AreaColab = () => {
         <PageContent>
           <UserInfoWrapper>
             <UserImageContainer>
-              <UserImage src={userInfo.foto ? `data:image/jpeg;base64,${userInfo.foto}` : mestre} alt="User" onError={(e) => e.target.src = mestre} />
+              <UserImage
+                src={
+                  userInfo.foto
+                    ? `data:image/jpeg;base64,${userInfo.foto}`
+                    : mestre
+                }
+                alt="User"
+                onError={(e) => (e.target.src = mestre)}
+              />
             </UserImageContainer>
             <UserName>{userInfo.name}</UserName>
             <UserRole>{userInfo.role}</UserRole>

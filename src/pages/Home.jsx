@@ -253,7 +253,7 @@ const Home = () => {
     try {
       const userId = sessionStorage.getItem("userId");
       const response = await axios.get(
-        `http://localhost:5000/api/user/${userId}/courses-progress`
+        `http://192.168.0.232:9310/api/user/${userId}/courses-progress`
       );
       setCoursesProgress(response.data);
     } catch (error) {
@@ -265,7 +265,7 @@ const Home = () => {
     try {
       const userId = sessionStorage.getItem("userId");
       const response = await axios.get(
-        `http://localhost:5000/api/user/${userId}/mandatory-courses`
+        `http://192.168.0.232:9310/api/user/${userId}/mandatory-courses`
       );
       setMandatoryCourses(response.data);
     } catch (error) {
@@ -275,7 +275,9 @@ const Home = () => {
 
   const fetchRankings = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/rankings");
+      const response = await axios.get(
+        "http://192.168.0.232:9310/api/rankings"
+      );
       setRankings(response.data);
     } catch (error) {
       console.error("Erro ao buscar rankings:", error);
