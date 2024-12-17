@@ -231,7 +231,7 @@ const LoginPage = () => {
       if (response.status === 200) {
         alert("Login realizado com sucesso!");
         console.log("eu vou chorar");
-        navigate("/error");
+        navigate("/courses");
         // Redireciona para a tela de cursos
       }
     } catch (error) {
