@@ -93,47 +93,32 @@ userRouter.get("/", async (req, res) => {
   }
 });*/
 
-const SECRET_KEY = "sua_chave_secreta"; // Use uma chave secreta forte e armazene-a em variáveis de ambiente
-
 userRouter.post("/login", async (req, res) => {
   try {
-    const { email, senha } = req.body;
-
-    // Validação inicial dos dados
-    if (!email || !senha) {
-      return res.status(400).json({ error: "Email e senha são obrigatórios" });
-    }
+    const { email, senha } = req.body; // Receber email e senha do corpo da requisição
 
     // Consultar usuário pelo email
     const result = await pool.query(
-      "SELECT id, senha FROM educ_system.educ_users WHERE email = $1",
+      "SELECT senha FROM educ_system.educ_users WHERE email = $1",
       [email]
     );
 
+    // Verificar se o email existe
     if (!result.rows.length) {
       return res.status(401).json({ error: "Email ou senha inválidos" });
     }
 
-    const { id, senha: senhaHash } = result.rows[0];
+    const senhaCorreta = result.rows[0].senha;
 
-    // Verificar se a senha está correta
-    const senhaCorreta = await bcrypt.compare(senha, senhaHash);
-    if (!senhaCorreta) {
+    // Verificar se a senha corresponde
+    if (senha !== senhaCorreta) {
       return res.status(401).json({ error: "Email ou senha inválidos" });
     }
 
-    // Gerar token JWT
-    const token = jwt.sign({ userId: id, email }, SECRET_KEY, {
-      expiresIn: "1h",
-    });
-
-    // Login bem-sucedido
-    res.status(200).json({
-      message: "Login realizado com sucesso",
-      token,
-    });
+    // Retorna uma resposta simples indicando sucesso
+    res.status(200).json({ message: "Login realizado com sucesso" });
   } catch (err) {
-    console.error("Erro ao realizar login:", err);
+    console.error(err);
     res.status(500).json({ error: "Erro no servidor" });
   }
 });

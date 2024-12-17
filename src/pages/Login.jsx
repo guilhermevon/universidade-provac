@@ -207,20 +207,19 @@ const LoginPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const form = event.target;
     const formData = new FormData(form);
 
     const payload = {
-      email: formData.get("email"), // Captura o email do campo do formulário
-      senha: formData.get("password"), // Captura a senha do campo do formulário
+      email: formData.get("email"), // Obtém o email do formulário
+      senha: formData.get("password"), // Obtém a senha do formulário
     };
 
     try {
-      console.log("Payload enviado:", payload); // Log para depuração
-
       const response = await axios.post(
-        "http://192.168.0.232:9310/users/login", // Altere para sua URL correta
-        payload,
+        "http://192.168.0.232:9310/users/login", // URL da rota de login
+        payload, // Envia o payload
         {
           headers: {
             "Content-Type": "application/json",
@@ -228,18 +227,13 @@ const LoginPage = () => {
         }
       );
 
-      if (response.status === 200 && response.data.token) {
-        // Armazena o token no sessionStorage
-        sessionStorage.setItem("token", response.data.token);
-
-        // Redireciona para a página desejada após login
-        const navigate = useNavigate();
-        navigate("/courses");
-      } else {
-        alert("Credenciais inválidas. Tente novamente.");
+      // Se o login for bem-sucedido, redireciona para a página de cursos
+      if (response.status === 200) {
+        alert("Login realizado com sucesso!");
+        navigate("/courses"); // Redireciona para a tela de cursos
       }
     } catch (error) {
-      console.error("Erro durante o login:", error);
+      console.error("Erro ao fazer login:", error);
 
       if (error.response && error.response.status === 401) {
         alert("Email ou senha inválidos. Tente novamente.");
