@@ -1,14 +1,24 @@
-// src/main.jsx
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import App from "./App";
-import "./index.css";
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Courses from "./pages/Courses";
+import Error from "./pages/error";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-);
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/courses" element={<Courses />} />
+      <Route
+        path="/error"
+        element={
+          <PrivateRoute>
+            <Error />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+  );
+};
+
+export default App;

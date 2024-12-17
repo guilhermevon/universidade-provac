@@ -230,7 +230,9 @@ const LoginPage = () => {
       // Se o login for bem-sucedido, redireciona para a página de cursos
       if (response.status === 200) {
         alert("Login realizado com sucesso!");
-        navigate("/courses"); // Redireciona para a tela de cursos
+        console.log("eu vou chorar");
+        navigate("/courses");
+        // Redireciona para a tela de cursos
       }
     } catch (error) {
       console.error("Erro ao fazer login:", error);

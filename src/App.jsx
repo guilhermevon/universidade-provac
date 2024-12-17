@@ -98,6 +98,14 @@ const App = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/error"
+          element={
+            <PrivateRoute>
+              <Error />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );
