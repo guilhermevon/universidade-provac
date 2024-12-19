@@ -143,8 +143,11 @@ userRouter.get("/departamento", async (req, res) => {
 userRouter.post("/register", async (req, res) => {
   const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
 
+  // Log para verificar os dados recebidos
+  console.log("Dados recebidos no registro:", req.body);
+
   try {
-    // Validação básica dos campos
+    // Verifica se todos os campos obrigatórios foram preenchidos
     if (!matricula || !senha || !usuario || !email || !funcao || !dp) {
       return res
         .status(400)
@@ -154,14 +157,13 @@ userRouter.post("/register", async (req, res) => {
     // Gera o hash da senha
     const hashedSenha = await bcrypt.hash(senha, 10);
 
-    // Query para inserir no banco de dados
+    // Query para inserir o usuário no banco de dados
     const query = `
       INSERT INTO educ_system.educ_users 
       (matricula, senha, usuario, email, funcao, dp, role, foto)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
 
-    // Executa a query com os parâmetros
     await pool.query(query, [
       matricula,
       hashedSenha,
@@ -169,23 +171,23 @@ userRouter.post("/register", async (req, res) => {
       email,
       funcao,
       dp,
-      role || "user", // Define um valor padrão para o campo 'role'
-      foto || null, // Permite que o campo 'foto' seja nulo
+      role || "user", // Define 'user' como padrão se 'role' não for fornecido
+      foto || null, // Permite que 'foto' seja nulo
     ]);
 
     // Resposta de sucesso
-    res.status(201).json({ message: "Usuário registrado com sucesso" });
+    res.status(201).json({ message: "Usuário registrado com sucesso." });
   } catch (err) {
-    // Tratamento de erros
     console.error("Erro ao registrar usuário:", err);
 
     if (err.code === "23505") {
-      // Erro de duplicidade (usuário já existe)
-      return res.status(409).json({ error: "Usuário já registrado." });
+      // Erro de duplicidade
+      return res.status(409).json({ error: "Usuário ou email já registrado." });
     }
 
-    // Erro genérico
+    // Resposta para outros erros
     res.status(500).json({ error: "Erro interno do servidor." });
   }
 });
+
 export default userRouter;

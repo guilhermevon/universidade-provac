@@ -57,6 +57,14 @@ const About = () => {
         com os objetivos da empresa. Aqui, o conhecimento é a chave para o
         sucesso coletivo!
       </Text>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br /> <br />
+      <Text>Desenvolvido por Guilherme Carvalho</Text>
     </Container>
   );
 };
