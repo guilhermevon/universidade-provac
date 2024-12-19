@@ -211,36 +211,53 @@ const LoginPage = () => {
     const form = event.target;
     const formData = new FormData(form);
 
-    const payload = {
-      email: formData.get("email"), // Obtém o email do formulário
-      senha: formData.get("password"), // Obtém a senha do formulário
-    };
+    if (formType === "login") {
+      const payload = {
+        email: formData.get("email"),
+        senha: formData.get("password"),
+      };
 
-    try {
-      const response = await axios.post(
-        "http://192.168.0.232:9310/users/login", // URL da rota de login
-        payload, // Envia o payload
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      try {
+        const response = await axios.post(
+          "http://192.168.0.232:9310/users/login",
+          payload,
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        if (response.status === 200) {
+          alert("Login realizado com sucesso!");
+          navigate("/welcome");
         }
-      );
-
-      // Se o login for bem-sucedido, redireciona para a página de cursos
-      if (response.status === 200) {
-        alert("Login realizado com sucesso!");
-        console.log("eu vou chorar");
-        navigate("/welcome");
-        // Redireciona para a tela de cursos
+      } catch (error) {
+        console.error("Erro ao fazer login:", error);
+        alert("Erro ao fazer login. Verifique suas credenciais.");
       }
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
+    } else if (formType === "register") {
+      const payload = new FormData();
 
-      if (error.response && error.response.status === 401) {
-        alert("Email ou senha inválidos. Tente novamente.");
-      } else {
-        alert("Erro no servidor. Tente novamente mais tarde.");
+      // Adiciona os campos do formulário no payload
+      payload.append("usuario", formData.get("usuario"));
+      payload.append("departamento", formData.get("departamento"));
+      payload.append("funcao", formData.get("funcao"));
+      payload.append("matricula", formData.get("matricula"));
+      payload.append("foto", formData.get("foto")); // Envia o arquivo
+      payload.append("email", formData.get("email"));
+      payload.append("senha", formData.get("password"));
+
+      try {
+        const response = await axios.post(
+          "http://192.168.0.232:9310/users/register",
+          payload,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (response.status === 201) {
+          alert("Usuário cadastrado com sucesso!");
+          setFormType("login"); // Alterna para a tela de login
+        }
+      } catch (error) {
+        console.error("Erro ao cadastrar usuário:", error);
+        alert("Erro ao cadastrar. Tente novamente.");
       }
     }
   };
@@ -271,7 +288,6 @@ const LoginPage = () => {
                     <option value="RH">RH</option>
                     <option value="PMO">PMO</option>
                     <option value="TI">TI</option>
-                    <option value="Financeiro">Financeiro</option>
                   </Select>
                 </FormField>
                 <FormField>
@@ -279,7 +295,7 @@ const LoginPage = () => {
                   <Select id="funcao" name="funcao" required>
                     <option value="">Selecione uma função</option>
                     <option value="">Desenvolvedor jr</option>
-                    <option value="">Analista 1</option>
+                    <option value="">admin</option>
                     {funcoes.map((funcao) => (
                       <option key={funcao.id} value={funcao.funcao}>
                         {funcao.funcao}

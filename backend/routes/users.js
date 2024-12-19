@@ -144,13 +144,25 @@ userRouter.post("/register", validateRegisterData, async (req, res, next) => {
   const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
 
   try {
+    // Verifique se todos os campos obrigatórios estão preenchidos
+    if (!matricula || !senha || !usuario || !email || !funcao || !dp) {
+      return res
+        .status(400)
+        .json({ error: "Preencha todos os campos obrigatórios." });
+    }
+
+    // Gera o hash da senha
     const hashedSenha = await bcrypt.hash(senha, 10);
+
+    // Query de inserção no banco de dados
     const insertUserQuery = `
       INSERT INTO educ_system.educ_users 
       (matricula, senha, usuario, email, funcao, dp, role, foto)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING *`;
+      RETURNING matricula, usuario, email, funcao, dp, role, foto
+    `;
 
+    // Executa a query com os parâmetros
     const result = await pool.query(insertUserQuery, [
       matricula,
       hashedSenha,
@@ -158,15 +170,21 @@ userRouter.post("/register", validateRegisterData, async (req, res, next) => {
       email,
       funcao,
       dp,
-      role || "user",
-      foto,
+      role || "user", // Define o valor padrão para role
+      foto || null, // Permite foto ser nulo
     ]);
 
+    // Resposta de sucesso
     res.status(201).json({
       message: "Usuário registrado com sucesso",
       user: result.rows[0],
     });
   } catch (err) {
+    // Tratamento de erros do banco de dados
+    if (err.code === "23505") {
+      // Código de erro para violação de chave única
+      return res.status(409).json({ error: "Usuário já registrado." });
+    }
     next(err);
   }
 });
