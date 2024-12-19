@@ -140,11 +140,11 @@ userRouter.get("/departamento", async (req, res) => {
 });
 
 // Registro
-userRouter.post("/register", validateRegisterData, async (req, res, next) => {
+userRouter.post("/register", async (req, res) => {
   const { matricula, senha, usuario, email, funcao, dp, role, foto } = req.body;
 
   try {
-    // Verifique se todos os campos obrigatórios estão preenchidos
+    // Validação básica dos campos
     if (!matricula || !senha || !usuario || !email || !funcao || !dp) {
       return res
         .status(400)
@@ -154,39 +154,38 @@ userRouter.post("/register", validateRegisterData, async (req, res, next) => {
     // Gera o hash da senha
     const hashedSenha = await bcrypt.hash(senha, 10);
 
-    // Query de inserção no banco de dados
-    const insertUserQuery = `
+    // Query para inserir no banco de dados
+    const query = `
       INSERT INTO educ_system.educ_users 
       (matricula, senha, usuario, email, funcao, dp, role, foto)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING matricula, usuario, email, funcao, dp, role, foto
     `;
 
     // Executa a query com os parâmetros
-    const result = await pool.query(insertUserQuery, [
+    await pool.query(query, [
       matricula,
       hashedSenha,
       usuario,
       email,
       funcao,
       dp,
-      role || "user", // Define o valor padrão para role
-      foto || null, // Permite foto ser nulo
+      role || "user", // Define um valor padrão para o campo 'role'
+      foto || null, // Permite que o campo 'foto' seja nulo
     ]);
 
     // Resposta de sucesso
-    res.status(201).json({
-      message: "Usuário registrado com sucesso",
-      user: result.rows[0],
-    });
+    res.status(201).json({ message: "Usuário registrado com sucesso" });
   } catch (err) {
-    // Tratamento de erros do banco de dados
+    // Tratamento de erros
+    console.error("Erro ao registrar usuário:", err);
+
     if (err.code === "23505") {
-      // Código de erro para violação de chave única
+      // Erro de duplicidade (usuário já existe)
       return res.status(409).json({ error: "Usuário já registrado." });
     }
-    next(err);
+
+    // Erro genérico
+    res.status(500).json({ error: "Erro interno do servidor." });
   }
 });
-
 export default userRouter;

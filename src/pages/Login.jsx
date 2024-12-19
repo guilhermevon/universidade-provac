@@ -233,22 +233,21 @@ const LoginPage = () => {
         alert("Erro ao fazer login. Verifique suas credenciais.");
       }
     } else if (formType === "register") {
-      const payload = new FormData();
-
-      // Adiciona os campos do formulário no payload
-      payload.append("usuario", formData.get("usuario"));
-      payload.append("departamento", formData.get("departamento"));
-      payload.append("funcao", formData.get("funcao"));
-      payload.append("matricula", formData.get("matricula"));
-      payload.append("foto", formData.get("foto")); // Envia o arquivo
-      payload.append("email", formData.get("email"));
-      payload.append("senha", formData.get("password"));
+      const payload = {
+        usuario: formData.get("usuario"),
+        departamento: formData.get("departamento"),
+        funcao: formData.get("funcao"),
+        matricula: formData.get("matricula"),
+        email: formData.get("email"),
+        senha: formData.get("password"),
+      };
 
       try {
         const response = await axios.post(
           "http://192.168.0.232:9310/users/register",
           payload,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          console.log("payload", payload),
+          { headers: { "Content-Type": "application/json" } }
         );
 
         if (response.status === 201) {
