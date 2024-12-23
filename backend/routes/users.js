@@ -247,7 +247,7 @@ userRouter.get(
     try {
       // Buscar o departamento pelo ID
       const departamento = await db.query(
-        "SELECT nome FROM departamentos WHERE departamento_id = $1",
+        "SELECT dp FROM educ_system.funcoes WHERE departamento_id = $1",
         [departamento_id]
       );
 
@@ -257,7 +257,7 @@ userRouter.get(
 
       // Buscar as funções associadas ao departamento
       const funcoes = await db.query(
-        "SELECT funcao FROM funcoes WHERE departamento_id = $1",
+        "SELECT funcao FROM educ_system.funcoes WHERE departamento_id = $1",
         [departamento_id]
       );
 

@@ -106,7 +106,7 @@ const Select = styled.select`
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 1rem;
-  color: #333;
+  color: #black;
   transition: border-color 0.3s ease;
 
   &:focus {
@@ -183,6 +183,7 @@ const LoginPage = () => {
   useEffect(() => {
     if (selectedDepartamento) {
       const fetchFuncoes = async () => {
+        console.log("selectedDepartamento", selectedDepartamento);
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
