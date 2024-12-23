@@ -196,9 +196,9 @@ const LoginPage = () => {
           setFuncoes(response.data);
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
+          setFuncoes([]); // Define uma lista vazia como fallback
         }
       };
-
       fetchFuncoes();
     } else {
       setFuncoes([]);
@@ -293,8 +293,6 @@ const LoginPage = () => {
                   <Label htmlFor="funcao">Função</Label>
                   <Select id="funcao" name="funcao" required>
                     <option value="">Selecione uma função</option>
-                    <option value="Desenvolvedor jr">Desenvolvedor jr</option>
-                    <option value="admin">admin</option>
                     {funcoes.map((funcao) => (
                       <option key={funcao.id} value={funcao.funcao}>
                         {funcao.funcao}

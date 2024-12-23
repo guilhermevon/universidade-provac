@@ -239,4 +239,22 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
+userRouter.get("/users/departamento/:departamento/funcoes", (req, res) => {
+  const { departamento } = req.params;
+  // Simulação de busca no banco
+  const funcoes = {
+    RH: ["Analista de RH", "Recrutador"],
+    TI: ["Desenvolvedor", "Administrador de Sistemas"],
+    PMO: ["Gerente de Projetos", "Analista de Projetos"],
+  };
+
+  if (funcoes[departamento]) {
+    res.json(
+      funcoes[departamento].map((funcao, index) => ({ id: index + 1, funcao }))
+    );
+  } else {
+    res.status(404).send({ error: "Departamento não encontrado" });
+  }
+});
+
 export default userRouter;
