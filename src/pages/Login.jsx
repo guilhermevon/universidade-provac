@@ -293,8 +293,8 @@ const LoginPage = () => {
                   <Label htmlFor="funcao">Função</Label>
                   <Select id="funcao" name="funcao" required>
                     <option value="">Selecione uma função</option>
-                    <option value="">Desenvolvedor jr</option>
-                    <option value="">admin</option>
+                    <option value="Desenvolvedor jr">Desenvolvedor jr</option>
+                    <option value="admin">admin</option>
                     {funcoes.map((funcao) => (
                       <option key={funcao.id} value={funcao.funcao}>
                         {funcao.funcao}
