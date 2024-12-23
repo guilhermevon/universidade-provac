@@ -243,9 +243,8 @@ userRouter.get(
   "/users/departamento/:departamento_id/funcoes",
   async (req, res) => {
     const departamentoId = req.params.departamento_id;
-
+    console.log("Departamento ID recebido:", departamentoId); // Adicionar log
     try {
-      // Buscar as funções e o departamento associado
       const result = await db.query(
         "SELECT dp, funcao, departamento_id FROM educ_system.funcoes WHERE departamento_id = $1",
         [departamentoId]
@@ -257,14 +256,12 @@ userRouter.get(
           .send({ error: "Nenhuma função ou departamento encontrado" });
       }
 
-      // Extrair dados do departamento (usando o campo dp)
       const departamento = result.rows[0].dp;
 
-      // Retornar as funções e o nome do departamento
       res.json({
         departamento,
         funcoes: result.rows.map((funcao) => ({
-          id: funcao.departamento_id, // ou outro campo identificador, se necessário
+          id: funcao.departamento_id,
           funcao: funcao.funcao,
         })),
       });

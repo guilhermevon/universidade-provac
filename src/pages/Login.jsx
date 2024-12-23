@@ -183,7 +183,6 @@ const LoginPage = () => {
   useEffect(() => {
     if (selectedDepartamento) {
       const fetchFuncoes = async () => {
-        console.log("selectedDepartamento", selectedDepartamento);
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
@@ -194,7 +193,7 @@ const LoginPage = () => {
               },
             }
           );
-          setFuncoes(response.data.funcao); // Ajuste no formato da resposta
+          setFuncoes(response.data.funcoes); // Ajuste no formato da resposta
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
         }
@@ -282,7 +281,7 @@ const LoginPage = () => {
                     required
                   >
                     <option value="">Selecione um departamento</option>
-                    {[
+                    {/*[
                       ...new Set(
                         departamentos.map((departamento) => departamento.dp)
                       ),
@@ -292,6 +291,14 @@ const LoginPage = () => {
                         value={departamentos[index].departamento_id}
                       >
                         {departamento}
+                      </option>
+                    ))*/}
+                    {departamentos.map((departamento) => (
+                      <option
+                        key={departamento.departamento_id}
+                        value={departamento.departamento_id}
+                      >
+                        {departamento.dp}
                       </option>
                     ))}
                   </Select>
