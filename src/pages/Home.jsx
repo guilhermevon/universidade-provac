@@ -13,9 +13,8 @@ const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
     font-family: 'Lato', sans-serif;
-    background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
-    color: #e0e0e0;
+    color: #1b2735;
     overflow-y: auto;
   }
 
@@ -48,7 +47,7 @@ const PageContent = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  color: black; /* Cinza claro para combinar com a paleta */
+  color: white; /* Cinza claro para combinar com a paleta */
   text-align: left;
   margin: 2rem 0 1rem;
   padding-left: 1.5rem;
