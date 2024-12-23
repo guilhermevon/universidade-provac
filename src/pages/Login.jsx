@@ -150,7 +150,7 @@ const SecondaryButton = styled(Button)`
   }
 `;
 
-//Estrutura de Site------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Estrutura de Site------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -196,7 +196,7 @@ const LoginPage = () => {
           setFuncoes(response.data);
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
-          setFuncoes([]); // Define uma lista vazia como fallback
+          setFuncoes([]); // Fallback para lista vazia
         }
       };
       fetchFuncoes();
@@ -246,7 +246,6 @@ const LoginPage = () => {
         const response = await axios.post(
           "http://192.168.0.232:9310/users/register",
           payload,
-          console.log("payload", payload),
           { headers: { "Content-Type": "application/json" } }
         );
 
@@ -284,9 +283,11 @@ const LoginPage = () => {
                     required
                   >
                     <option value="">Selecione um departamento</option>
-                    <option value="RH">RH</option>
-                    <option value="PMO">PMO</option>
-                    <option value="TI">TI</option>
+                    {departamentos.map((departamento) => (
+                      <option key={departamento.id} value={departamento.id}>
+                        {departamento.nome}
+                      </option>
+                    ))}
                   </Select>
                 </FormField>
                 <FormField>

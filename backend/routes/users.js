@@ -239,22 +239,46 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
-userRouter.get("/users/departamento/:departamento/funcoes", (req, res) => {
-  const { departamento } = req.params;
-  // Simulação de busca no banco
-  const funcoes = {
-    RH: ["Analista de RH", "Recrutador"],
-    TI: ["Desenvolvedor", "Administrador de Sistemas"],
-    PMO: ["Gerente de Projetos", "Analista de Projetos"],
-  };
+userRouter.get(
+  "/users/departamento/:departamento_id/funcoes",
+  async (req, res) => {
+    const { departamento_id } = req.params;
 
-  if (funcoes[departamento]) {
-    res.json(
-      funcoes[departamento].map((funcao, index) => ({ id: index + 1, funcao }))
-    );
-  } else {
-    res.status(404).send({ error: "Departamento não encontrado" });
+    try {
+      // Buscar o departamento pelo ID
+      const departamento = await db.query(
+        "SELECT nome FROM departamentos WHERE departamento_id = $1",
+        [departamento_id]
+      );
+
+      if (departamento.rows.length === 0) {
+        return res.status(404).send({ error: "Departamento não encontrado" });
+      }
+
+      // Buscar as funções associadas ao departamento
+      const funcoes = await db.query(
+        "SELECT funcao FROM funcoes WHERE departamento_id = $1",
+        [departamento_id]
+      );
+
+      if (funcoes.rows.length === 0) {
+        return res
+          .status(404)
+          .send({ error: "Nenhuma função encontrada para este departamento" });
+      }
+
+      // Retorna as funções com o ID e nome da função
+      res.json(
+        funcoes.rows.map((funcao, index) => ({
+          id: index + 1,
+          funcao: funcao.funcao,
+        }))
+      );
+    } catch (error) {
+      console.error("Erro ao buscar funções:", error);
+      res.status(500).send({ error: "Erro ao buscar funções" });
+    }
   }
-});
+);
 
 export default userRouter;
