@@ -106,7 +106,7 @@ const Select = styled.select`
   border-radius: 5px;
   border: 1px solid #ddd;
   font-size: 1rem;
-  color: #black;
+  color: #333;
   transition: border-color 0.3s ease;
 
   &:focus {
@@ -194,21 +194,19 @@ const LoginPage = () => {
               },
             }
           );
-          setFuncoes(response.data);
+          setFuncoes(response.data.funcao); // Ajuste no formato da resposta
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
-          setFuncoes([]); // Fallback para lista vazia
         }
       };
       fetchFuncoes();
     } else {
-      setFuncoes([]);
+      setFuncoes([]); // Limpar as funções caso o departamento seja desmarcado
     }
   }, [selectedDepartamento]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     const form = event.target;
     const formData = new FormData(form);
 
@@ -284,9 +282,16 @@ const LoginPage = () => {
                     required
                   >
                     <option value="">Selecione um departamento</option>
-                    {departamentos.map((departamento) => (
-                      <option key={departamento.id} value={departamento.id}>
-                        {departamento.nome}
+                    {[
+                      ...new Set(
+                        departamentos.map((departamento) => departamento.dp)
+                      ),
+                    ].map((departamento, index) => (
+                      <option
+                        key={index}
+                        value={departamentos[index].departamento_id}
+                      >
+                        {departamento}
                       </option>
                     ))}
                   </Select>
