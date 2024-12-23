@@ -160,8 +160,8 @@ userRouter.post("/register", async (req, res) => {
     // Query para inserir o usuário no banco de dados
     const query = `
       INSERT INTO educ_system.educ_users 
-      (matricula, senha, usuario, email, funcao, dp, role, foto)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (matricula, senha, usuario, email, funcao, dp, foto)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
     await pool.query(query, [
