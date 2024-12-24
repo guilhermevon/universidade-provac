@@ -47,7 +47,7 @@ const Welcome = () => {
   return (
     <Container>
       <Logo src={logoProvac} alt="Provac Logo" />
-      <Text>BEM VINDO AO SISTEMA DE CURSOS!</Text>
+      <Text>BEM VINDO $"{"Usuário"}"</Text>
     </Container>
   );
 };

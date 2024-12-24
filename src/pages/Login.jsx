@@ -253,11 +253,12 @@ const LoginPage = () => {
     } else if (formType === "register") {
       const payload = {
         usuario: formData.get("usuario"),
-        departamento: formData.get("departamento"),
+        dp: formData.get("departamento"), // Altere para 'dp'
         funcao: formData.get("funcao"),
         matricula: formData.get("matricula"),
         email: formData.get("email"),
         senha: formData.get("password"),
+        foto: formData.get("foto"), // Adicione 'foto'
       };
 
       try {
@@ -266,7 +267,7 @@ const LoginPage = () => {
           payload,
           { headers: { "Content-Type": "application/json" } }
         );
-
+        console.log("payload", payload);
         if (response.status === 201) {
           alert("Usuário cadastrado com sucesso!");
           setFormType("login"); // Alterna para a tela de login

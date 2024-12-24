@@ -194,7 +194,6 @@ userRouter.get("/departamento", async (req, res) => {
 userRouter.post("/register", async (req, res) => {
   const { matricula, senha, usuario, email, funcao, dp, foto } = req.body;
 
-  // Log para verificar os dados recebidos
   console.log("Dados recebidos no registro:", req.body);
 
   try {
@@ -225,10 +224,7 @@ userRouter.post("/register", async (req, res) => {
       return res.status(409).json({ error: "Usuário ou email já registrado." });
     }
 
-    // Gera o hash da senha
-    const hashedSenha = await bcrypt.hash(senha, 10);
-
-    // Query para inserir o usuário no banco de dados
+    // Query para inserir o usuário no banco de dados sem hash
     const query = `
       INSERT INTO educ_system.educ_users 
       (matricula, senha, usuario, email, funcao, dp, foto)
@@ -237,21 +233,20 @@ userRouter.post("/register", async (req, res) => {
 
     await pool.query(query, [
       matricula,
-      hashedSenha,
+      senha, // Senha armazenada como texto simples
       usuario,
       email,
       funcao,
       dp,
-      foto || null, // Permite que 'foto' seja nulo
+      foto || null,
     ]);
 
-    // Resposta de sucesso
     res.status(201).json({ message: "Usuário registrado com sucesso." });
   } catch (err) {
     console.error("Erro ao registrar usuário:", err);
-
-    // Resposta para outros erros
-    res.status(500).json({ error: "Erro interno do servidor." });
+    res
+      .status(500)
+      .json({ error: "Erro ao cadastrar. Detalhes no log do servidor." });
   }
 });
 
