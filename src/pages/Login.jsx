@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 
+// Global Styles
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
 
@@ -10,7 +11,7 @@ const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
     font-family: 'Lato', sans-serif;
-    background-color: #1c1c1c; /* Cor de fundo sólida que estava na parte superior */
+    background-color: #1c1c1c;
   }
 
   body {
@@ -19,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+// Styled Components
 const PageWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -150,15 +152,17 @@ const SecondaryButton = styled(Button)`
   }
 `;
 
-// Estrutura de Site------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+//ESTRUTURA DO SITE----------------------------------------------------------------------------------------------------------------------------------------------
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formType, setFormType] = useState("login");
   const [departamentos, setDepartamentos] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
-  const [selectedDepartamento, setSelectedDepartamento] = useState("");
+  const [selectedDepartamento, setSelectedDepartamento] = useState(null);
+  const [selectedFuncao, setSelectedFuncao] = useState(null);
+  const [funcoesFiltradas, setFuncoesFiltradas] = useState([]);
 
+  // Fetch Departamentos
   useEffect(() => {
     const fetchDepartamentos = async () => {
       const token = sessionStorage.getItem("token");
@@ -174,36 +178,42 @@ const LoginPage = () => {
         setDepartamentos(response.data);
       } catch (error) {
         console.error("Erro ao buscar departamentos:", error);
+        setDepartamentos([]);
       }
     };
 
     fetchDepartamentos();
   }, []);
 
+  // Fetch Funções com base no departamento selecionado
   useEffect(() => {
-    if (selectedDepartamento) {
-      const fetchFuncoes = async () => {
+    // Fetch funções com base no departamento selecionado
+    const fetchFuncoes = async () => {
+      if (selectedDepartamento) {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9310/users/departamento/${selectedDepartamento}/funcoes`,
+            `http://192.168.0.232:9310/funcoes?departamento_id=${selectedDepartamento}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
-          setFuncoes(response.data.funcoes); // Ajuste no formato da resposta
+          setFuncoes(response.data || []);
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
+          setFuncoes([]); // Limpa as funções em caso de erro
         }
-      };
-      fetchFuncoes();
-    } else {
-      setFuncoes([]); // Limpar as funções caso o departamento seja desmarcado
-    }
+      } else {
+        setFuncoes([]); // Limpa as funções se nenhum departamento for selecionado
+      }
+    };
+
+    fetchFuncoes();
   }, [selectedDepartamento]);
 
+  // Handle Form Submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -276,24 +286,11 @@ const LoginPage = () => {
                   <Select
                     id="departamento"
                     name="departamento"
-                    value={selectedDepartamento}
+                    value={selectedDepartamento || ""}
                     onChange={(e) => setSelectedDepartamento(e.target.value)}
-                    required
                   >
                     <option value="">Selecione um departamento</option>
-                    {/*[
-                      ...new Set(
-                        departamentos.map((departamento) => departamento.dp)
-                      ),
-                    ].map((departamento, index) => (
-                      <option
-                        key={index}
-                        value={departamentos[index].departamento_id}
-                      >
-                        {departamento}
-                      </option>
-                    ))*/}
-                    {departamentos.map((departamento) => (
+                    {departamentos?.map((departamento) => (
                       <option
                         key={departamento.departamento_id}
                         value={departamento.departamento_id}
@@ -305,10 +302,20 @@ const LoginPage = () => {
                 </FormField>
                 <FormField>
                   <Label htmlFor="funcao">Função</Label>
-                  <Select id="funcao" name="funcao" required>
-                    <option value="">Selecione uma função</option>
-                    {funcoes.map((funcao) => (
-                      <option key={funcao.id} value={funcao.funcao}>
+                  <Select
+                    id="funcao"
+                    name="funcao"
+                    required
+                    value={selectedFuncao || ""}
+                    onChange={(e) => setSelectedFuncao(e.target.value)}
+                    disabled={!funcoes.length}
+                  >
+                    <option value="funcao">Selecione uma função</option>
+                    {funcoes?.map((funcao) => (
+                      <option
+                        key={funcao.departamento_id}
+                        value={funcao.funcao}
+                      >
                         {funcao.funcao}
                       </option>
                     ))}

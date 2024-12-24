@@ -7,41 +7,6 @@ import pool from "../db/dbConnection.js";
 
 dotenv.config();
 
-/*const { Pool } = pkg;
-
-const pool = new Pool({
-  user: "admin_provac",
-  host: "192.168.0.232",
-  database: "provac_producao",
-  password: "Provac@2024",
-  port: "5432",
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-  } else {
-    console.log("Conexão bem-sucedida ao banco de dados!");
-    release(); // Libera a conexão de volta ao pool
-  }
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err.stack);
-    return;
-  }
-
-  // Definindo o search_path para o schema educ_system
-  client.query("SET search_path TO educ_system", (err, res) => {
-    if (err) {
-      console.error("Erro ao configurar o search_path:", err.stack);
-    }
-    // Você agora pode fazer as consultas no schema educ_system
-    release();
-  });
-});*/
-
 const funcoesRouter = express.Router();
 
 const authenticateJWT = (req, res, next) => {
@@ -68,10 +33,33 @@ const authenticateJWT = (req, res, next) => {
   );
 };
 
-funcoesRouter.get("/", async (req, res) => {
+/*funcoesRouter.get("/", async (req, res) => {
   try {
     // Conexão com o banco e execução da query
     const result = await pool.query("SELECT * FROM educ_system.funcoes");
+
+    res.json(result.rows); // Retorna apenas os dados das linhas
+  } catch (err) {
+    console.error("Erro ao consultar o banco de dados:", err);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});*/
+
+funcoesRouter.get("/", async (req, res) => {
+  const { departamento_id } = req.query; // Obtém o departamento_id da query string
+
+  try {
+    let query = "SELECT * FROM educ_system.funcoes";
+    let values = [];
+
+    // Adiciona filtro para departamento_id, se fornecido
+    if (departamento_id) {
+      query += " WHERE departamento_id = $1";
+      values = [departamento_id];
+    }
+
+    // Conexão com o banco e execução da query
+    const result = await pool.query(query, values);
 
     res.json(result.rows); // Retorna apenas os dados das linhas
   } catch (err) {
