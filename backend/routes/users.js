@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import pool from "../db/dbConnection.js"; // Certifique-se de que o pool está funcionando
+import validator from "validator";
 
 dotenv.config();
 
@@ -204,6 +205,26 @@ userRouter.post("/register", async (req, res) => {
         .json({ error: "Preencha todos os campos obrigatórios." });
     }
 
+    // Valida o formato do email
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: "Email inválido." });
+    }
+
+    // Valida o formato da matrícula (exemplo: apenas números)
+    if (!/^\d+$/.test(matricula)) {
+      return res.status(400).json({ error: "Matrícula inválida." });
+    }
+
+    // Verifica duplicidade de email e matrícula
+    const checkQuery = `
+      SELECT 1 FROM educ_system.educ_users 
+      WHERE matricula = $1 OR email = $2
+    `;
+    const result = await pool.query(checkQuery, [matricula, email]);
+    if (result.rows.length > 0) {
+      return res.status(409).json({ error: "Usuário ou email já registrado." });
+    }
+
     // Gera o hash da senha
     const hashedSenha = await bcrypt.hash(senha, 10);
 
@@ -228,11 +249,6 @@ userRouter.post("/register", async (req, res) => {
     res.status(201).json({ message: "Usuário registrado com sucesso." });
   } catch (err) {
     console.error("Erro ao registrar usuário:", err);
-
-    if (err.code === "23505") {
-      // Erro de duplicidade
-      return res.status(409).json({ error: "Usuário ou email já registrado." });
-    }
 
     // Resposta para outros erros
     res.status(500).json({ error: "Erro interno do servidor." });

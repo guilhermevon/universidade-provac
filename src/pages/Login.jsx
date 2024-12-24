@@ -186,12 +186,11 @@ const LoginPage = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch funções com base no departamento selecionado
     const fetchFuncoes = async () => {
       if (selectedDepartamento) {
         const token = sessionStorage.getItem("token");
         try {
-          // Altere a URL da requisição para passar o nome do departamento, ao invés do departamento_id
+          // Requisição para buscar funções baseadas no departamento selecionado
           const response = await axios.get(
             `http://192.168.0.232:9310/funcoes?dp=${selectedDepartamento}`,
             {
@@ -200,13 +199,24 @@ const LoginPage = () => {
               },
             }
           );
-          setFuncoes(response.data || []); // Atualiza as funções com os dados retornados
+          const funcoesList = response.data || [];
+          setFuncoes(funcoesList); // Atualiza as funções
+
+          // Limpa a função selecionada se ela não for mais válida para o novo departamento
+          if (
+            selectedFuncao &&
+            !funcoesList.some((funcao) => funcao.id === selectedFuncao)
+          ) {
+            setSelectedFuncao(null); // Limpa a função se a selecionada não for mais válida
+          }
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
           setFuncoes([]); // Limpa as funções em caso de erro
+          setSelectedFuncao(null); // Limpa a função em caso de erro
         }
       } else {
         setFuncoes([]); // Limpa as funções se nenhum departamento for selecionado
+        setSelectedFuncao(null); // Limpa a função se nenhum departamento for selecionado
       }
     };
 
@@ -287,15 +297,20 @@ const LoginPage = () => {
                     id="departamento"
                     name="departamento"
                     value={selectedDepartamento || ""}
-                    onChange={(e) => setSelectedDepartamento(e.target.value)}
+                    onChange={(e) => {
+                      const novoDepartamento = e.target.value;
+                      setSelectedDepartamento(novoDepartamento);
+                      setSelectedFuncao(null); // Limpa a função quando o departamento é alterado
+                    }}
                   >
                     <option value="">Selecione um departamento</option>
-                    {departamentos?.map((departamento) => (
-                      <option
-                        key={departamento.departamento_id}
-                        value={departamento.departamento_id}
-                      >
-                        {departamento.dp}
+                    {Array.from(
+                      new Set(
+                        departamentos.map((departamento) => departamento.dp)
+                      )
+                    ).map((departamento, index) => (
+                      <option key={index} value={departamento}>
+                        {departamento}
                       </option>
                     ))}
                   </Select>
@@ -305,10 +320,9 @@ const LoginPage = () => {
                   <Select
                     id="funcao"
                     name="funcao"
-                    required
                     value={selectedFuncao || ""}
                     onChange={(e) => setSelectedFuncao(e.target.value)}
-                    disabled={!funcoes.length}
+                    disabled={funcoes.length === 0} // Desabilita o campo de função se não houver funções
                   >
                     <option value="funcao">Selecione uma função</option>
                     {funcoes?.map((funcao) => (
