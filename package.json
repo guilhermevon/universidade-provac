@@ -38,7 +38,8 @@
     "react-icons": "^5.2.1",
     "react-player": "^2.16.0",
     "react-router-dom": "^6.24.1",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.1.11",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
