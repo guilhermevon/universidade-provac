@@ -46,22 +46,22 @@ const authenticateJWT = (req, res, next) => {
 });*/
 
 funcoesRouter.get("/", async (req, res) => {
-  const { departamento_id } = req.query; // Obtém o departamento_id da query string
+  const { dp } = req.query; // Obtém o nome do departamento da query string
 
   try {
     let query = "SELECT * FROM educ_system.funcoes";
     let values = [];
 
-    // Adiciona filtro para departamento_id, se fornecido
-    if (departamento_id) {
-      query += " WHERE departamento_id = $1";
-      values = [departamento_id];
+    // Adiciona filtro para o nome do departamento, se fornecido
+    if (dp) {
+      query += " WHERE dp = $1";
+      values = [dp];
     }
 
     // Conexão com o banco e execução da query
     const result = await pool.query(query, values);
 
-    res.json(result.rows); // Retorna apenas os dados das linhas
+    res.json(result.rows); // Retorna apenas os dados das funções
   } catch (err) {
     console.error("Erro ao consultar o banco de dados:", err);
     res.status(500).send("Erro ao consultar o banco de dados");

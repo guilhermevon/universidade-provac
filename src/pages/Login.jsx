@@ -185,22 +185,22 @@ const LoginPage = () => {
     fetchDepartamentos();
   }, []);
 
-  // Fetch Funções com base no departamento selecionado
   useEffect(() => {
     // Fetch funções com base no departamento selecionado
     const fetchFuncoes = async () => {
       if (selectedDepartamento) {
         const token = sessionStorage.getItem("token");
         try {
+          // Altere a URL da requisição para passar o nome do departamento, ao invés do departamento_id
           const response = await axios.get(
-            `http://192.168.0.232:9310/funcoes?departamento_id=${selectedDepartamento}`,
+            `http://192.168.0.232:9310/funcoes?dp=${selectedDepartamento}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
-          setFuncoes(response.data || []);
+          setFuncoes(response.data || []); // Atualiza as funções com os dados retornados
         } catch (error) {
           console.error("Erro ao buscar funções:", error);
           setFuncoes([]); // Limpa as funções em caso de erro
@@ -211,7 +211,7 @@ const LoginPage = () => {
     };
 
     fetchFuncoes();
-  }, [selectedDepartamento]);
+  }, [selectedDepartamento]); // Atualiza sempre que o departamento muda
 
   // Handle Form Submission
   const handleSubmit = async (event) => {
