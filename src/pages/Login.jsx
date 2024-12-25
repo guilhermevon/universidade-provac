@@ -243,6 +243,9 @@ const LoginPage = () => {
         );
 
         if (response.status === 200) {
+          const { token, user } = response.data;
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("userNome", user.nome); // Salva o nome do usuário
           alert("Login realizado com sucesso!");
           navigate("/welcome");
         }

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import logoProvac from "../../src/assets/logo_provac.png";
+//import logoProvac from "../../src/assets/logo_provac.png";
 
 const Container = styled.div`
   display: flex;
@@ -44,10 +44,13 @@ const Text = styled.p`
 `;
 
 const Welcome = () => {
+  const userNome = sessionStorage.getItem("userNome");
+
   return (
     <Container>
       <Logo src={logoProvac} alt="Provac Logo" />
-      <Text>BEM VINDO $"{"Usuário"}"</Text>
+      <h1>Bem-vindo, {userNome}!</h1>
+      <Text>Estamos felizes em tê-lo de volta.</Text>
     </Container>
   );
 };
