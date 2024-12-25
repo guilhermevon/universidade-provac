@@ -84,6 +84,12 @@ userRouter.get("/", async (req, res) => {
   }
 });*/
 
+const SECRET_KEY = "tokenCursos"; // Substitua pela sua chave secreta
+
+function generateToken(userId) {
+  return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: "1h" }); // Token válido por 1 hora
+}
+
 userRouter.post("/login", async (req, res) => {
   const { email, senha } = req.body;
 
