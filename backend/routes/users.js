@@ -89,7 +89,7 @@ userRouter.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, nome, email FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
+      "SELECT id, usuario, email FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
       [email, senha]
     );
 
