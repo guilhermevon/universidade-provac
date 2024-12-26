@@ -372,6 +372,8 @@ const AreaColab = () => {
     fetchUserInfo();
   }, [navigate]);
 
+  const userNome = sessionStorage.getItem("userNome");
+
   return (
     <>
       <GlobalStyle />
@@ -395,8 +397,8 @@ const AreaColab = () => {
                 onError={(e) => (e.target.src = mestre)}
               />
             </UserImageContainer>
-            <UserName>{userInfo.name}</UserName>
-            <UserRole>{userInfo.role}</UserRole>
+            <UserName>{userNome}</UserName>
+            <UserRole>{userInfo.funcao}</UserRole>
             <RankMedalsContainer>
               <RankTitle>Rank: Mestre</RankTitle>
               <MedalsTitle>Medalhas</MedalsTitle>

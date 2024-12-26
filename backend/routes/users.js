@@ -87,7 +87,7 @@ userRouter.get("/", async (req, res) => {
 const SECRET_KEY = "tokenCursos"; // Substitua pela sua chave secreta
 
 function generateToken(userId) {
-  return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: "1h" }); // Token válido por 1 hora
+  return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: "3h" }); // Token válido por 1 hora
 }
 
 userRouter.post("/login", async (req, res) => {
@@ -95,7 +95,7 @@ userRouter.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, usuario, email FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
+      "SELECT id, usuario, email, role, funcao, total_pontos FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
       [email, senha]
     );
 
@@ -110,7 +110,7 @@ userRouter.post("/login", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, usuario: user.usuario, email: user.email },
+      user: { id: user.id, usuario: user.usuario, email: user.email, role: user.role, funcao: user.funcao, total_pontos: user.total_pontos },
     });
   } catch (err) {
     console.error("Erro ao consultar o banco de dados:", err.stack);

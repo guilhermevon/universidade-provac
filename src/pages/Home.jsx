@@ -325,6 +325,8 @@ const Home = () => {
     navigate(`/course/${id}`, { state: { nroAula, progress } });
   };
 
+  const userNome = sessionStorage.getItem("userNome");
+
   return (
     <>
       <GlobalStyle />
@@ -332,7 +334,9 @@ const Home = () => {
         <Navbar />
         <StarWrapper />
         <PageContent>
-          <SectionTitle>Continuar Assistindo</SectionTitle>
+          <SectionTitle>
+            Olá, <span style={{ color: "red" }}>{userNome}</span>
+          !</SectionTitle>
           <ScrollWrapper>
             <NavigationButton
               left
@@ -370,7 +374,6 @@ const Home = () => {
               <FaArrowRight />
             </NavigationButton>
           </ScrollWrapper>
-
           {mandatoryCourses.length > 0 && (
             <>
               <SectionTitle>Cursos Obrigatórios</SectionTitle>
@@ -410,7 +413,6 @@ const Home = () => {
               </ScrollWrapper>
             </>
           )}
-
           <SectionTitle>Ranks</SectionTitle>
           <RankingsSection>
             <RankingBox>

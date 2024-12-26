@@ -45,14 +45,14 @@ const Text = styled.p`
 `;
 
 const Welcome = () => {
-  //const userNome = sessionStorage.getItem("userNome");
-  const location = useLocation();
-  const { payload } = location.state || {}; // Obtenha o payload do estado ou use um valor padrão
+  const userNome = sessionStorage.getItem("userNome");
 
   return (
     <Container>
       <Logo src={logoProvac} alt="Provac Logo" />
-      <h1>Bem-vindo! {payload.email}</h1>
+      <h1>
+        Bem-vindo, <span style={{ color: "red" }}>{userNome}</span>!
+      </h1>
     </Container>
   );
 };
