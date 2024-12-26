@@ -233,6 +233,7 @@ const LoginPage = () => {
       const payload = {
         email: formData.get("email"),
         senha: formData.get("password"),
+        usuario: formData.get("usuario"),
       };
 
       try {
@@ -245,9 +246,11 @@ const LoginPage = () => {
         if (response.status === 200) {
           const { token, user } = response.data;
           sessionStorage.setItem("token", token);
-          sessionStorage.setItem("userNome", user.nome); // Salva o nome do usuário
+          sessionStorage.setItem("userNome", user.usuario); // Salva o nome do usuário
+          console.log("payload", response.data);
+          console.log("vochorar", user);
           alert("Login realizado com sucesso!");
-          navigate("/welcome");
+          navigate("/welcome", { state: { payload } });
         }
       } catch (error) {
         console.error("Erro ao fazer login:", error);

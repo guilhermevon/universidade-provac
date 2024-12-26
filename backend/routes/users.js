@@ -110,7 +110,7 @@ userRouter.post("/login", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, nome: user.nome, email: user.email },
+      user: { id: user.id, usuario: user.usuario, email: user.email },
     });
   } catch (err) {
     console.error("Erro ao consultar o banco de dados:", err.stack);

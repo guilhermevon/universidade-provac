@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-//import logoProvac from "../../src/assets/logo_provac.png";
+import logoProvac from "../../src/assets/logo_provac.png";
+import { useLocation } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -44,13 +45,14 @@ const Text = styled.p`
 `;
 
 const Welcome = () => {
-  const userNome = sessionStorage.getItem("userNome");
+  //const userNome = sessionStorage.getItem("userNome");
+  const location = useLocation();
+  const { payload } = location.state || {}; // Obtenha o payload do estado ou use um valor padrão
 
   return (
     <Container>
       <Logo src={logoProvac} alt="Provac Logo" />
-      <h1>Bem-vindo, {userNome}!</h1>
-      <Text>Estamos felizes em tê-lo de volta.</Text>
+      <h1>Bem-vindo! {payload.email}</h1>
     </Container>
   );
 };
