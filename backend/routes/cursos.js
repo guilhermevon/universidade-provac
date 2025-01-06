@@ -44,7 +44,7 @@ cursosRouter.get("/", async (req, res) => {
   }
 });
 
-cursosRouter.get("/api/courses", authenticateJWT, async (req, res) => {
+cursosRouter.get("/buscar", authenticateJWT, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
