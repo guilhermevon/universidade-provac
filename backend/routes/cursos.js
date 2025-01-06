@@ -11,10 +11,10 @@ const cursosRouter = express.Router();
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
+ /* if (!authHeader) {
     console.log("Acesso não autorizado: Cabeçalho de autorização ausente");
     return res.status(401).json({ message: "Acesso não autorizado" });
-  }
+  }*/
 
   const token = authHeader.split(" ")[1];
 
@@ -44,7 +44,7 @@ cursosRouter.get("/", async (req, res) => {
   }
 });
 
-cursosRouter.get("/buscar", authenticateJWT, async (req, res) => {
+cursosRouter.get("/buscar", /*authenticateJWT,*/ async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
