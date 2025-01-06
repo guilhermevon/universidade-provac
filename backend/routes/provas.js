@@ -193,15 +193,12 @@ provasRouter.get(
   }
 );
 
-provasRouter.get(
-  "/api/course/:id/provas",
-  authenticateJWT,
-  async (req, res) => {
-    const { id } = req.params;
-    console.log(`Buscando provas para o curso com ID: ${id}`); // Log para depuração
-    try {
-      const result = await pool.query(
-        `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
+provasRouter.get("/api/course/:id/provas", async (req, res) => {
+  const { id } = req.params;
+  console.log(`Buscando provas para o curso com ID: ${id}`); // Log para depuração
+  try {
+    const result = await pool.query(
+      `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
                 q.id_questao, q.tipo_questao, q.enunciado, q.pontuacao, q.ordem AS questao_ordem, 
                 a.id_alternativa, a.texto_alternativa, a.correta, a.ordem AS alternativa_ordem
          FROM educ_system.provas p
@@ -212,18 +209,39 @@ provasRouter.get(
            FROM educ_system.modules m
            WHERE m.course_id = $1
          )`,
-        [id]
-      );
+      [id]
+    );
 
-      if (result.rows.length === 0) {
-        console.log("Nenhuma prova encontrada para este curso"); // Log para depuração
-        return res
-          .status(404)
-          .json({ message: "Nenhuma prova encontrada para este curso" });
-      }
+    if (result.rows.length === 0) {
+      console.log("Nenhuma prova encontrada para este curso"); // Log para depuração
+      return res
+        .status(404)
+        .json({ message: "Nenhuma prova encontrada para este curso" });
+    }
 
-      const provas = result.rows.reduce((acc, row) => {
-        const {
+    const provas = result.rows.reduce((acc, row) => {
+      const {
+        id_prova,
+        titulo,
+        descricao,
+        duracao,
+        nota_minima_aprovacao,
+        data_criacao,
+        data_atualizacao,
+        id_modulo,
+        id_questao,
+        tipo_questao,
+        enunciado,
+        pontuacao,
+        questao_ordem,
+        id_alternativa,
+        texto_alternativa,
+        correta,
+        alternativa_ordem,
+      } = row;
+      let prova = acc.find((p) => p.id_prova === id_prova);
+      if (!prova) {
+        prova = {
           id_prova,
           titulo,
           descricao,
@@ -232,61 +250,39 @@ provasRouter.get(
           data_criacao,
           data_atualizacao,
           id_modulo,
+          questoes: [],
+        };
+        acc.push(prova);
+      }
+      let questao = prova.questoes.find((q) => q.id_questao === id_questao);
+      if (!questao && id_questao) {
+        questao = {
           id_questao,
           tipo_questao,
           enunciado,
           pontuacao,
-          questao_ordem,
+          ordem: questao_ordem,
+          alternativas: [],
+        };
+        prova.questoes.push(questao);
+      }
+      if (id_alternativa) {
+        questao.alternativas.push({
           id_alternativa,
           texto_alternativa,
           correta,
-          alternativa_ordem,
-        } = row;
-        let prova = acc.find((p) => p.id_prova === id_prova);
-        if (!prova) {
-          prova = {
-            id_prova,
-            titulo,
-            descricao,
-            duracao,
-            nota_minima_aprovacao,
-            data_criacao,
-            data_atualizacao,
-            id_modulo,
-            questoes: [],
-          };
-          acc.push(prova);
-        }
-        let questao = prova.questoes.find((q) => q.id_questao === id_questao);
-        if (!questao && id_questao) {
-          questao = {
-            id_questao,
-            tipo_questao,
-            enunciado,
-            pontuacao,
-            ordem: questao_ordem,
-            alternativas: [],
-          };
-          prova.questoes.push(questao);
-        }
-        if (id_alternativa) {
-          questao.alternativas.push({
-            id_alternativa,
-            texto_alternativa,
-            correta,
-            ordem: alternativa_ordem,
-          });
-        }
-        return acc;
-      }, []);
+          ordem: alternativa_ordem,
+        });
+      }
+      return acc;
+    }, []);
 
-      res.json(provas);
-    } catch (error) {
-      console.error("Erro ao buscar provas:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    }
+    res.json(provas);
+  } catch (error) {
+    console.error("Erro ao buscar provas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
   }
-);
+});
 
 provasRouter.post("/api/respostas", authenticateJWT, async (req, res) => {
   const { userId, provaId, respostas } = req.body;

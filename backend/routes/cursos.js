@@ -8,30 +8,6 @@ dotenv.config();
 
 const cursosRouter = express.Router();
 
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
- /* if (!authHeader) {
-    console.log("Acesso não autorizado: Cabeçalho de autorização ausente");
-    return res.status(401).json({ message: "Acesso não autorizado" });
-  }*/
-
-  const token = authHeader.split(" ")[1];
-
-  jwt.verify(
-    token,
-    process.env.JWT_SECRET || "fallback_secret",
-    (err, user) => {
-      if (err) {
-        console.log("Token inválido:", err.message);
-        return res.status(403).json({ message: "Token inválido" });
-      }
-      req.user = user;
-      next();
-    }
-  );
-};
-
 cursosRouter.get("/", async (req, res) => {
   try {
     // Conexão com o banco e execução da query
@@ -44,7 +20,7 @@ cursosRouter.get("/", async (req, res) => {
   }
 });
 
-cursosRouter.get("/buscar", /*authenticateJWT,*/ async (req, res) => {
+cursosRouter.get("/buscar", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
@@ -68,7 +44,7 @@ cursosRouter.get("/buscar", /*authenticateJWT,*/ async (req, res) => {
   }
 });
 
-cursosRouter.post("/api/manage-courses", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-courses", async (req, res) => {
   const { title, subtitle, img, dp } = req.body;
   const { role } = req.user;
 
@@ -88,7 +64,7 @@ cursosRouter.post("/api/manage-courses", authenticateJWT, async (req, res) => {
   }
 });
 
-cursosRouter.get("/api/course/:id", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -109,7 +85,7 @@ cursosRouter.get("/api/course/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -155,7 +131,7 @@ cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
 // Nova rota para salvar progresso do vídeo
 cursosRouter.post(
   "/api/course/video-progress",
-  authenticateJWT,
+
   async (req, res) => {
     const { userId, courseId, nroAula, progress } = req.body;
 
@@ -208,7 +184,7 @@ cursosRouter.post(
 
 cursosRouter.get(
   "/api/user/:userId/courses-progress",
-  authenticateJWT,
+
   async (req, res) => {
     const { userId } = req.params;
 
@@ -238,7 +214,6 @@ cursosRouter.get(
 // Rota para registrar pontuação ao assistir uma aula
 cursosRouter.post(
   "/api/course/:courseId/aula/:aulaId/pontuacao",
-  authenticateJWT,
   async (req, res) => {
     const { courseId, aulaId } = req.params;
     const { userId } = req.body;
@@ -283,15 +258,12 @@ cursosRouter.post(
   }
 );
 
-cursosRouter.get(
-  "/api/course/:courseId/provas",
-  authenticateJWT,
-  async (req, res) => {
-    const { courseId } = req.params;
+cursosRouter.get("/api/course/:courseId/provas", async (req, res) => {
+  const { courseId } = req.params;
 
-    try {
-      const result = await pool.query(
-        `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
+  try {
+    const result = await pool.query(
+      `SELECT p.id_prova, p.titulo, p.descricao, p.duracao, p.nota_minima_aprovacao, p.data_criacao, p.data_atualizacao, 
                 q.id_questao, q.tipo_questao, q.enunciado, q.pontuacao, q.ordem AS questao_ordem, 
                 a.id_alternativa, a.texto_alternativa, a.correta, a.ordem AS alternativa_ordem
          FROM educ_system.provas p
@@ -302,17 +274,38 @@ cursosRouter.get(
            FROM educ_system.modules m
            WHERE m.course_id = $1
          )`,
-        [courseId]
-      );
+      [courseId]
+    );
 
-      if (result.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Nenhuma prova encontrada para este curso" });
-      }
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Nenhuma prova encontrada para este curso" });
+    }
 
-      const provas = result.rows.reduce((acc, row) => {
-        const {
+    const provas = result.rows.reduce((acc, row) => {
+      const {
+        id_prova,
+        titulo,
+        descricao,
+        duracao,
+        nota_minima_aprovacao,
+        data_criacao,
+        data_atualizacao,
+        id_modulo,
+        id_questao,
+        tipo_questao,
+        enunciado,
+        pontuacao,
+        questao_ordem,
+        id_alternativa,
+        texto_alternativa,
+        correta,
+        alternativa_ordem,
+      } = row;
+      let prova = acc.find((p) => p.id_prova === id_prova);
+      if (!prova) {
+        prova = {
           id_prova,
           titulo,
           descricao,
@@ -321,64 +314,42 @@ cursosRouter.get(
           data_criacao,
           data_atualizacao,
           id_modulo,
+          questoes: [],
+        };
+        acc.push(prova);
+      }
+      let questao = prova.questoes.find((q) => q.id_questao === id_questao);
+      if (!questao && id_questao) {
+        questao = {
           id_questao,
           tipo_questao,
           enunciado,
           pontuacao,
-          questao_ordem,
+          ordem: questao_ordem,
+          alternativas: [],
+        };
+        prova.questoes.push(questao);
+      }
+      if (id_alternativa) {
+        questao.alternativas.push({
           id_alternativa,
           texto_alternativa,
           correta,
-          alternativa_ordem,
-        } = row;
-        let prova = acc.find((p) => p.id_prova === id_prova);
-        if (!prova) {
-          prova = {
-            id_prova,
-            titulo,
-            descricao,
-            duracao,
-            nota_minima_aprovacao,
-            data_criacao,
-            data_atualizacao,
-            id_modulo,
-            questoes: [],
-          };
-          acc.push(prova);
-        }
-        let questao = prova.questoes.find((q) => q.id_questao === id_questao);
-        if (!questao && id_questao) {
-          questao = {
-            id_questao,
-            tipo_questao,
-            enunciado,
-            pontuacao,
-            ordem: questao_ordem,
-            alternativas: [],
-          };
-          prova.questoes.push(questao);
-        }
-        if (id_alternativa) {
-          questao.alternativas.push({
-            id_alternativa,
-            texto_alternativa,
-            correta,
-            ordem: alternativa_ordem,
-          });
-        }
-        return acc;
-      }, []);
+          ordem: alternativa_ordem,
+        });
+      }
+      return acc;
+    }, []);
 
-      res.json(provas);
-    } catch (error) {
-      console.error("Erro ao buscar provas:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    }
+    res.json(provas);
+  } catch (error) {
+    console.error("Erro ao buscar provas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
   }
-);
+});
 
 // Rota para buscar todas as funções de um departamento específico
-cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   const { id } = req.params;
   try {
     const resultAulas = await pool.query(
@@ -444,7 +415,7 @@ cursosRouter.get("/api/course/:id/aulas", authenticateJWT, async (req, res) => {
   }
 });
 
-cursosRouter.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/aula/:id", async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -471,7 +442,7 @@ cursosRouter.delete("/api/aula/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-cursosRouter.delete("/api/course/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/course/:id", async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -591,7 +562,7 @@ cursosRouter.delete("/api/course/:id", authenticateJWT, async (req, res) => {
 // Adicionando as rotas de módulos diretamente no server.js
 
 // Rota para listar módulos
-cursosRouter.get("/api/modules", authenticateJWT, async (req, res) => {
+cursosRouter.get("/api/modules", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM educ_system.modules ORDER BY name"
@@ -604,7 +575,7 @@ cursosRouter.get("/api/modules", authenticateJWT, async (req, res) => {
 });
 
 // Rota para criar um novo módulo
-cursosRouter.post("/api/manage-modules", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-modules", async (req, res) => {
   const { name, description, course_id } = req.body;
   const { role } = req.user;
 
@@ -625,7 +596,7 @@ cursosRouter.post("/api/manage-modules", authenticateJWT, async (req, res) => {
 });
 
 // Rota para deletar um módulo
-cursosRouter.delete("/api/module/:id", authenticateJWT, async (req, res) => {
+cursosRouter.delete("/api/module/:id", async (req, res) => {
   const { id } = req.params;
   const { role } = req.user;
 
@@ -663,7 +634,7 @@ cursosRouter.delete("/api/module/:id", authenticateJWT, async (req, res) => {
   }
 });
 
-cursosRouter.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
+cursosRouter.post("/api/manage-aulas", async (req, res) => {
   const { title, url, description, course_id, module_id } = req.body;
   const { role } = req.user;
 
@@ -684,22 +655,18 @@ cursosRouter.post("/api/manage-aulas", authenticateJWT, async (req, res) => {
 });
 
 // Rota para listar módulos de um curso específico
-cursosRouter.get(
-  "/api/courses/:courseId/modules",
-  authenticateJWT,
-  async (req, res) => {
-    const { courseId } = req.params;
-    try {
-      const result = await pool.query(
-        "SELECT id, name FROM educ_system.modules WHERE course_id = $1 ORDER BY name",
-        [courseId]
-      );
-      res.json(result.rows);
-    } catch (error) {
-      console.error("Erro ao buscar módulos:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    }
+cursosRouter.get("/api/courses/:courseId/modules", async (req, res) => {
+  const { courseId } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT id, name FROM educ_system.modules WHERE course_id = $1 ORDER BY name",
+      [courseId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erro ao buscar módulos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
   }
-);
+});
 
 export default cursosRouter; // Exporta apenas a aplicação Express

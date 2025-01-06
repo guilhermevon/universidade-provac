@@ -291,7 +291,11 @@ const Course = () => {
             ) : selectedExam ? (
               <div>Exibir conteúdo da prova aqui</div>
             ) : (
-              <div>Selecione uma aula ou prova para começar</div>
+              <div style={{ width: "100%", height: "100%" }}>
+                <span style={{ color: "white" }}>
+                  Selecione uma aula ou prova para começar
+                </span>
+              </div>
             )}
             {selectedAula && (
               <>
