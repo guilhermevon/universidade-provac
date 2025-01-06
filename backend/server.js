@@ -21,9 +21,28 @@ if (process.env.API_MODE === "production") {
   process.exit(1);
 }
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:4000", // Frontend em ambiente de desenvolvimento
+  "http://192.168.0.232:9220", // Frontend em produção
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        // Permite requisições sem origin (ex.: tools internas) ou de origens válidas
+        callback(null, true);
+      } else {
+        callback(new Error("Não permitido pela política de CORS"));
+      }
+    },
+    credentials: true, // Permite envio de cookies e autenticação
+  })
+);
+
 app.use(express.json({ limit: "10mb" }));
 
+// Rotas
 app.use("/cursos", cursosRouter);
 app.use("/funcoes", funcoesRouter);
 app.use("/provas", provasRouter);
