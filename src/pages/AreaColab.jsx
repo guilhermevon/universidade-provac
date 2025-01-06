@@ -4,6 +4,7 @@ import styled, { createGlobalStyle, keyframes } from "styled-components";
 import axios from "axios";
 import Navbar from "../components/NavBar/NavBar";
 import mestre from "../assets/mestre.png";
+import Default from "../assets/default.jpg";
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
@@ -97,8 +98,9 @@ const Stars3 = styled.div`
 `;
 
 const PageWrapper = styled.div`
-  min-height: 100vh;
-  position: relative;
+  flex: 1; /* Faz com que ambos ocupem tamanhos iguais */
+  max-width: 30%; /* Cada container ocupará 50% */
+  height: auto;
   overflow: hidden;
 `;
 
@@ -117,7 +119,10 @@ const PageContent = styled.div`
   padding-top: calc(60px + 2rem);
   padding-left: 2rem;
   padding-right: 2rem;
-  min-height: calc(100vh - 60px - 2rem);
+   {
+    /*min-height: calc(100vh - 60px - 2rem);*/
+  }
+  min-height: 500px;
   z-index: 1;
 `;
 
@@ -300,6 +305,16 @@ const UserRole = styled.p`
   text-align: center;
 `;
 
+const FlexContainer = styled.div`
+  display: flex;
+
+  justify-content: center; /* Centraliza horizontalmente os containers */
+  align-items: center; /* Centraliza verticalmente os containers */
+  gap: 10px; /* Espaço entre os containers */
+  min-height: 100vh; /* Garante que ocupa a altura total da página */
+  padding: 0px; /* Opcional: adiciona espaçamento interno */
+`;
+
 const AreaColab = () => {
   const [finalizedCourses, setFinalizedCourses] = useState([]);
   const [userInfo, setUserInfo] = useState({ name: "", role: "", foto: "" });
@@ -340,19 +355,16 @@ const AreaColab = () => {
       }
 
       try {
-        const response = await axios.get(
-          "http://192.168.0.232:9310/api/user/info",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get("http://192.168.0.232:9310/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUserInfo(response.data);
 
         // Fetch user photo separately
         const photoResponse = await axios.get(
-          "http://192.168.0.232:9310/api/user/photo",
+          "http://192.168.0.232:9310/users",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -373,54 +385,78 @@ const AreaColab = () => {
   }, [navigate]);
 
   const userNome = sessionStorage.getItem("userNome");
+  const funcao = sessionStorage.getItem("funcao");
+  const role = sessionStorage.getItem("role");
 
   return (
     <>
       <GlobalStyle />
-      <PageWrapper>
-        <Navbar />
-        <StarWrapper>
-          <Stars />
-          <Stars2 />
-          <Stars3 />
-        </StarWrapper>
-        <PageContent>
-          <UserInfoWrapper>
-            <UserImageContainer>
-              <UserImage
-                src={
-                  userInfo.foto
-                    ? `data:image/jpeg;base64,${userInfo.foto}`
-                    : mestre
-                }
-                alt="User"
-                onError={(e) => (e.target.src = mestre)}
-              />
-            </UserImageContainer>
-            <UserName>{userNome}</UserName>
-            <UserRole>{userInfo.funcao}</UserRole>
-            <RankMedalsContainer>
-              <RankTitle>Rank: Mestre</RankTitle>
-              <MedalsTitle>Medalhas</MedalsTitle>
-            </RankMedalsContainer>
-            <MestreImage src={mestre} alt="Mestre" />
-          </UserInfoWrapper>
-          <ScrollWrapper>
-            <SectionTitle>Cursos Finalizados</SectionTitle>
-            <ScrollContainer ref={scrollRef}>
-              {finalizedCourses.map((course, index) => (
-                <StyledCard key={index}>
-                  <CardImage src={course.img} alt={course.title} />
-                  <CardContent>
-                    <CardTitle>{course.title}</CardTitle>
-                    <CardSubtitle>{course.subtitle}</CardSubtitle>
-                  </CardContent>
-                </StyledCard>
-              ))}
-            </ScrollContainer>
-          </ScrollWrapper>
-        </PageContent>
-      </PageWrapper>
+      <FlexContainer>
+        {/* Container 1 */}
+        <PageWrapper>
+          <Navbar />
+          <StarWrapper>
+            <Stars />
+            <Stars2 />
+            <Stars3 />
+          </StarWrapper>
+          <PageContent>
+            <UserInfoWrapper>
+              <UserImageContainer>
+                <UserImage
+                  src={
+                    userInfo.foto
+                      ? `data:image/jpeg;base64,${userInfo.foto}`
+                      : Default
+                  }
+                  alt=""
+                  onError={(e) => (e.target.src = "??")}
+                />
+              </UserImageContainer>
+              <UserName>{userNome}</UserName>
+              <UserRole>
+                {funcao} / {role}
+              </UserRole>
+              <br />
+              <RankMedalsContainer>
+                <RankTitle>
+                  Rank <br /> <img src={mestre} alt="Medalha" />
+                </RankTitle>
+
+                <MedalsTitle>Medalhas</MedalsTitle>
+              </RankMedalsContainer>
+            </UserInfoWrapper>
+          </PageContent>
+        </PageWrapper>
+
+        {/* Container 2 */}
+        <PageWrapper>
+          <Navbar />
+          <StarWrapper>
+            <Stars />
+            <Stars2 />
+            <Stars3 />
+          </StarWrapper>
+          <PageContent>
+            <UserInfoWrapper>
+              <SectionTitle>Cursos Finalizados</SectionTitle>
+            </UserInfoWrapper>
+            <ScrollWrapper>
+              <ScrollContainer ref={scrollRef}>
+                {finalizedCourses.map((course, index) => (
+                  <StyledCard key={index}>
+                    <CardImage src={course.img} alt={course.title} />
+                    <CardContent>
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardSubtitle>{course.subtitle}</CardSubtitle>
+                    </CardContent>
+                  </StyledCard>
+                ))}
+              </ScrollContainer>
+            </ScrollWrapper>
+          </PageContent>
+        </PageWrapper>
+      </FlexContainer>
     </>
   );
 };

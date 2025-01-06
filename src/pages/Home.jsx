@@ -242,6 +242,15 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const usuario = sessionStorage.getItem("usuario");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+  });
+
+  useEffect(() => {
     fetchCoursesProgress();
     fetchMandatoryCourses();
     fetchRankings();
@@ -326,6 +335,7 @@ const Home = () => {
   };
 
   const userNome = sessionStorage.getItem("userNome");
+  const total_pontos = sessionStorage.getItem("total_pontos");
 
   return (
     <>
@@ -335,8 +345,8 @@ const Home = () => {
         <StarWrapper />
         <PageContent>
           <SectionTitle>
-            Olá, <span style={{ color: "red" }}>{userNome}</span>
-          !</SectionTitle>
+            Olá, <span style={{ color: "red" }}>{userNome}</span>!
+          </SectionTitle>
           <ScrollWrapper>
             <NavigationButton
               left
@@ -452,7 +462,7 @@ const Home = () => {
                 <FaCrown />
               </PersonalRankIcon>
               <PersonalRankPoints>
-                {rankings.personalRank.total_pontos}
+                Sua Pontuação: {total_pontos}
               </PersonalRankPoints>
               <PersonalRankName>
                 {rankings.personalRank.usuario}

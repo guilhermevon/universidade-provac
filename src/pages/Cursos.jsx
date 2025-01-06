@@ -236,14 +236,11 @@ const Cursos = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        "http://192.168.0.232:9310/api/courses",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("http://192.168.0.232:9310/cursos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setCourses(response.data);
     } catch (error) {
       console.error("Erro ao buscar cursos:", error);
@@ -254,14 +251,11 @@ const Cursos = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        "http://192.168.0.232:9310/api/funcoes",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("http://192.168.0.232:9310/funcoes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setFuncoes(response.data);
     } catch (error) {
       console.error("Erro ao buscar funções:", error);
@@ -279,7 +273,8 @@ const Cursos = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/api/manage-courses",
+        "http://192.168.0.232:9310/cursos",
+        // "http://192.168.0.232:9310/api/manage-courses",
         { title, subtitle, img, dp },
         {
           headers: {
@@ -306,7 +301,8 @@ const Cursos = () => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.0.232:9310/api/course/${selectedCourse}`,
+        `http://192.168.0.232:9310/cursos/${selectedCourse}`,
+        //`http://192.168.0.232:9310/api/course/${selectedCourse}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -330,7 +326,8 @@ const Cursos = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/api/mandatory-course",
+        `http://192.168.0.232:9310/cursos/${selectedCourse}`,
+        //"http://192.168.0.232:9310/api/mandatory-course",
         { courseId: selectedCourse, funcaoId: selectedFuncao },
         {
           headers: {

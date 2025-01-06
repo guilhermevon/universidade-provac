@@ -30,7 +30,7 @@ const App = () => {
         <Route
           path="/areagest"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Courses />
             </RoleBasedRoute>
           }
@@ -38,7 +38,7 @@ const App = () => {
         <Route
           path="/cursos"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Cursos />
             </RoleBasedRoute>
           }
@@ -46,7 +46,7 @@ const App = () => {
         <Route
           path="/modulos"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Modulos />
             </RoleBasedRoute>
           }
@@ -54,7 +54,7 @@ const App = () => {
         <Route
           path="/aulas"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Aulas />
             </RoleBasedRoute>
           }
@@ -62,7 +62,7 @@ const App = () => {
         <Route
           path="/provas"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Provas />
             </RoleBasedRoute>
           }
@@ -70,7 +70,7 @@ const App = () => {
         <Route
           path="/aprovacao"
           element={
-            <RoleBasedRoute requiredRole="1">
+            <RoleBasedRoute requiredRole="Gestor">
               <Aprovacao />
             </RoleBasedRoute>
           }

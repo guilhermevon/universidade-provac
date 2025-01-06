@@ -13,12 +13,14 @@ const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
     font-family: 'Lato', sans-serif;
+    background-size: cover;
+    color: #1b2735;
+    overflow-y: auto;
   }
 
-  body {
-    background: url(${backgroundImage}) no-repeat center center fixed;
-    background-size: cover;
-    overflow-y: auto;
+  ::selection {
+    background: #0D47A1; /* Azul marinho para o fundo da seleção */
+    color: white;
   }
 `;
 
@@ -321,11 +323,11 @@ const Courses = () => {
       <GlobalStyle />
       <PageWrapper>
         <Navbar />
-        <StarWrapper>
+        {/*  <StarWrapper>
           <Stars />
           <Stars2 />
           <Stars3 />
-        </StarWrapper>
+        </StarWrapper> */}
         <PageContent>
           {Object.keys(coursesByDepartment).map((department) => (
             <div key={department}>

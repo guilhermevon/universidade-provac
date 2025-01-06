@@ -236,15 +236,18 @@ const Navbar = () => {
   };
 
   const isGestorArea = [
-    "/areagest",
-    "/cursos",
-    "/modulos",
-    "/aulas",
-    "/provas",
+    "/areaGestor",
+    "/cursosSide",
+    "/modulosSide",
+    "/aulasSide",
+    "/provasSide",
     "/documentacao",
     "/graficos",
     "/aprovacao",
   ].includes(location.pathname);
+
+  const role = sessionStorage.getItem("role");
+  console.log("role", role);
 
   return (
     <>
@@ -278,14 +281,16 @@ const Navbar = () => {
               Sobre
             </Link>
           </NavLink>
-          <NavLink>
-            <Link
-              to="/cursos"
-              className={location.pathname === "/cursos" ? "active" : ""}
-            >
-              Área Gestor
-            </Link>
-          </NavLink>
+          {role === "Gestor" && (
+            <NavLink>
+              <Link
+                to="/areaGestor"
+                className={location.pathname === "/cursos" ? "active" : ""}
+              >
+                Área Gestor
+              </Link>
+            </NavLink>
+          )}
         </NavLinks>
         <div style={{ display: "flex", alignItems: "center" }}>
           <LoginLink>
@@ -303,29 +308,30 @@ const Navbar = () => {
           <div className="bar"></div>
         </ToggleButton>
       </NavbarContainer>
-      {isGestorArea && (
+
+      {isGestorArea && role === "Gestor" && (
         <Sidebar>
           <ul>
-            <li className={location.pathname === "/cursos" ? "active" : ""}>
-              <Link to="/cursos">
+            <li className={location.pathname === "/cursos"}>
+              <Link to="/cursosSide">
                 <HiOutlineVideoCamera />
                 Cursos
               </Link>
             </li>
-            <li className={location.pathname === "/modulos" ? "active" : ""}>
-              <Link to="/modulos">
+            <li className={location.pathname === "/modulosSide" ? "active" : ""}>
+              <Link to="/modulosSide">
                 <HiOutlineViewBoards />
                 Módulos
               </Link>
             </li>
-            <li className={location.pathname === "/aulas" ? "active" : ""}>
-              <Link to="/aulas">
+            <li className={location.pathname === "/aulasSide" ? "active" : ""}>
+              <Link to="/aulasSide">
                 <HiOutlineBookOpen />
                 Aulas
               </Link>
             </li>
             <li className={location.pathname === "/provas" ? "active" : ""}>
-              <Link to="/provas">
+              <Link to="/provasSide">
                 <HiOutlineAcademicCap />
                 Provas
               </Link>

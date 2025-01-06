@@ -152,6 +152,15 @@ const SecondaryButton = styled(Button)`
   }
 `;
 
+const TerciaryButton = styled(Button)`
+  background-color: #d41715;
+  margin-top: 1rem;
+
+  &:hover {
+    background-color: red;
+  }
+`;
+
 //ESTRUTURA DO SITE----------------------------------------------------------------------------------------------------------------------------------------------
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -234,6 +243,9 @@ const LoginPage = () => {
         email: formData.get("email"),
         senha: formData.get("password"),
         usuario: formData.get("usuario"),
+        funcao: formData.get("funcao"),
+        role: formData.get("role"),
+        total_pontos: formData.get("total_pontos"),
       };
 
       try {
@@ -247,10 +259,13 @@ const LoginPage = () => {
           const { token, user } = response.data;
           sessionStorage.setItem("token", token);
           sessionStorage.setItem("userNome", user.usuario); // Salva o nome do usuário
+          sessionStorage.setItem("funcao", user.funcao);
+          sessionStorage.setItem("role", user.role);
+          sessionStorage.setItem("total_pontos", user.total_pontos);
           console.log("payload", response.data);
           console.log("vochorar", user);
           alert("Login realizado com sucesso!");
-          navigate("/welcome", { state: { payload } });
+          navigate("/home", { state: { payload } });
         }
       } catch (error) {
         console.error("Erro ao fazer login:", error);
@@ -284,6 +299,9 @@ const LoginPage = () => {
       }
     }
   };
+
+  const role = sessionStorage.getItem("role");
+  const userNome = sessionStorage.getItem("userNome");
 
   return (
     <>
@@ -370,13 +388,27 @@ const LoginPage = () => {
               {formType === "login" ? "Entrar" : "Cadastrar"}
             </Button>
           </form>
-          <SecondaryButton
-            onClick={() =>
-              setFormType(formType === "login" ? "register" : "login")
-            }
-          >
-            {formType === "login" ? "Criar uma conta" : "Já tenho uma conta"}
-          </SecondaryButton>
+          {role === "Gestor" && (
+            <SecondaryButton
+              onClick={() =>
+                setFormType(formType === "login" ? "register" : "login")
+              }
+            >
+              {formType === "login" ? "Criar uma conta" : "Já tenho uma conta"}
+            </SecondaryButton>
+          )}
+          {/*role === "user" ||
+            (role === "Gestor" && (
+              <TerciaryButton
+                onClick={() =>
+                  setFormType(formType === "Sair" ? "register" : "login")
+                }
+              >
+                {formType === "login"
+                  ? `Sair de ${userNome}`
+                  : "Já tenho uma conta"}
+              </TerciaryButton>
+            ))*/}
         </FormWrapper>
       </PageWrapper>
     </>
