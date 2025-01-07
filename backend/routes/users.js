@@ -95,7 +95,7 @@ userRouter.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, usuario, email, role, funcao, total_pontos FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
+      "SELECT id, usuario, email, role, funcao, total_pontos, dp FROM educ_system.educ_users WHERE email = $1 AND senha = $2",
       [email, senha]
     );
 
@@ -110,7 +110,7 @@ userRouter.post("/login", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, usuario: user.usuario, email: user.email, role: user.role, funcao: user.funcao, total_pontos: user.total_pontos },
+      user: { id: user.id, usuario: user.usuario, email: user.email, role: user.role, funcao: user.funcao, total_pontos: user.total_pontos, dp: user.dp},
     });
   } catch (err) {
     console.error("Erro ao consultar o banco de dados:", err.stack);

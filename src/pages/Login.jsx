@@ -246,6 +246,7 @@ const LoginPage = () => {
         funcao: formData.get("funcao"),
         role: formData.get("role"),
         total_pontos: formData.get("total_pontos"),
+        dp: formData.get("dp"),
       };
 
       try {
@@ -262,6 +263,7 @@ const LoginPage = () => {
           sessionStorage.setItem("funcao", user.funcao);
           sessionStorage.setItem("role", user.role);
           sessionStorage.setItem("total_pontos", user.total_pontos);
+          sessionStorage.setItem("dp", user.dp);
           console.log("payload", response.data);
           console.log("vochorar", user);
           alert("Login realizado com sucesso!");

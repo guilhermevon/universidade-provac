@@ -234,6 +234,16 @@ const NavigationButton = styled.button`
   visibility: ${(props) => (props.visible ? "visible" : "hidden")};
 `;
 
+const SectionTitle = styled.h2`
+  color: white; /* Cinza claro para combinar com a paleta */
+  text-align: left;
+  margin: 2rem 0 1rem;
+  padding-left: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  position: relative;
+`;
+
 const Courses = () => {
   const [coursesByDepartment, setCoursesByDepartment] = useState({});
   const [scrollVisibility, setScrollVisibility] = useState({});
@@ -318,6 +328,9 @@ const Courses = () => {
     navigate(`/course/${id}`);
   };
 
+  const userNome = sessionStorage.getItem("userNome");
+  const funcao = sessionStorage.getItem("funcao");
+  const dp = sessionStorage.getItem("dp");
   return (
     <>
       <GlobalStyle />
@@ -329,6 +342,14 @@ const Courses = () => {
           <Stars3 />
         </StarWrapper> */}
         <PageContent>
+          <SectionTitle>
+            Olá, <span style={{ color: "red" }}>{userNome}</span>!
+            <br />
+            <p style={{ fontSize: "0.875rem", color: "gray", margin: "0" }}>
+              {funcao} / {dp}
+            </p>
+          </SectionTitle>
+
           {Object.keys(coursesByDepartment).map((department) => (
             <div key={department}>
               <DepartmentTitle>{department}</DepartmentTitle>

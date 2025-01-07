@@ -128,7 +128,6 @@ rankingRouter.get("/api/rankings", authenticateJWT, async (req, res) => {
 // Rota para registrar pontuação ao completar um módulo
 rankingRouter.post(
   "/api/course/:courseId/modulo/:moduloId/pontuacao",
-  authenticateJWT,
   async (req, res) => {
     const { courseId, moduloId } = req.params;
     const { userId } = req.body;

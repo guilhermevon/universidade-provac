@@ -195,7 +195,7 @@ const Course = () => {
     const fetchCourseData = async () => {
       try {
         const responseAulas = await axios.get(
-          `http://192.168.0.232:9310/api/course/${id}/aulas`
+          `http://192.168.0.232:9310/cursos/api/course/${id}/aulas`
         );
         setModules(responseAulas.data);
         const firstModule = Object.keys(responseAulas.data)[0];
@@ -205,12 +205,12 @@ const Course = () => {
         }
 
         const responseCourse = await axios.get(
-          `http://192.168.0.232:9310/api/course/${id}`
+          `http://192.168.0.232:9310/cursos/api/course/${id}`
         );
         setCourseInfo(responseCourse.data);
 
         const responseExams = await axios.get(
-          `http://192.168.0.232:9310/api/course/${id}/provas`
+          `http://192.168.0.232:9310/cursos/api/course/${id}/provas`
         );
         setExams(responseExams.data);
       } catch (error) {
@@ -255,7 +255,7 @@ const Course = () => {
           progress,
         });
         const response = await axios.post(
-          "http://192.168.0.232:9310/api/course/video-progress",
+          "http://192.168.0.232:9310/cursos/api/course/video-progress",
           {
             courseId: id,
             nroAula,
