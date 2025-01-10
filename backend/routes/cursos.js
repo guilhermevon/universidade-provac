@@ -46,11 +46,11 @@ cursosRouter.get("/buscar", async (req, res) => {
 
 cursosRouter.post("/api/manage-courses", async (req, res) => {
   const { title, subtitle, img, dp } = req.body;
-  const { role } = req.user;
+  /* const { role } = req.user;
 
   if (role !== "Gestor") {
     return res.status(403).json({ message: "Acesso não autorizado" });
-  }
+  }*/
 
   try {
     const result = await pool.query(
