@@ -6,19 +6,22 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
+
   html, body {
     height: 100%;
     margin: 0;
     font-family: 'Lato', sans-serif;
-  }
-
-  body {
-    background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
+    color: #1b2735;
     overflow-y: auto;
   }
-`;
 
+  ::selection {
+    background: #0D47A1; /* Azul marinho para o fundo da seleção */
+    color: white;
+  }
+`;
 const generateBoxShadow = (n) => {
   let value = `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`;
   for (let i = 1; i < n; i++) {
@@ -227,11 +230,6 @@ const Aulas = () => {
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
     try {
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -247,15 +245,10 @@ const Aulas = () => {
       const user = JSON.parse(jsonPayload);
       console.log("User payload:", user);
       console.log("User role:", user.role);
-
-      if (user.role !== "1") {
-        navigate("/login");
-      }
     } catch (error) {
       console.error("Erro ao verificar o token:", error);
-      navigate("/login");
     }
-  }, [navigate]);
+  }, []);
 
   const fetchCourses = async () => {
     const token = sessionStorage.getItem("token");
@@ -392,11 +385,6 @@ const Aulas = () => {
       <GlobalStyle />
       <PageWrapper>
         <Navbar />
-        <StarWrapper>
-          <Stars />
-          <Stars2 />
-          <Stars3 />
-        </StarWrapper>
         <PageContent>
           <FormWrapper>
             <FormTitle>Cadastro de Aula</FormTitle>

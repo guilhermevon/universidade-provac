@@ -5,8 +5,13 @@ import styled, { keyframes } from "styled-components";
 import Navbar from "../components/NavBar/NavBar";
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Centraliza horizontalmente
+  justify-content: center; // Centraliza verticalmente
   padding: 20px;
-  margin-left: 250px; // Adicione margem para não sobrepor o sidebar
+  height: 100vh; // Garante que ocupe toda a altura da tela
+  margin-left: 250px; // Margem para não sobrepor a sidebar
   z-index: 1;
   position: relative;
 `;
@@ -138,12 +143,7 @@ const Areagest = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://192.168.0.232:9310/api/manage-courses",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          "http://192.168.0.232:9310/cursos/api/manage-courses"
         );
         setCourses(response.data || []); // Garante que `courses` seja uma array
       } catch (error) {
@@ -158,9 +158,7 @@ const Areagest = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/api/manage-courses",
-        { title, description },
-        { headers: { Authorization: `Bearer ${token}` } }
+        "http://192.168.0.232:9310/cursos/api/manage-courses"
       );
       setCourses([...courses, response.data]);
       setTitle("");

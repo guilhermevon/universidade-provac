@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/NavBar/NavBar";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Areagest from "./pages/Areagest";
 import Login from "./pages/Login";
 import Courses from "./pages/Courses";
 import Course from "./pages/Course";
@@ -27,46 +28,11 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/welcome" element={<Welcome />} />
-        <Route
-          path="/areagest"
-          element={
-            <RoleBasedRoute requiredRole="Gestor">
-              <Courses />
-            </RoleBasedRoute>
-          }
-        />
-        <Route
-          path="/cursos"
-          element={
-            <RoleBasedRoute requiredRole="Gestor">
-              <Cursos />
-            </RoleBasedRoute>
-          }
-        />
-        <Route
-          path="/modulos"
-          element={
-            <RoleBasedRoute requiredRole="Gestor">
-              <Modulos />
-            </RoleBasedRoute>
-          }
-        />
-        <Route
-          path="/aulas"
-          element={
-            <RoleBasedRoute requiredRole="Gestor">
-              <Aulas />
-            </RoleBasedRoute>
-          }
-        />
-        <Route
-          path="/provas"
-          element={
-            <RoleBasedRoute requiredRole="Gestor">
-              <Provas />
-            </RoleBasedRoute>
-          }
-        />
+        <Route path="/areagest" element={<Areagest />} />
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/modulos" element={<Modulos />} />
+        <Route path="/aulas" element={<Aulas />} />
+        <Route path="/provas" element={<Provas />} />
         <Route
           path="/aprovacao"
           element={

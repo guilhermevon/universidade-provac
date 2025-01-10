@@ -11,12 +11,14 @@ const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
     font-family: 'Lato', sans-serif;
+    background-size: cover;
+    color: #1b2735;
+    overflow-y: auto;
   }
 
-  body {
-    background: url(${backgroundImage}) no-repeat center center fixed;
-    background-size: cover;
-    overflow-y: auto;
+  ::selection {
+    background: #0D47A1; /* Azul marinho para o fundo da seleção */
+    color: white;
   }
 `;
 
@@ -241,9 +243,13 @@ const Cursos = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setCourses(response.data);
+      const data = response.data;
+      // Verifique se os dados estão no formato esperado.
+      console.log(data);
+      setCourses(data || {}); // Garanta que courses seja sempre um objeto.
     } catch (error) {
       console.error("Erro ao buscar cursos:", error);
+      setCourses({}); // Fallback para um objeto vazio em caso de erro.
     }
   };
 
@@ -273,7 +279,7 @@ const Cursos = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/cursos",
+        "http://192.168.0.232:9310/cursos/api/manage-courses",
         // "http://192.168.0.232:9310/api/manage-courses",
         { title, subtitle, img, dp },
         {
@@ -345,17 +351,13 @@ const Cursos = () => {
       alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
     }
   };
+  console.log(courses[dp]);
 
   return (
     <>
       <GlobalStyle />
       <PageWrapper>
         <Navbar />
-        <StarWrapper>
-          <Stars />
-          <Stars2 />
-          <Stars3 />
-        </StarWrapper>
         <PageContent>
           <FormWrapper>
             <FormTitle>Cadastro de Curso</FormTitle>
@@ -412,12 +414,12 @@ const Cursos = () => {
               <option value="" disabled>
                 Selecione um curso
               </option>
-              {Object.keys(courses).map((dp) =>
+              {Array.isArray(courses[dp]) ? (
                 courses[dp].map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.title} - {dp}
-                  </option>
+                  <div key={course.id}>{course.title}</div>
                 ))
+              ) : (
+                <p>Não há cursos disponíveis para {dp}</p>
               )}
             </Select>
             <DeleteButton onClick={handleDeleteCourse}>Deletar</DeleteButton>
@@ -433,12 +435,12 @@ const Cursos = () => {
                 <option value="" disabled>
                   Selecione um curso
                 </option>
-                {Object.keys(courses).map((dp) =>
+                {Array.isArray(courses[dp]) ? (
                   courses[dp].map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title} - {dp}
-                    </option>
+                    <div key={course.id}>{course.title}</div>
                   ))
+                ) : (
+                  <p>Não há cursos disponíveis para {dp}</p>
                 )}
               </Select>
               <Select

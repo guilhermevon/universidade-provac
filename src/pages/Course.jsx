@@ -279,6 +279,12 @@ const Course = () => {
         <Navbar />
         <PageContent>
           <VideoWrapper>
+            {selectedAula && (
+              <>
+                <CourseTitle>{courseInfo.title}</CourseTitle>
+                <CourseDescription>{selectedAula.descricao}</CourseDescription>
+              </>
+            )}
             {selectedAula ? (
               <ReactPlayerWrapper>
                 <ReactPlayerStyled
@@ -291,17 +297,11 @@ const Course = () => {
             ) : selectedExam ? (
               <div>Exibir conteúdo da prova aqui</div>
             ) : (
-              <div style={{ width: "100%", height: "100%" }}>
+              <div>
                 <span style={{ color: "white" }}>
                   Selecione uma aula ou prova para começar
                 </span>
               </div>
-            )}
-            {selectedAula && (
-              <>
-                <CourseTitle>{courseInfo.title}</CourseTitle>
-                <CourseDescription>{selectedAula.descricao}</CourseDescription>
-              </>
             )}
           </VideoWrapper>
           <ListWrapper>
