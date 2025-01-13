@@ -230,7 +230,7 @@ const Modulos = () => {
   const [deleteModules, setDeleteModules] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+ /* useEffect(() => {
     try {
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -249,7 +249,7 @@ const Modulos = () => {
     } catch (error) {
       console.error("Erro ao verificar o token:", error);
     }
-  }, [navigate]);
+  }, [navigate]);*/
 
   const fetchModules = async () => {
     const token = sessionStorage.getItem("token");
@@ -318,7 +318,7 @@ const Modulos = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/api/manage-modules",
+        "http://192.168.0.232:9310/cursos/api/manage-modules",
         { name, description, course_id: selectedCourse },
         {
           headers: {

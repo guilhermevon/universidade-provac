@@ -577,11 +577,6 @@ cursosRouter.get("/api/modules", async (req, res) => {
 // Rota para criar um novo módulo
 cursosRouter.post("/api/manage-modules", async (req, res) => {
   const { name, description, course_id } = req.body;
-  const { role } = req.user;
-
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
 
   try {
     const result = await pool.query(

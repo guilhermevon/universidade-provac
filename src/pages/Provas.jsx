@@ -238,7 +238,7 @@ const Provas = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9310/api/course/${cursoId}/provas`,
+            `http://192.168.0.232:9310/provas/api/course/${cursoId}/provas`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
