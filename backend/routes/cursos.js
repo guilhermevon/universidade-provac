@@ -636,11 +636,6 @@ cursosRouter.delete("/api/module/:id", async (req, res) => {
 
 cursosRouter.post("/api/manage-aulas", async (req, res) => {
   const { title, url, description, course_id, module_id } = req.body;
-  const { role } = req.user;
-
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
 
   try {
     const result = await pool.query(

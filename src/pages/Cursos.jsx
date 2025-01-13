@@ -350,7 +350,6 @@ const Cursos = () => {
       alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
     }
   };
-  
 
   return (
     <>
@@ -413,13 +412,11 @@ const Cursos = () => {
               <option value="" disabled>
                 Selecione um curso
               </option>
-              {Array.isArray(courses[dp]) ? (
-                courses[dp].map((course) => (
-                  <div key={course.id}>{course.title}</div>
-                ))
-              ) : (
-                <p>Não há cursos disponíveis para {dp}</p>
-              )}
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.title}
+                </option>
+              ))}
             </Select>
             <DeleteButton onClick={handleDeleteCourse}>Deletar</DeleteButton>
           </DeleteCourseForm>
@@ -434,13 +431,11 @@ const Cursos = () => {
                 <option value="" disabled>
                   Selecione um curso
                 </option>
-                {Array.isArray(courses[dp]) ? (
-                  courses[dp].map((course) => (
-                    <div key={course.id}>{course.title}</div>
-                  ))
-                ) : (
-                  <p>Não há cursos disponíveis para {dp}</p>
-                )}
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}
+                  </option>
+                ))}
               </Select>
               <Select
                 value={selectedFuncao}

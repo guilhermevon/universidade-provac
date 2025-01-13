@@ -255,7 +255,7 @@ const Aulas = () => {
 
     try {
       const response = await axios.get(
-        "http://192.168.0.232:9310/api/courses",
+        "http://192.168.0.232:9310/cursos/api/courses",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -276,7 +276,7 @@ const Aulas = () => {
 
     try {
       const response = await axios.get(
-        `http://192.168.0.232:9310/api/courses/${courseId}/modules`,
+        `http://192.168.0.232:9310/cursos/api/courses/${courseId}/modules`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -329,7 +329,7 @@ const Aulas = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.0.232:9310/api/manage-aulas",
+        "http://192.168.0.232:9310/cursos/api/manage-aulas",
         {
           title,
           url,
@@ -362,7 +362,7 @@ const Aulas = () => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.0.232:9310/api/aulas/${selectedAula}`,
+        `http://192.168.0.232:9310/cursos/api/aulas/${selectedAula}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

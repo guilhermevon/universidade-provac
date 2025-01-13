@@ -167,7 +167,7 @@ const Provas = () => {
       const token = sessionStorage.getItem("token");
       try {
         const response = await axios.get(
-          "http://192.168.0.232:9310/api/courses",
+          "http://192.168.0.232:9310/cursos/api/courses",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -192,7 +192,7 @@ const Provas = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9310/api/courses/${prova.cursoId}/modules`,
+            `http://192.168.0.232:9310/cursos/api/courses/${prova.cursoId}/modules`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -215,7 +215,7 @@ const Provas = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9310/api/courses/${cursoId}/modules`,
+            `http://192.168.0.232:9310/cursos/api/courses/${cursoId}/modules`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
