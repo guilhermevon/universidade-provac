@@ -294,7 +294,8 @@ const Aulas = () => {
 
     try {
       const response = await axios.get(
-        `http://192.168.0.232:9310/cursos/api/modules/${moduleId}/aulas`,
+        `http://192.168.0.232:9310/cursos/api/course/${moduleId}/aulas`,
+        /*/api/course/:id/aulas*/
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -316,7 +316,7 @@ const Provas = () => {
 
     try {
       const responseProva = await axios.post(
-        "http://192.168.0.232:9310/api/manage-provas",
+        "http://192.168.0.232:9310/provas/api/manage-provas",
         { ...prova, questoes },
         {
           headers: {

@@ -79,7 +79,7 @@ provasRouter.get("/", async (req, res) => {
   }
 });
 
-provasRouter.post("/api/manage-provas", authenticateJWT, async (req, res) => {
+provasRouter.post("/api/manage-provas", async (req, res) => {
   const {
     titulo,
     descricao,
@@ -89,11 +89,7 @@ provasRouter.post("/api/manage-provas", authenticateJWT, async (req, res) => {
     moduloId,
     questoes,
   } = req.body;
-  const { role } = req.user;
-
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
+  
 
   const client = await pool.connect();
   try {
