@@ -669,4 +669,52 @@ cursosRouter.get("/api/courses/:courseId/modules", async (req, res) => {
   }
 });
 
+cursosRouter.get("/api/courses", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, dp, title, subtitle, img
+       FROM educ_system.courses
+       WHERE status = 'aprovado' 
+       ORDER BY dp, title`
+    );
+
+    const coursesByDepartment = result.rows.reduce((acc, course) => {
+      const { id, dp, title, subtitle, img } = course;
+      if (!acc[dp]) {
+        acc[dp] = [];
+      }
+      acc[dp].push({ id, title, subtitle, img });
+      return acc;
+    }, {});
+
+    res.json(coursesByDepartment);
+  } catch (error) {
+    console.error("Erro ao buscar cursos:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
+cursosRouter.post("/api/mandatory-course", async (req, res) => {
+  const { courseId, funcaoId } = req.body;
+  //const { role } = req.user;
+
+  // if (role !== "1") {
+  //   return res.status(403).json({ message: "Acesso não autorizado" });
+  // }
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO educ_system.cursos_obrigatorios (id_curso, id_funcao) VALUES ($1, $2) RETURNING *",
+      [courseId, funcaoId]
+    );
+    res.status(201).json({
+      message: "Curso obrigatório atribuído com sucesso",
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Erro ao atribuir curso obrigatório:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+
 export default cursosRouter; // Exporta apenas a aplicação Express

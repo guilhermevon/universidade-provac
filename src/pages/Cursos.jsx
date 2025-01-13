@@ -332,8 +332,7 @@ const Cursos = () => {
 
     try {
       const response = await axios.post(
-        `http://192.168.0.232:9310/cursos/${selectedCourse}`,
-        //"http://192.168.0.232:9310/api/mandatory-course",
+        "http://192.168.0.232:9310/cursos/api/mandatory-course",
         { courseId: selectedCourse, funcaoId: selectedFuncao },
         {
           headers: {
@@ -351,7 +350,7 @@ const Cursos = () => {
       alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
     }
   };
-  console.log(courses[dp]);
+  
 
   return (
     <>

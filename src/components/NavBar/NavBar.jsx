@@ -247,7 +247,6 @@ const Navbar = () => {
   ].includes(location.pathname);
 
   const role = sessionStorage.getItem("role");
-  console.log("role", role);
 
   return (
     <>
