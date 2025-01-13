@@ -89,7 +89,6 @@ provasRouter.post("/api/manage-provas", async (req, res) => {
     moduloId,
     questoes,
   } = req.body;
-  
 
   const client = await pool.connect();
   try {
@@ -383,10 +382,12 @@ provasRouter.delete(
   authenticateJWT,
   async (req, res) => {
     const { id_prova } = req.params;
-    const { role } = req.user;
+    {
+      /*const { role } = req.user;
 
     if (role !== "1") {
       return res.status(403).json({ message: "Acesso não autorizado" });
+    } */
     }
 
     const client = await pool.connect();

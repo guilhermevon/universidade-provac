@@ -444,11 +444,6 @@ cursosRouter.delete("/api/aula/:id", async (req, res) => {
 
 cursosRouter.delete("/api/course/:id", async (req, res) => {
   const { id } = req.params;
-  const { role } = req.user;
-
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
 
   const client = await pool.connect();
   try {
