@@ -288,7 +288,7 @@ const Modulos = () => {
 
     try {
       const response = await axios.get(
-        `http://192.168.0.232:9310/api/courses/${courseId}/modules`,
+        `http://192.168.0.232:9310/cursos/api/courses/${courseId}/modules`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -344,7 +344,7 @@ const Modulos = () => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.0.232:9310/api/module/${selectedModule}`,
+        `http://192.168.0.232:9310/cursos/api/module/${selectedModule}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
