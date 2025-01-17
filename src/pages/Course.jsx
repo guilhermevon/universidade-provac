@@ -103,6 +103,7 @@ const ListTitle = styled.h2`
   margin-bottom: 1rem;
   font-size: 1.2rem;
   text-align: center;
+  color: red;
 `;
 
 const ModuleItem = styled.div`

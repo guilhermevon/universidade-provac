@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle, keyframes } from "styled-components";
 import axios from "axios";
 import Navbar from "../components/NavBar/NavBar";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import backgroundImage from "../assets/bg_home.png";
 
 const GlobalStyle = createGlobalStyle`
@@ -254,14 +254,11 @@ const Aulas = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        "http://192.168.0.232:9310/cursos/api/courses",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("http://192.168.0.232:9310/cursos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const coursesData = Object.keys(response.data).flatMap(
         (key) => response.data[key]
       );
@@ -295,7 +292,6 @@ const Aulas = () => {
     try {
       const response = await axios.get(
         `http://192.168.0.232:9310/cursos/api/course/${moduleId}/aulas`,
-        /*/api/course/:id/aulas*/
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -480,11 +476,12 @@ const Aulas = () => {
               <option value="" disabled>
                 Selecione uma aula
               </option>
-              {aulas.map((aula) => (
-                <option key={aula.id} value={aula.id}>
-                  {aula.titulo}
-                </option>
-              ))}
+              {Array.isArray(aulas) &&
+                aulas.map((aula) => (
+                  <option key={aula.course_id} value={aula.course_id}>
+                    {aula.titulo}
+                  </option>
+                ))}
             </Select>
             <DeleteButton onClick={handleDeleteAula}>Deletar</DeleteButton>
           </DeleteAulaForm>

@@ -283,8 +283,8 @@ const Navbar = () => {
           {role === "Gestor" && (
             <NavLink>
               <Link
-                to="/areagest"
-                className={location.pathname === "/areagest"}
+                to="/cursos"
+                className={location.pathname === "/cursos"}
               >
                 Área Gestor
               </Link>

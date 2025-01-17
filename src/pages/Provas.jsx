@@ -166,14 +166,11 @@ const Provas = () => {
     const fetchCursos = async () => {
       const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.get(
-          "http://192.168.0.232:9310/cursos/api/courses",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get("http://192.168.0.232:9310/cursos", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const cursosData = Object.keys(response.data).flatMap(
           (key) => response.data[key]
         );
@@ -355,11 +352,14 @@ const Provas = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      await axios.delete(`http://192.168.0.232:9310/api/prova/${provaId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(
+        `http://192.168.0.232:9310/provas/api/prova/${provaId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       alert("Prova deletada com sucesso!");
       setProvaId("");

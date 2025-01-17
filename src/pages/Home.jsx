@@ -335,6 +335,8 @@ const Home = () => {
   };
 
   const userNome = sessionStorage.getItem("userNome");
+  const funcao = sessionStorage.getItem("funcao");
+  const dp = sessionStorage.getItem("dp");
   const total_pontos = sessionStorage.getItem("total_pontos");
 
   return (
@@ -346,6 +348,10 @@ const Home = () => {
         <PageContent>
           <SectionTitle>
             Olá, <span style={{ color: "red" }}>{userNome}</span>!
+            <br />
+            <p style={{ fontSize: "0.875rem", color: "gray", margin: "0" }}>
+              {funcao} / {dp}
+            </p>
           </SectionTitle>
           <ScrollWrapper>
             <NavigationButton

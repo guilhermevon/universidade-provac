@@ -230,7 +230,7 @@ const Modulos = () => {
   const [deleteModules, setDeleteModules] = useState([]);
   const navigate = useNavigate();
 
- /* useEffect(() => {
+  /* useEffect(() => {
     try {
       const base64Url = token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -255,7 +255,9 @@ const Modulos = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get("http://192.168.0.232:9310/cursos/api/modules");
+      const response = await axios.get(
+        "http://192.168.0.232:9310/cursos/api/modules"
+      );
       setModules(response.data);
     } catch (error) {
       console.error("Erro ao buscar módulos:", error);
@@ -266,14 +268,11 @@ const Modulos = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get(
-        "http://192.168.0.232:9310/cursos/api/courses",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("http://192.168.0.232:9310/cursos/api/courses", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const coursesData = Object.keys(response.data).flatMap(
         (key) => response.data[key]
       );

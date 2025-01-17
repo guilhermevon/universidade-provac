@@ -417,11 +417,6 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
 
 cursosRouter.delete("/api/aula/:id", async (req, res) => {
   const { id } = req.params;
-  const { role } = req.user;
-
-  if (role !== "1") {
-    return res.status(403).json({ message: "Acesso não autorizado" });
-  }
 
   try {
     const result = await pool.query(
@@ -636,8 +631,18 @@ cursosRouter.post("/api/manage-aulas", async (req, res) => {
 
 // Rota para listar módulos de um curso específico
 cursosRouter.get("/api/courses/:courseId/modules", async (req, res) => {
-  const { courseId } = req.params;
+  let { courseId } = req.params;
   try {
+    // Converter courseId para número inteiro
+    courseId = parseInt(courseId, 10);
+
+    // Verificar se courseId é um número válido
+    if (isNaN(courseId)) {
+      return res
+        .status(400)
+        .json({ message: "O courseId deve ser um número válido" });
+    }
+
     const result = await pool.query(
       "SELECT id, name FROM educ_system.modules WHERE course_id = $1 ORDER BY name",
       [courseId]
@@ -653,9 +658,8 @@ cursosRouter.get("/api/courses", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, dp, title, subtitle, img
-       FROM educ_system.courses
-       WHERE status = 'aprovado' 
-       ORDER BY dp, title`
+      FROM educ_system.courses
+      ORDER BY dp, title;`
     );
 
     const coursesByDepartment = result.rows.reduce((acc, course) => {
