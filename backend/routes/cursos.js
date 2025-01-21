@@ -85,7 +85,7 @@ cursosRouter.get("/api/course/:id", async (req, res) => {
   }
 });
 
-cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
+/*cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(
@@ -110,6 +110,54 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
       return res
         .status(404)
         .json({ message: "Nenhuma aula encontrada para este curso" });
+    }
+
+    const aulasPorModulo = result.rows.reduce((acc, aula) => {
+      const { modulo, aula: titulo, url, descricao, nro_aula } = aula;
+      if (!acc[modulo]) {
+        acc[modulo] = [];
+      }
+      acc[modulo].push({ titulo, url, descricao, nro_aula });
+      return acc;
+    }, {});
+
+    res.json(aulasPorModulo);
+  } catch (error) {
+    console.error("Erro ao buscar aulas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});*/
+
+cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
+  const { id } = req.params; // ID do curso
+  const { module_id } = req.query; // ID do módulo (opcional)
+
+  try {
+    const query = `
+      SELECT 
+        m.name AS modulo,
+        a.titulo AS aula,
+        a.url,
+        a.descricao,
+        a.nro_aula
+      FROM 
+        educ_system.courses c
+      JOIN 
+        educ_system.aulas a ON c.id = a.course_id
+      JOIN
+        educ_system.modules m ON a.module_id = m.id
+      WHERE c.id = $1
+      ${module_id ? "AND m.id = $2" : ""} 
+      ORDER BY m.name, a.nro_aula
+    `;
+
+    const values = module_id ? [id, module_id] : [id];
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Nenhuma aula encontrada para este curso ou módulo" });
     }
 
     const aulasPorModulo = result.rows.reduce((acc, aula) => {
