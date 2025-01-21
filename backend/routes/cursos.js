@@ -465,12 +465,12 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
 });
 
 cursosRouter.delete("/api/aula/:id", async (req, res) => {
-  const { id } = req.params;
+  const { nro_aula } = req.params;
 
   try {
     const result = await pool.query(
-      "DELETE FROM educ_system.aulas WHERE id = $1 RETURNING *",
-      [id]
+      "DELETE FROM educ_system.aulas WHERE nro_aula = $1 RETURNING *",
+      [nro_aula]
     );
 
     if (result.rowCount === 0) {

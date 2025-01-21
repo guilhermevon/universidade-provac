@@ -352,7 +352,7 @@ const Aulas = () => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.0.232:9310/cursos/api/aulas/${selectedAula}`,
+        `http://192.168.0.232:9310/cursos/api/aula/${selectedAula}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
