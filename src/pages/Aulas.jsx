@@ -245,6 +245,7 @@ const Aulas = () => {
       const user = JSON.parse(jsonPayload);
       console.log("User payload:", user);
       console.log("User role:", user.role);
+      console.log("selected", selectedCourse);
     } catch (error) {
       console.error("Erro ao verificar o token:", error);
     }
@@ -323,20 +324,20 @@ const Aulas = () => {
   }, [selectedCourse, selectedModule]);
 
   useEffect(() => {
+    if (selectedCourse && selectedModule) {
+      fetchAulas();
+    }
+  }, [selectedCourse, selectedModule]);
+
+  useEffect(() => {
     fetchCourses();
   }, []);
 
   useEffect(() => {
-    if (selectedCourse) {
-      fetchModules(selectedCourse);
+    if (selectedCourse && selectedModule) {
+      fetchAulas(selectedCourse, selectedModule);
     }
-  }, [selectedCourse]);
-
-  useEffect(() => {
-    if (selectedModule) {
-      fetchAulas(selectedModule);
-    }
-  }, [selectedModule]);
+  }, [selectedCourse, selectedModule]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -435,7 +436,7 @@ const Aulas = () => {
                 </option>
                 {courses.map((course) => (
                   <option key={course.id} value={course.id}>
-                    {course.title}
+                    {course.title || course.id}
                   </option>
                 ))}
               </Select>
@@ -494,15 +495,20 @@ const Aulas = () => {
               <option value="" disabled>
                 Selecione uma aula
               </option>
-              {Object.entries(aulas).map(([modulo, aulasArray]) => (
-                <optgroup key={modulo} label={modulo}>
-                  {aulasArray.map((aula, index) => (
-                    <option key={index} value={aula.titulo}>
-                      {aula.titulo} (Aula {aula.nro_aula})
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
+              <Select
+                value={selectedAula}
+                onChange={(e) => setSelectedAula(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  Selecione uma aula
+                </option>
+                {aulas.map((aula) => (
+                  <option key={aula.id} value={aula.id}>
+                    {aula.title || aula.titulo}
+                  </option>
+                ))}
+              </Select>
             </Select>
             <DeleteButton onClick={handleDeleteAula}>Deletar</DeleteButton>
           </DeleteAulaForm>
