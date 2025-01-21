@@ -228,29 +228,10 @@ const Aulas = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-
-    try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-
-      const user = JSON.parse(jsonPayload);
-      console.log("User payload:", user);
-      console.log("User role:", user.role);
-      console.log("selected", selectedCourse);
-    } catch (error) {
-      console.error("Erro ao verificar o token:", error);
-    }
+    fetchCourses();
   }, []);
 
+  // Função para buscar cursos
   const fetchCourses = async () => {
     const token = sessionStorage.getItem("token");
 
@@ -269,6 +250,7 @@ const Aulas = () => {
     }
   };
 
+  // Função para buscar módulos do curso selecionado
   const fetchModules = async (courseId) => {
     const token = sessionStorage.getItem("token");
 
@@ -282,63 +264,53 @@ const Aulas = () => {
         }
       );
       setModules(response.data);
+      setSelectedModule(""); // Resetar módulo ao mudar o curso
+      setSelectedAula(""); // Resetar aula ao mudar o módulo
     } catch (error) {
       console.error("Erro ao buscar módulos:", error);
     }
   };
 
-  const fetchAulas = async () => {
+  // Função para buscar aulas do módulo selecionado
+  const fetchAulas = async (courseId, moduleId) => {
     const token = sessionStorage.getItem("token");
 
-    if (!selectedCourse || !selectedModule) {
+    if (!courseId || !moduleId) {
       console.error("Curso ou módulo não selecionado.");
       return;
     }
 
     try {
       const response = await axios.get(
-        `http://192.168.0.232:9310/cursos/api/course/${selectedCourse}/module/${selectedModule}/aulas`,
+        `http://192.168.0.232:9310/cursos/api/course/${courseId}/module/${moduleId}/aulas`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      if (response.data) {
-        setAulas(response.data);
-      } else {
-        console.error("Nenhuma aula encontrada.");
-        setAulas([]);
-      }
+      setAulas(response.data);
     } catch (error) {
       console.error("Erro ao buscar aulas:", error);
-      setAulas([]);
+      setAulas([]); // Garantir que aulas seja resetado em caso de erro
     }
   };
 
+  // useEffect para buscar módulos quando o curso mudar
   useEffect(() => {
-    if (selectedCourse && selectedModule) {
-      fetchAulas();
+    if (selectedCourse) {
+      fetchModules(selectedCourse);
     }
-  }, [selectedCourse, selectedModule]);
+  }, [selectedCourse]);
 
-  useEffect(() => {
-    if (selectedCourse && selectedModule) {
-      fetchAulas();
-    }
-  }, [selectedCourse, selectedModule]);
-
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
+  // useEffect para buscar aulas quando o módulo mudar
   useEffect(() => {
     if (selectedCourse && selectedModule) {
       fetchAulas(selectedCourse, selectedModule);
     }
-  }, [selectedCourse, selectedModule]);
+  }, [selectedModule]);
 
+  // Função para cadastrar uma aula
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem("token");
@@ -366,6 +338,7 @@ const Aulas = () => {
         setDescription("");
         setSelectedCourse("");
         setSelectedModule("");
+        setSelectedAula("");
       }
     } catch (error) {
       console.error("Erro ao cadastrar aula:", error);
@@ -373,6 +346,7 @@ const Aulas = () => {
     }
   };
 
+  // Função para deletar uma aula
   const handleDeleteAula = async () => {
     const token = sessionStorage.getItem("token");
 
@@ -388,7 +362,7 @@ const Aulas = () => {
       if (response.status === 200) {
         alert("Aula deletada com sucesso!");
         setSelectedAula("");
-        fetchAulas(selectedModule);
+        fetchAulas(selectedCourse, selectedModule);
       }
     } catch (error) {
       console.error("Erro ao deletar aula:", error);
@@ -495,20 +469,11 @@ const Aulas = () => {
               <option value="" disabled>
                 Selecione uma aula
               </option>
-              <Select
-                value={selectedAula}
-                onChange={(e) => setSelectedAula(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Selecione uma aula
+              {aulas.map((aula) => (
+                <option key={aula.id} value={aula.id}>
+                  {aula.title || aula.titulo}
                 </option>
-                {aulas.map((aula) => (
-                  <option key={aula.id} value={aula.id}>
-                    {aula.title || aula.titulo}
-                  </option>
-                ))}
-              </Select>
+              ))}
             </Select>
             <DeleteButton onClick={handleDeleteAula}>Deletar</DeleteButton>
           </DeleteAulaForm>
