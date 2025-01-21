@@ -359,14 +359,14 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
           a.url,
           a.descricao,
           a.nro_aula
-         FROM 
+      FROM 
           educ_system.courses c
-         JOIN 
+      JOIN 
           educ_system.aulas a ON c.id = a.course_id
-         JOIN
+      JOIN
           educ_system.modules m ON a.module_id = m.id
-         WHERE c.id = $1
-         ORDER BY m.name, a.nro_aula`,
+      WHERE 
+      c.id = $1`,
       [id]
     );
 
@@ -570,6 +570,7 @@ cursosRouter.post("/api/manage-modules", async (req, res) => {
 
   try {
     const result = await pool.query(
+      // linha 572de cursos.js
       "INSERT INTO educ_system.modules (name, description, course_id) VALUES ($1, $2, $3) RETURNING *",
       [name, description, course_id]
     );
