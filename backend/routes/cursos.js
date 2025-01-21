@@ -86,7 +86,7 @@ cursosRouter.get("/api/course/:id", async (req, res) => {
 });
 
 cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
-  const { id } = req.params;
+  const { nomeModulo } = req.params;
   try {
     const result = await pool.query(
       `SELECT 
@@ -105,7 +105,7 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
         m.name = $1  -- Altere o filtro para o nome do módulo
     ORDER BY 
         m.name, a.nro_aula`,
-      [id]
+      [nomeModulo]
     );
 
     if (result.rows.length === 0) {
