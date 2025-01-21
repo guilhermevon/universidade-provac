@@ -90,19 +90,21 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT 
-          m.name AS modulo,
-          a.titulo AS aula,
-          a.url,
-          a.descricao,
-          a.nro_aula
-         FROM 
-          educ_system.courses c
-         JOIN 
-          educ_system.aulas a ON c.id = a.course_id
-         JOIN
-          educ_system.modules m ON a.module_id = m.id
-         WHERE c.id = $1
-         ORDER BY m.name, a.nro_aula`,
+        m.name AS modulo,
+        a.titulo AS aula,
+        a.url,
+        a.descricao,
+        a.nro_aula
+    FROM 
+        educ_system.courses c
+    JOIN 
+        educ_system.aulas a ON c.id = a.course_id
+    JOIN
+        educ_system.modules m ON a.module_id = m.id
+    WHERE 
+        m.name = $1  -- Altere o filtro para o nome do módulo
+    ORDER BY 
+        m.name, a.nro_aula`,
       [id]
     );
 
