@@ -128,6 +128,52 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   }
 });
 
+//rota pra chorar
+cursosRouter.get("/api/course/:courseId/module/:moduleId/aulas", async (req, res) => {
+  const { courseId, moduleId } = req.params;
+
+  try {
+    const query = `
+      SELECT 
+        m.name AS modulo,
+        a.titulo AS aula,
+        a.url,
+        a.descricao,
+        a.nro_aula
+      FROM 
+        educ_system.courses c
+      JOIN 
+        educ_system.aulas a ON c.id = a.course_id
+      JOIN
+        educ_system.modules m ON a.module_id = m.id
+      WHERE c.id = $1 AND m.id = $2
+      ORDER BY m.name, a.nro_aula;
+    `;
+
+    const result = await pool.query(query, [courseId, moduleId]);
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Nenhuma aula encontrada para este curso e módulo" });
+    }
+
+    const aulas = result.rows.map((aula) => ({
+      modulo: aula.modulo,
+      titulo: aula.aula,
+      url: aula.url,
+      descricao: aula.descricao,
+      nro_aula: aula.nro_aula,
+    }));
+
+    res.json(aulas);
+  } catch (error) {
+    console.error("Erro ao buscar aulas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+});
+//---------------------------------------------------------------------------------------------------
+
 // Nova rota para salvar progresso do vídeo
 cursosRouter.post(
   "/api/course/video-progress",

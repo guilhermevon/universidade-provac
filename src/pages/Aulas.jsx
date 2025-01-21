@@ -286,23 +286,41 @@ const Aulas = () => {
     }
   };
 
-  const fetchAulas = async (moduleId) => {
+  const fetchAulas = async () => {
     const token = sessionStorage.getItem("token");
+
+    if (!selectedCourse || !selectedModule) {
+      console.error("Curso ou módulo não selecionado.");
+      return;
+    }
 
     try {
       const response = await axios.get(
-        `http://192.168.0.232:9310/cursos/api/course/${moduleId}/aulas`,
+        `http://192.168.0.232:9310/cursos/api/course/${selectedCourse}/module/${selectedModule}/aulas`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setAulas(response.data);
+
+      if (response.data) {
+        setAulas(response.data);
+      } else {
+        console.error("Nenhuma aula encontrada.");
+        setAulas([]);
+      }
     } catch (error) {
       console.error("Erro ao buscar aulas:", error);
+      setAulas([]);
     }
   };
+
+  useEffect(() => {
+    if (selectedCourse && selectedModule) {
+      fetchAulas();
+    }
+  }, [selectedCourse, selectedModule]);
 
   useEffect(() => {
     fetchCourses();
@@ -476,12 +494,15 @@ const Aulas = () => {
               <option value="" disabled>
                 Selecione uma aula
               </option>
-              {Array.isArray(aulas) &&
-                aulas.map((aula) => (
-                  <option key={aula.course_id} value={aula.course_id}>
-                    {aula.titulo}
-                  </option>
-                ))}
+              {Object.entries(aulas).map(([modulo, aulasArray]) => (
+                <optgroup key={modulo} label={modulo}>
+                  {aulasArray.map((aula, index) => (
+                    <option key={index} value={aula.titulo}>
+                      {aula.titulo} (Aula {aula.nro_aula})
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </Select>
             <DeleteButton onClick={handleDeleteAula}>Deletar</DeleteButton>
           </DeleteAulaForm>
