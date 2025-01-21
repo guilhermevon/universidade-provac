@@ -268,11 +268,14 @@ const Modulos = () => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await axios.get("http://192.168.0.232:9310/cursos/api/courses", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "http://192.168.0.232:9310/cursos/api/courses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const coursesData = Object.keys(response.data).flatMap(
         (key) => response.data[key]
       );
@@ -314,6 +317,11 @@ const Modulos = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem("token");
+
+    if (!selectedCourse) {
+      alert("Por favor, selecione um curso.");
+      return; // Evita o envio do formulário se nenhum curso for selecionado
+    }
 
     try {
       const response = await axios.post(

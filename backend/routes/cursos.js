@@ -176,6 +176,25 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
   }
 });
 
+//nova rota para bsucar as aulas
+cursosRouter.get(
+  "/cursos/api/course/:courseId/module/:moduleId/aulas",
+  async (req, res) => {
+    const { courseId, moduleId } = req.params;
+
+    try {
+      const aulas = await db.query(
+        `SELECT * FROM aulas WHERE course_id = $1 AND module_id = $2`,
+        [courseId, moduleId]
+      );
+      res.json(aulas.rows); // Retorne apenas as aulas filtradas
+    } catch (error) {
+      console.error("Erro ao buscar aulas:", error);
+      res.status(500).send("Erro ao buscar aulas.");
+    }
+  }
+);
+
 // Nova rota para salvar progresso do vídeo
 cursosRouter.post(
   "/api/course/video-progress",
