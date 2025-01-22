@@ -287,20 +287,23 @@ provasRouter.get(
 
     try {
       const query = `
-      SELECT 
-        m.name AS modulo,
-        p.titulo AS prova,
-        p.descricao,
-        p.duracao,
-        p.nota_minima_aprovacao,
-        p.data_criacao,
-        p.data_atualizacao
-      FROM 
-        educ_system.provas p
-      JOIN
-        educ_system.modules m ON p.id_modulo = m.id
-      WHERE m.id = $1
-      ORDER BY m.name, p.data_criacao;
+          SELECT 
+      m.name AS modulo,
+      p.id_prova AS id_prova,
+      p.titulo AS prova,
+      p.descricao,
+      p.duracao,
+      p.nota_minima_aprovacao,
+      p.data_criacao,
+      p.data_atualizacao
+    FROM 
+      educ_system.provas p
+    JOIN
+      educ_system.modules m ON p.id_modulo = m.id
+    WHERE 
+      m.id = $1
+    ORDER BY 
+      m.name, p.data_criacao;
     `;
 
       const result = await pool.query(query, [moduleId]);

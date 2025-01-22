@@ -235,14 +235,15 @@ const Provas = () => {
         const token = sessionStorage.getItem("token");
         try {
           const response = await axios.get(
-            `http://192.168.0.232:9310/provas/api/course/${cursoId}/module/${moduloId}/provas`,
+            `http://192.168.0.232:9310/provas/api/module/${moduloId}/provas`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
-          setProvas(response.data.filter((p) => p.id_modulo === moduloId));
+          // Aqui, se a API já retorna as provas filtradas, basta usar diretamente.
+          setProvas(response.data);
         } catch (error) {
           console.error("Erro ao buscar provas:", error);
         }
@@ -350,9 +351,15 @@ const Provas = () => {
   const handleDeleteProva = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem("token");
+    console.log("idProva", provas);
+    // Certifique-se de que 'provaId' está com o ID correto
+    if (!provaId) {
+      alert("Selecione uma prova para excluir.");
+      return;
+    }
 
     try {
-      await axios.delete(
+      const response = await axios.delete(
         `http://192.168.0.232:9310/provas/api/prova/${provaId}`,
         {
           headers: {
@@ -361,9 +368,11 @@ const Provas = () => {
         }
       );
 
-      alert("Prova deletada com sucesso!");
-      setProvaId("");
-      setProvas(provas.filter((p) => p.id_prova !== provaId));
+      if (response.status === 200) {
+        alert("Prova deletada com sucesso!");
+        setProvas(provas.filter((p) => p.id_prova !== provaId));
+        setProvaId(""); // Limpa a seleção após exclusão
+      }
     } catch (error) {
       console.error("Erro ao deletar prova:", error);
       alert("Erro ao deletar prova. Por favor, tente novamente.");
@@ -559,7 +568,7 @@ const Provas = () => {
               </Select>
               <Select
                 value={provaId}
-                onChange={(e) => setProvaId(e.target.value)}
+                onChange={(e) => setProvaId(e.target.value)} // Aqui você armazena o ID da prova
                 required
               >
                 <option value="" disabled>
@@ -567,7 +576,8 @@ const Provas = () => {
                 </option>
                 {provas.map((prova) => (
                   <option key={prova.id_prova} value={prova.id_prova}>
-                    {prova.titulo}
+                    {" "}
+                    {prova.prova}
                   </option>
                 ))}
               </Select>
