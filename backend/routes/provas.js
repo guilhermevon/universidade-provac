@@ -316,6 +316,7 @@ provasRouter.get(
 
       const provas = result.rows.map((prova) => ({
         modulo: prova.modulo,
+        id_prova: prova.id_prova,
         prova: prova.prova,
         descricao: prova.descricao,
         duracao: prova.duracao,
