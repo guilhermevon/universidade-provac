@@ -281,9 +281,9 @@ provasRouter.get("/api/course/:id/provas", async (req, res) => {
 
 //rota para buscar as provas com base no course_id e no modulo_id
 provasRouter.get(
-  "/api/course/:courseId/module/:moduleId/provas",
+  "/api/module/:moduleId/provas", // Rota agora só usa moduleId
   async (req, res) => {
-    const { courseId, moduleId } = req.params;
+    const { moduleId } = req.params;
 
     try {
       const query = `
@@ -296,20 +296,18 @@ provasRouter.get(
         p.data_criacao,
         p.data_atualizacao
       FROM 
-        educ_system.courses c
-      JOIN 
-        educ_system.provas p ON c.id = p.id_modulo
+        educ_system.provas p
       JOIN
         educ_system.modules m ON p.id_modulo = m.id
-      WHERE c.id = $1 AND m.id = $2
+      WHERE m.id = $1
       ORDER BY m.name, p.data_criacao;
     `;
 
-      const result = await pool.query(query, [courseId, moduleId]);
+      const result = await pool.query(query, [moduleId]);
 
       if (result.rows.length === 0) {
         return res.status(404).json({
-          message: "Nenhuma prova encontrada para este curso e módulo",
+          message: "Nenhuma prova encontrada para este módulo",
         });
       }
 
