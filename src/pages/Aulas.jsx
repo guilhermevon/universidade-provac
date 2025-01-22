@@ -470,7 +470,7 @@ const Aulas = () => {
                 Selecione uma aula
               </option>
               {aulas.map((aula) => (
-                <option key={aula.id} value={aula.id}>
+                <option key={aula.nro_aula} value={aula.nro_aula}>
                   {aula.title || aula.titulo}
                 </option>
               ))}

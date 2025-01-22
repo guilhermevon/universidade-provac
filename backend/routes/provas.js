@@ -279,6 +279,59 @@ provasRouter.get("/api/course/:id/provas", async (req, res) => {
   }
 });
 
+//rota para buscar as provas com base no course_id e no modulo_id
+provasRouter.get(
+  "/api/course/:courseId/module/:moduleId/provas",
+  async (req, res) => {
+    const { courseId, moduleId } = req.params;
+
+    try {
+      const query = `
+      SELECT 
+        m.name AS modulo,
+        p.titulo AS prova,
+        p.descricao,
+        p.duracao,
+        p.nota_minima_aprovacao,
+        p.data_criacao,
+        p.data_atualizacao
+      FROM 
+        educ_system.courses c
+      JOIN 
+        educ_system.provas p ON c.id = p.id_modulo
+      JOIN
+        educ_system.modules m ON p.id_modulo = m.id
+      WHERE c.id = $1 AND m.id = $2
+      ORDER BY m.name, p.data_criacao;
+    `;
+
+      const result = await pool.query(query, [courseId, moduleId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          message: "Nenhuma prova encontrada para este curso e módulo",
+        });
+      }
+
+      const provas = result.rows.map((prova) => ({
+        modulo: prova.modulo,
+        prova: prova.prova,
+        descricao: prova.descricao,
+        duracao: prova.duracao,
+        nota_minima_aprovacao: prova.nota_minima_aprovacao,
+        data_criacao: prova.data_criacao,
+        data_atualizacao: prova.data_atualizacao,
+      }));
+
+      res.json(provas);
+    } catch (error) {
+      console.error("Erro ao buscar provas:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  }
+);
+//---------------------------------------------------------------------------------------------
+
 provasRouter.post("/api/respostas", authenticateJWT, async (req, res) => {
   const { userId, provaId, respostas } = req.body;
 
@@ -377,80 +430,76 @@ provasRouter.post("/api/exam/submit", authenticateJWT, async (req, res) => {
   }
 });
 
-provasRouter.delete(
-  "/api/prova/:id_prova",
-  authenticateJWT,
-  async (req, res) => {
-    const { id_prova } = req.params;
-    {
-      /*const { role } = req.user;
+provasRouter.delete("/api/prova/:id_prova", async (req, res) => {
+  const { id_prova } = req.params;
+  {
+    /*const { role } = req.user;
 
     if (role !== "1") {
       return res.status(403).json({ message: "Acesso não autorizado" });
     } */
-    }
+  }
 
-    const client = await pool.connect();
-    try {
-      await client.query("BEGIN");
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
 
-      // Delete from respostas_usuario
-      const deleteRespostasUsuarioQuery = `
+    // Delete from respostas_usuario
+    const deleteRespostasUsuarioQuery = `
         DELETE FROM educ_system.respostas_usuario 
         WHERE id_tentativa IN (
           SELECT id_tentativa FROM educ_system.tentativas_prova 
           WHERE id_prova = $1
         )
       `;
-      await client.query(deleteRespostasUsuarioQuery, [id_prova]);
+    await client.query(deleteRespostasUsuarioQuery, [id_prova]);
 
-      // Delete from tentativas_prova
-      const deleteTentativasProvaQuery = `
+    // Delete from tentativas_prova
+    const deleteTentativasProvaQuery = `
         DELETE FROM educ_system.tentativas_prova 
         WHERE id_prova = $1
       `;
-      await client.query(deleteTentativasProvaQuery, [id_prova]);
+    await client.query(deleteTentativasProvaQuery, [id_prova]);
 
-      // Delete from alternativas
-      const deleteAlternativasQuery = `
+    // Delete from alternativas
+    const deleteAlternativasQuery = `
         DELETE FROM educ_system.alternativas 
         WHERE id_questao IN (
           SELECT id_questao FROM educ_system.questoes 
           WHERE id_prova = $1
         )
       `;
-      await client.query(deleteAlternativasQuery, [id_prova]);
+    await client.query(deleteAlternativasQuery, [id_prova]);
 
-      // Delete from questoes
-      const deleteQuestoesQuery = `
+    // Delete from questoes
+    const deleteQuestoesQuery = `
         DELETE FROM educ_system.questoes 
         WHERE id_prova = $1
       `;
-      await client.query(deleteQuestoesQuery, [id_prova]);
+    await client.query(deleteQuestoesQuery, [id_prova]);
 
-      // Finally, delete the prova
-      const deleteProvaQuery =
-        "DELETE FROM educ_system.provas WHERE id_prova = $1 RETURNING *";
-      const result = await client.query(deleteProvaQuery, [id_prova]);
+    // Finally, delete the prova
+    const deleteProvaQuery =
+      "DELETE FROM educ_system.provas WHERE id_prova = $1 RETURNING *";
+    const result = await client.query(deleteProvaQuery, [id_prova]);
 
-      await client.query("COMMIT");
+    await client.query("COMMIT");
 
-      if (result.rowCount === 0) {
-        return res.status(404).json({ message: "Prova não encontrada" });
-      }
-
-      res
-        .status(200)
-        .json({ message: "Prova deletada com sucesso", prova: result.rows[0] });
-    } catch (error) {
-      await client.query("ROLLBACK");
-      console.error("Erro ao deletar prova:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    } finally {
-      client.release();
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Prova não encontrada" });
     }
+
+    res
+      .status(200)
+      .json({ message: "Prova deletada com sucesso", prova: result.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Erro ao deletar prova:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  } finally {
+    client.release();
   }
-);
+});
 
 provasRouter.get(
   "/api/prova/:id/questoes",
