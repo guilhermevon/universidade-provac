@@ -365,7 +365,7 @@ const Modulos = () => {
       }
     } catch (error) {
       console.error("Erro ao deletar módulo:", error);
-      alert("Erro ao deletar módulo. Por favor, tente novamente.");
+      alert("Erro ao deletar módulo. Por favor, tente novamente. Obs: Não é possível deletar módulo que contenha uma prova");
     }
   };
 

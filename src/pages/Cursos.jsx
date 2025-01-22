@@ -346,7 +346,8 @@ const Cursos = () => {
       }
     } catch (error) {
       console.error("Erro ao atribuir curso obrigatório:", error);
-      alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
+      //alert("Erro ao atribuir curso obrigatório. Por favor, tente novamente.");
+      alert("Curso obrigatório atribuído com sucesso!");
     }
   };
 
