@@ -465,24 +465,30 @@ cursosRouter.get("/api/course/:id/aulas", async (req, res) => {
 });
 
 cursosRouter.delete("/api/aula/:id", async (req, res) => {
-  const { nro_aula } = req.params;
+  const { id } = req.params;
 
   try {
     const result = await pool.query(
       "DELETE FROM educ_system.aulas WHERE nro_aula = $1 RETURNING *",
-      [nro_aula]
+      [id]
     );
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Aula não encontrada" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Aula deletada com sucesso", aula: result.rows[0] });
+    // Retorna a resposta com sucesso e os dados da aula deletada
+    res.status(200).json({
+      message: "Aula deletada com sucesso",
+      aula: result.rows[0],
+    });
   } catch (error) {
     console.error("Erro ao deletar aula:", error);
-    res.status(500).json({ message: "Erro interno do servidor" });
+    // Você pode logar o erro específico para depuração, e talvez enviar uma mensagem mais detalhada, se apropriado.
+    res.status(500).json({
+      message: "Erro interno do servidor",
+      error: error.message, // Envia a mensagem de erro para depuração, se necessário
+    });
   }
 });
 
