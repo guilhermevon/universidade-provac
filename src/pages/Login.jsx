@@ -166,10 +166,33 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [formType, setFormType] = useState("login");
   const [departamentos, setDepartamentos] = useState([]);
+  const [roleOptions, setRoleOptions] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
   const [selectedFuncao, setSelectedFuncao] = useState(null);
   const [funcoesFiltradas, setFuncoesFiltradas] = useState([]);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const response = await axios.get(
+          "http://192.168.0.232:9310/users/role",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRoleOptions(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar Role:", error);
+        setRoleOptions([]);
+      }
+    };
+
+    fetchRole();
+  }, []);
 
   // Fetch Departamentos
   useEffect(() => {
@@ -365,6 +388,27 @@ const LoginPage = () => {
                 <FormField>
                   <Label htmlFor="matricula">Matrícula</Label>
                   <Input id="matricula" name="matricula" type="text" required />
+                </FormField>
+                <FormField>
+                  <Select
+                    id="role"
+                    name="role"
+                    value={roleOptions || ""}
+                    onChange={(e) => {
+                      const novorole = e.target.value;
+                      setRoleOptions(novorole);
+                      setSelectedFuncao(null); // Limpa a função quando o role é alterado
+                    }}
+                  >
+                    <option value="">Selecione um role</option>
+                    {Array.from(new Set(role.map((role) => role))).map(
+                      (role, index) => (
+                        <option key={index} value={role}>
+                          {role}
+                        </option>
+                      )
+                    )}
+                  </Select>
                 </FormField>
                 <FormField>
                   <Label htmlFor="foto">Foto</Label>

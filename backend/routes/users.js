@@ -110,7 +110,15 @@ userRouter.post("/login", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, usuario: user.usuario, email: user.email, role: user.role, funcao: user.funcao, total_pontos: user.total_pontos, dp: user.dp},
+      user: {
+        id: user.id,
+        usuario: user.usuario,
+        email: user.email,
+        role: user.role,
+        funcao: user.funcao,
+        total_pontos: user.total_pontos,
+        dp: user.dp,
+      },
     });
   } catch (err) {
     console.error("Erro ao consultar o banco de dados:", err.stack);
@@ -122,6 +130,22 @@ userRouter.post("/login", async (req, res) => {
 userRouter.get("/departamento", async (req, res) => {
   try {
     const result = await pool.query("SELECT dp FROM educ_system.educ_users"); // Usando pool.query diretamente
+
+    if (result.rows.length > 0) {
+      return res.json(result.rows);
+    } else {
+      return res.status(404).json({ message: "Nenhum usuário encontrado." });
+    }
+  } catch (err) {
+    console.error("Erro ao consultar o banco de dados:", err.stack);
+    res.status(500).send("Erro ao consultar o banco de dados");
+  }
+});
+
+// Rota GET para retornar role de todos os usuários
+userRouter.get("/role", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT role FROM educ_system.educ_users"); // Usando pool.query diretamente
 
     if (result.rows.length > 0) {
       return res.json(result.rows);

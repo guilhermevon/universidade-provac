@@ -183,6 +183,36 @@ const RatingButton = styled.button`
   }
 `;
 
+const ExamContent = styled.div`
+  padding: 16px;
+  color: white;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+`;
+
+const ExamTitle = styled.h2`
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #f4f4f4;
+`;
+
+const ExamDescription = styled.p`
+  margin: 0 0 16px;
+  font-size: 16px;
+`;
+
+const ExamDuration = styled.p`
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #aaa;
+`;
+
+const ExamMinGrade = styled.p`
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #aaa;
+`;
+
 const Course = () => {
   const { id } = useParams();
   const [modules, setModules] = useState({});
@@ -214,6 +244,7 @@ const Course = () => {
           `http://192.168.0.232:9310/cursos/api/course/${id}/provas`
         );
         setExams(responseExams.data);
+        console.log("exams", responseExams.data);
       } catch (error) {
         console.error("Erro ao buscar informações do curso:", error);
         // Se ocorrer um erro ao buscar as provas, ainda assim continue com a exibição do curso
@@ -303,6 +334,24 @@ const Course = () => {
                   Selecione uma aula ou prova para começar
                 </span>
               </div>
+            )}
+            {selectedExam && (
+              <ExamContent>
+                <ExamTitle>{selectedExam.titulo}</ExamTitle>
+                <ExamDescription>{selectedExam.descricao}</ExamDescription>
+                <ExamDuration>
+                  Duração: {selectedExam.duracao} minutos
+                </ExamDuration>
+                <ExamMinGrade>
+                  Nota mínima para aprovação:{" "}
+                  {selectedExam.nota_minima_aprovacao}
+                </ExamMinGrade>
+                <ExamMinGrade>
+                  questao
+                  {exams.questoes}
+                </ExamMinGrade>
+                {/* Adicione aqui qualquer outro dado relevante da prova */}
+              </ExamContent>
             )}
           </VideoWrapper>
           <ListWrapper>
