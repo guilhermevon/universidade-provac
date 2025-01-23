@@ -169,6 +169,7 @@ const LoginPage = () => {
   const [roleOptions, setRoleOptions] = useState([]);
   const [funcoes, setFuncoes] = useState([]);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [selectedFuncao, setSelectedFuncao] = useState(null);
   const [funcoesFiltradas, setFuncoesFiltradas] = useState([]);
 
@@ -184,6 +185,7 @@ const LoginPage = () => {
             },
           }
         );
+        console.log("rolesssss", response.data);
         setRoleOptions(response.data);
       } catch (error) {
         console.error("Erro ao buscar Role:", error);
@@ -390,24 +392,26 @@ const LoginPage = () => {
                   <Input id="matricula" name="matricula" type="text" required />
                 </FormField>
                 <FormField>
+                  <Label htmlFor="role">Role</Label>
                   <Select
                     id="role"
                     name="role"
-                    value={roleOptions || ""}
+                    text="Role"
+                    value={selectedRole || ""}
                     onChange={(e) => {
-                      const novorole = e.target.value;
-                      setRoleOptions(novorole);
-                      setSelectedFuncao(null); // Limpa a função quando o role é alterado
+                      const novoRole = e.target.value;
+                      setSelectedRole(novoRole);
                     }}
                   >
                     <option value="">Selecione um role</option>
-                    {Array.from(new Set(role.map((role) => role))).map(
-                      (role, index) => (
-                        <option key={index} value={role}>
-                          {role}
+                    <option value="Gestor">Gestor</option>
+                    <option value="user">User</option>
+                    {/*Array.isArray(roleOptions) &&
+                      roleOptions.map((role, index) => (
+                        <option key={index} value={roleOptions}>
+                          {roleOptions}
                         </option>
-                      )
-                    )}
+                      ))*/}
                   </Select>
                 </FormField>
                 <FormField>

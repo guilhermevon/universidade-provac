@@ -159,13 +159,13 @@ userRouter.get("/role", async (req, res) => {
 });
 
 userRouter.post("/register", async (req, res) => {
-  const { matricula, senha, usuario, email, funcao, dp, foto } = req.body;
+  const { matricula, senha, usuario, email, funcao, dp, foto, role } = req.body;
 
   console.log("Dados recebidos no registro:", req.body);
 
   try {
     // Verifica se todos os campos obrigatórios foram preenchidos
-    if (!matricula || !senha || !usuario || !email || !funcao || !dp) {
+    if (!matricula || !senha || !usuario || !email || !funcao || !dp || !role) {
       return res
         .status(400)
         .json({ error: "Preencha todos os campos obrigatórios." });
@@ -194,8 +194,8 @@ userRouter.post("/register", async (req, res) => {
     // Query para inserir o usuário no banco de dados sem hash
     const query = `
       INSERT INTO educ_system.educ_users 
-      (matricula, senha, usuario, email, funcao, dp, foto)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      (matricula, senha, usuario, email, funcao, dp, foto, role)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
 
     await pool.query(query, [
@@ -206,6 +206,7 @@ userRouter.post("/register", async (req, res) => {
       funcao,
       dp,
       foto || null,
+      role,
     ]);
 
     res.status(201).json({ message: "Usuário registrado com sucesso." });
