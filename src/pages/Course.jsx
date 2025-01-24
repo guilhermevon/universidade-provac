@@ -213,6 +213,63 @@ const ExamMinGrade = styled.p`
   color: #aaa;
 `;
 
+const QuestionSection = styled.div`
+  margin-top: 20px;
+`;
+
+const QuestionCard = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+`;
+
+const QuestionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+`;
+
+const QuestionNumber = styled.h3`
+  font-size: 18px;
+  color: #333;
+`;
+
+const QuestionPoints = styled.span`
+  font-size: 14px;
+  color: #666;
+`;
+
+const QuestionText = styled.p`
+  font-size: 16px;
+  color: #444;
+`;
+
+const AlternativesList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+`;
+
+const AlternativeItem = styled.li`
+  margin-bottom: 10px;
+`;
+
+const AlternativeLabel = styled.label`
+  margin-left: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+`;
+
+const NoQuestionsMessage = styled.p`
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 20px;
+`;
+
 const Course = () => {
   const { id } = useParams();
   const [modules, setModules] = useState({});
@@ -245,6 +302,7 @@ const Course = () => {
         );
         setExams(responseExams.data);
         console.log("exams", responseExams.data);
+        console.log("exmassssss", exams);
       } catch (error) {
         console.error("Erro ao buscar informações do curso:", error);
         // Se ocorrer um erro ao buscar as provas, ainda assim continue com a exibição do curso
@@ -304,6 +362,11 @@ const Course = () => {
     }
   };
 
+  const enviarRespostas = () => {
+    alert("Suas respostas foram enviadas com sucesso!");
+    window.location.reload();
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -327,7 +390,7 @@ const Course = () => {
                 />
               </ReactPlayerWrapper>
             ) : selectedExam ? (
-              <div>Exibir conteúdo da prova aqui</div>
+              <div></div>
             ) : (
               <div>
                 <span style={{ color: "white" }}>
@@ -346,11 +409,45 @@ const Course = () => {
                   Nota mínima para aprovação:{" "}
                   {selectedExam.nota_minima_aprovacao}
                 </ExamMinGrade>
-                <ExamMinGrade>
-                  questao
-                  {exams.questoes}
-                </ExamMinGrade>
-                {/* Adicione aqui qualquer outro dado relevante da prova */}
+
+                {/* Exibindo as questões */}
+                <QuestionSection>
+                  {selectedExam.questoes && selectedExam.questoes.length > 0 ? (
+                    selectedExam.questoes.map((questao, index) => (
+                      <QuestionCard key={questao.id_questao}>
+                        <QuestionHeader>
+                          <QuestionNumber>Questão {index + 1}</QuestionNumber>
+                          <QuestionPoints>
+                            {questao.pontuacao} pontos
+                          </QuestionPoints>
+                        </QuestionHeader>
+                        <QuestionText>{questao.enunciado}</QuestionText>
+                        <AlternativesList>
+                          {questao.alternativas.map((alternativa) => (
+                            <AlternativeItem key={alternativa.id_alternativa}>
+                              <input
+                                type="radio"
+                                name={`questao-${questao.id_questao}`}
+                                id={`alternativa-${alternativa.id_alternativa}`}
+                                value={alternativa.id_alternativa}
+                              />
+                              <AlternativeLabel
+                                htmlFor={`alternativa-${alternativa.id_alternativa}`}
+                              >
+                                {alternativa.texto_alternativa}
+                              </AlternativeLabel>
+                            </AlternativeItem>
+                          ))}
+                        </AlternativesList>
+                      </QuestionCard>
+                    ))
+                  ) : (
+                    <NoQuestionsMessage>
+                      Essa prova ainda não possui questões.
+                    </NoQuestionsMessage>
+                  )}
+                  <button onClick={enviarRespostas}>Enviar</button>
+                </QuestionSection>
               </ExamContent>
             )}
           </VideoWrapper>

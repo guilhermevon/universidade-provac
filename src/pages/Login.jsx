@@ -303,6 +303,7 @@ const LoginPage = () => {
         usuario: formData.get("usuario"),
         dp: formData.get("departamento"), // Altere para 'dp'
         funcao: formData.get("funcao"),
+        role: formData.get("role"),
         matricula: formData.get("matricula"),
         email: formData.get("email"),
         senha: formData.get("password"),
